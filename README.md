@@ -1,155 +1,84 @@
-🎙️ AI Interpreter (AI 口译实战与评测平台)
+### 🧱 核心模块与架构解构
 
-🚀 本项目是由六人小组基于极限敏捷开发模式（5周极速交付）打造的 AI 口译训练平台。结合了大语言模型（LLM）、语音识别（STT）和语音合成（TTS）技术，旨在为用户提供沉浸式的中英口译训练与 AI 智能打分体验。
+为了让 6 个人并行开发互不干扰，我们将项目拆分为 5 个独立的 Python 脚本模块，最后由你（组长）在 `main.py` 中进行拼装。
 
-📑 目录 (Table of Contents)
+1. **UI & 路由 (`main.py`)**: 组长负责，用 `Gradio Blocks` 搭建三大 Tab（AI口译、实战演练、学习记录）。
+2. **语音转换引擎 (`audio_engine.py`)**: 负责 STT（语音转文字）和 TTS（文字转语音）。
+3. **翻译引擎 (`translate_engine.py`)**: 负责调用 LLM 进行纯文本的中英互译。
+4. **AI 裁判引擎 (`scoring_engine.py`)**: 核心难点。由于大模型听不到声音，我们要**用 ASR 的识别结果来“欺骗” LLM 进行打分**。
+5. **数据中心 (`data_manager.py`)**: 负责读写素材库（JSON 格式）和用户的学习记录（CSV 或 SQLite）。
 
-✨ 核心功能
+---
 
-🛠️ 技术栈
+### 👥 六人任务分配表 (每人每周专注一项)
 
-👥 团队分工 & 模块结构
+| 队员 | 角色/职责 | 核心交付物 | 建议技术 |
+| --- | --- | --- | --- |
+| **你 (组长)** | **架构师 & UI 集成** | 建立 GitHub，分配任务，编写 `main.py` 整合所有人代码。 | `Gradio.Blocks`, Git |
+| **Paul** | **语音工程师** | 编写 `audio_engine.py`。实现音频文件输入，输出文字；及文字输入，输出音频文件。 | 阿里 DashScope, `edge-tts` |
+| **Sara** | **翻译与素材库** | 编写 `translate_engine.py` 进行高质翻译；在 `data_manager.py` 中写一个随机抽取素材的函数。 | 智谱 GLM-4 / DeepSeek V3, `json` |
+| **David** | **Prompt 工程师 (裁判)** | 编写 `scoring_engine.py`。设计一段绝佳的 Prompt，让 LLM 根据原句和用户语音识别出的文本，给出 9 分制打分和评语。 | LLM Prompt Engineering |
+| **Meg** | **数据库工程师** | 编写 `data_manager.py` 里的记录读写功能。把用户的每次练习、得分存入文件，并能读取展示。 | `pandas` 或 `sqlite3` |
+| **队员 6** | **测试与云端部署** | 负责跑测试，找出报错（如没说话就提交导致的崩溃），并在最后一周部署到云端公网。 | ModelScope 创空间 / HuggingFace |
 
-🚀 快速启动指南 (Quick Start)
+---
 
-🤝 开发与协作规范 (必读)
+### 🗓️ 5 周极速开发流程 (每周 30-60 min)
 
-✨ 核心功能
+#### **第 1 周：基础设施建设与 API 跑通 (Git Init)**
 
-🔄 极速双向翻译 (AI 翻译机)
+* **组长：** 在 GitHub 上新建仓库，创建好上述的 5 个 `.py` 空文件。写好 `README.md`，规定大家只在自己的文件里写代码。
+* **全员：** 把代码 `git clone` 到本地。各自去申请负责模块的 API Key（阿里灵积、智谱等）。
+* **目标：** 每个人在本地能用 Python 写一个最简单的 `print("hello")` 并成功 `git push` 到仓库。
 
-支持文字输入或语音录入。
+#### **第 2 周：底层原子函数开发 (Core Functions)**
 
-自动识别并输出地道的中文/英文翻译文本。
+这是最关键的并行开发周。每个人只需要专注自己文件里的函数，**不要管界面**。
 
-自动生成目标语言的高质量语音播报。
+* **Paul:** 完成 `stt(audio_path)` 和 `tts(text)`。
+* **Sara:** 完成 `translate(text, target_lang)` 和 `get_random_material()`。
+* **David:** 完成打分逻辑 `evaluate_translation(original_text, user_audio_text)`，返回 `{"发音":3, "流畅":2, "准确":3, "评语":"..."}`。
+* **Meg:** 完成 `save_record(data_dict)` 和 `get_all_records()`。
 
-🤺 实战演练与 AI 裁判
+#### **第 3 周：Gradio UI 骨架搭建 (UI Prototype)**
 
-🎲 素材拉取：内置 materials.json 素材库，随机抽取不同难度的中英文段落进行训练。
+* **组长主导：** 运用 Gradio Blocks 搭建界面。这周暂不连接真实的后台函数，只做界面布局。
+* **Tab 1 - AI 翻译机：** 录音组件 -> 文本框(识别) -> 文本框(翻译) -> 音频播放器。
+* **Tab 2 - 实战演练：** 点击“抽取素材” -> 显示英文 -> 录制我的翻译 -> 显示我的文字 -> 显示 3 维打分及雷达图。
+* **Tab 3 - 学习记录：** 一个 `gr.Dataframe` 表格展示历史。
 
-🎤 实机录音：用户针对抽取的英文原句，录制自己的中文口译音频。
 
-⚖️ 多维度智能评分：
 
-发音标准性（3分）：识别同音错字与发音缺陷。
+#### **第 4 周：全面拼装与大联调 (Integration)**
 
-语言流畅性（3分）：检测卡顿、重复与冗余词汇。
+* **全员操作：** 组长把组员在第 2 周写好的原子函数，导入到第 3 周写好的 UI 骨架中。
+* **示例逻辑 (实战演练 Tab)：**
+用户点击提交录音 -> `Paul的stt` 获取文字 -> `David的打分函数` 分析 -> `Meg的保存函数` 记录 -> Gradio 界面更新得分。
+* 大家开始互相测试，捕捉 Bug（比如中文乱码、API 超时）。
 
-翻译准确性（3分）：评估语义还原度。
+#### **第 5 周：打磨与一键部署 (Deployment)**
 
-📝 综合点评：AI 根据具体表现生成针对性的改进建议。
+* **队员 6 主导：** 把写好的代码传到 ModelScope 创空间 或 HuggingFace Spaces。这些平台原生支持 Gradio，写一个 `requirements.txt` 就能一键部署，免费获得一个公网 URL 给老师看。
+* **全员：** 补充素材库的 JSON 数据，优化页面的提示语，准备答辩或录制 Demo 视频。
 
-📈 学习记录数据看板
+---
 
-自动保存用户的每次实战录音打分数据至本地 records.csv。
+### 💡 核心难点攻克：如何让 LLM 给发音和流畅度打分？
 
-提供可视化的数据表格，随时追踪口译能力的成长轨迹。
+由于大模型（如 GLM-4）听不到用户的真实发音，David 在做 `scoring_engine.py` 时，需要利用**语音识别（STT）的容错特性**。
 
-🛠️ 技术栈
+如果用户发音不准或不流畅，STT 会识别出同音错字、结巴（如“我我我”）、或者断句奇怪的标点。
+David 的 Prompt 可以这样设计：
 
-本项目采用“低代码、高产出”的纯 Python 架构，极具轻量化：
+> "你是一个严格的口译老师。目标英文原句是：[A]。用户录音后，语音识别器得出的文本是：[B]。
+> 请根据 [B] 进行打分（满分9分）：
+> 1. 准确性(3分)：[B] 的意思是否准确传达了 [A]？
+> 2. 流畅性(3分)：[B] 中是否有重复词、口语化卡顿（如‘那个’、‘额’）？
+> 3. 发音标准性(3分)：[B] 中是否出现了明显的由于发音不准导致的同音错别字？
+> 请返回 JSON 格式的打分结果和简短评语。"
+> 
+> 
 
-前端与路由管理: Gradio (纯 Python 渲染交互界面与音视频流)
+这套架构能确保每个人都在自己的“安全区”里发挥，即便有人进度慢了，组长也能迅速接管某个独立函数，极大地降低了项目烂尾的风险。
 
-语音转文本 (STT): 阿里灵积 DashScope (Paraformer API)
-
-文本翻译与裁判 (LLM): 智谱 GLM-4 / DeepSeek API
-
-文本转语音 (TTS): edge-tts (微软官方引擎，自然流畅)
-
-数据持久化: JSON (素材库) + CSV (学习记录)
-
-👥 团队分工 & 模块结构
-
-为保证每周 30-60 分钟的高效协同，代码按模块进行物理隔离。
-
-模块文件
-
-负责人
-
-核心职责
-
-main.py
-
-组长
-
-UI 组装、路由配置、Gradio Blocks 架构集成
-
-audio_engine.py
-
-Paul
-
-接入 STT API (语音转字) 与 TTS (字转语音) 功能
-
-translate_engine.py
-
-Sara
-
-接入 LLM 翻译接口，编写高质量翻译 Prompt
-
-scoring_engine.py
-
-David
-
-核心裁判逻辑，校验 STT 文本，输出 9 分制 JSON
-
-data_manager.py
-
-Meg
-
-读写 materials.json 和 records.csv
-
-运维与测试部署
-
-队员 6
-
-全局 Bug 追踪，ModelScope 创空间云端部署
-
-🚀 快速启动指南 (Quick Start)
-
-1. 克隆仓库
-
-git clone https://github.com/你的用户名/ai-interpreter.git
-cd ai-interpreter
-
-
-2. 安装依赖环境
-
-建议使用 Python 3.9+。
-
-pip install gradio dashscope zhipuai edge-tts pandas
-
-
-3. 配置 API 密钥
-
-在项目根目录新建一个 .env 文件（请勿提交到 Git），填入你们申请到的 API Keys：
-
-DASHSCOPE_API_KEY=你的阿里灵积API密钥
-ZHIPU_API_KEY=你的智谱API密钥
-
-
-4. 初始化数据文件
-
-确保根目录下存在以下两个文件（如果 data_manager.py 已运行则自动生成）：
-
-materials.json（内含至少一条测试数据）
-
-records.csv
-
-5. 运行项目
-
-python main.py
-
-
-终端会输出一个本地链接（如 http://127.0.0.1:7860），在浏览器中打开即可开始体验！
-
-🤝 开发与协作规范 (必读)
-
-绝对隔离：请只修改你负责的 .py 文件，不要碰别人的文件，更不要直接修改 main.py（除非你是组长）。
-
-及时提交：每次完成一个小函数的测试后，立刻 git add . -> git commit -m "功能描述" -> git push。
-
-遇到报错：如果你的模块在本地跑不通，可以先写一个 return 假数据（Mock 数据）的兜底方案，不要阻塞组长在 main.py 里的集成进度。
-
-“Done is better than perfect. 先跑通，再完美！”
+在准备数据库管理（`data_manager.py`）时，你们更倾向于使用最简单的本地 CSV/JSON 文件来存储学习记录，还是希望引入轻量级的 SQLite 关系型数据库来进行更规范的管理？
