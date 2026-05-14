@@ -1,5 +1,6 @@
 ### 🧱 核心模块与架构解构
 注意：环境采用venv虚拟环境
+激活指令：.\venv\Scripts\activate
 
 为了让 6 个人并行开发互不干扰，我们将项目拆分为 5 个独立的 Python 脚本模块，最后由你（组长）在 `main.py` 中进行拼装。
 
@@ -16,7 +17,7 @@
 | 队员 | 角色/职责 | 核心交付物 | 建议技术 |
 | --- | --- | --- | --- |
 | **你 (组长)** | **架构师 & UI 集成** | 建立 GitHub，分配任务，编写 `main.py` 整合所有人代码。 | `Gradio.Blocks`, Git |
-| **Paul** | **语音工程师** | 编写 `audio_engine.py`。实现音频文件输入，输出文字；及文字输入，输出音频文件。 | 阿里 DashScope, `edge-tts` |
+| **Paul** | **语音工程师** | 编写 `audio_engine.py`。实现音频文件/文字输入，输出文字和音频文件。 | 阿里 DashScope, `edge-tts` |
 | **Sara** | **翻译与素材库** | 编写 `translate_engine.py` 进行高质翻译；在 `data_manager.py` 中写一个随机抽取素材的函数。 | 智谱 GLM-4 / DeepSeek V3, `json` |
 | **David** | **Prompt 工程师 (裁判)** | 编写 `scoring_engine.py`。设计一段绝佳的 Prompt，让 LLM 根据原句和用户语音识别出的文本，给出 9 分制打分和评语。 | LLM Prompt Engineering |
 | **Meg** | **数据库工程师** | 编写 `data_manager.py` 里的记录读写功能。把用户的每次练习、得分存入文件，并能读取展示。 | `pandas` 或 `sqlite3` |
