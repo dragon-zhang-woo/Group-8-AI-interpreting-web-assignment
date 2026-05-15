@@ -24,8 +24,8 @@ load_dotenv()
 # 设置UTF-8编码支持
 if sys.platform == 'win32':
     import codecs
-    if hasattr(sys.stdout, 'buffer'):
-        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+    # 不要在 Windows 上重新包装 stdout，会导致 I/O 错误
+    os.environ['PYTHONIOENCODING'] = 'utf-8'
 
 # 创建 Flask 应用
 app = Flask(__name__)
