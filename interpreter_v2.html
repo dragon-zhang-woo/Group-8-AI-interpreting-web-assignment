@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 口译训练助手 V2</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            max-width: 950px; 
+            margin: 0 auto; 
+            padding: 30px 20px; 
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        h1 { text-align: center; color: #2c3e50; }
+        
+        .settings {
+            text-align: center;
+            margin-bottom: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        select {
+            padding: 8px 12px;
+            font-size: 16px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            margin: 0 10px;
+        }
+        
+        .controls { text-align: center; margin-bottom: 20px; }
+        button { 
+            padding: 12px 24px; 
+            font-size: 16px; 
+            margin: 0 10px; 
+            cursor: pointer; 
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button:active { transform: translateY(2px); box-shadow: none; }
+        
+        #startBtn { background-color: #27ae60; color: white; }
+        #startBtn:hover { background-color: #219653; }
+        #startBtn:disabled { background-color: #95a5a6; cursor: not-allowed; transform: none; box-shadow: none;}
+        
+        #stopBtn { background-color: #e74c3c; color: white; }
+        #stopBtn:hover { background-color: #c0392b; }
+        #stopBtn:disabled { background-color: #95a5a6; cursor: not-allowed; transform: none; box-shadow: none;}
+
+        #clearBtn { background-color: #f39c12; color: white; }
+        #clearBtn:hover { background-color: #d68910; }
+
+        .container { display: flex; gap: 20px; }
+        .box { 
+            flex: 1; 
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        h3 { margin-top: 0; color: #34495e; font-size: 18px; display: flex; justify-content: space-between; align-items: center;}
+        textarea { 
+            width: 100%; 
+            height: 400px; 
+            font-size: 16px; 
+            padding: 12px; 
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical; 
+            box-sizing: border-box;
+            line-height: 1.6;
+            background-color: #fafafa;
+        }
+        .status { text-align: center; margin-top: 15px; font-weight: bold; font-size: 15px; color: #7f8c8d; }
+    </style>
+</head>
+<body>
+    <h1>AI 口译训练助手 V2</h1>
+    
+    <div class="settings">
+        <label for="sourceLang">源语言 (你说的话): </label>
+        <select id="sourceLang">
+            <option value="zh">简体中文</option>
+            <option value="en">English (英语)</option>
+            <option value="ja">日本語 (日语)</option>
+        </select>
+        
+        <span style="font-weight: bold; margin: 0 10px; color: #7f8c8d;">➔</span>
+        
+        <label for="targetLang">目标语言 (翻译为): </label>
+        <select id="targetLang">
+            <option value="en">English (英语)</option>
+            <option value="zh">简体中文</option>
+            <option value="ja">日本語 (日语)</option>
+        </select>
+    </div>
+
+    <div class="controls">
+        <button id="startBtn">开始录音</button>
+        <button id="stopBtn" disabled>停止录音</button>
+        <button id="clearBtn">清空记录</button>
+        <div id="statusText" class="status">准备就绪</div>
+    </div>
+
+    <div class="container">
+        <div class="box">
+            <h3 id="sourceTitle">原文记录</h3>
+            <textarea id="originalText" readonly placeholder="这里将实时保留并显示您的多次语音记录..."></textarea>
+        </div>
+        <div class="box">
+            <h3 id="targetTitle">参考译文</h3>
+            <textarea id="translatedText" readonly placeholder="这里将保留对应的翻译结果..."></textarea>
+        </div>
+    </div>
+
+    <script>
+        // 浏览器 API 兼容处理
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        
+        if (!SpeechRecognition) {
+            alert("抱歉，您的浏览器不支持语音识别功能。请使用最新版本的 Google Chrome 或 Microsoft Edge。");
+        } else {
+            const recognition = new SpeechRecognition();
+            recognition.continuous = true; 
+            recognition.interimResults = false; 
+
+            // DOM 元素绑定
+            const startBtn = document.getElementById('startBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const originalTextArea = document.getElementById('originalText');
+            const translatedTextArea = document.getElementById('translatedText');
+            const statusText = document.getElementById('statusText');
+            const sourceLangSelect = document.getElementById('sourceLang');
+            const targetLangSelect = document.getElementById('targetLang');
+
+            // 语言代码映射 (用于语音识别)
+            const speechLangMap = {
+                'zh': 'zh-CN',
+                'en': 'en-US',
+                'ja': 'ja-JP'
+            };
+
+            let recordCounter = 1; // 记录对话轮数
+
+            // 更新标题显示
+            function updateTitles() {
+                const sourceText = sourceLangSelect.options[sourceLangSelect.selectedIndex].text;
+                const targetText = targetLangSelect.options[targetLangSelect.selectedIndex].text;
+                document.getElementById('sourceTitle').textContent = `原文 (${sourceText})`;
+                document.getElementById('targetTitle').textContent = `译文 (${targetText})`;
+            }
+
+            // 监听语言选择改变
+            sourceLangSelect.addEventListener('change', () => {
+                if (!startBtn.disabled) { 
+                    updateTitles();
+                } else {
+                    alert("请先停止当前录音再切换语言。");
+                }
+            });
+            targetLangSelect.addEventListener('change', updateTitles);
+            
+            // 初始化标题
+            updateTitles();
+
+            // 开始按钮
+            startBtn.onclick = () => {
+                const sourceLangCode = sourceLangSelect.value;
+                recognition.lang = speechLangMap[sourceLangCode]; // 根据下拉框设置识别语言
+                
+                try {
+                    recognition.start();
+                    startBtn.disabled = true;
+                    stopBtn.disabled = false;
+                    sourceLangSelect.disabled = true; // 录音时禁止切换语言
+                    statusText.textContent = `🎤 正在倾听 (${sourceLangSelect.options[sourceLangSelect.selectedIndex].text})...`;
+                    statusText.style.color = '#e67e22';
+                } catch (e) {
+                    console.error("启动识别失败:", e);
+                }
+            };
+
+            // 停止按钮
+            stopBtn.onclick = () => {
+                recognition.stop();
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
+                sourceLangSelect.disabled = false;
+                statusText.textContent = '录音已停止';
+                statusText.style.color = '#7f8c8d';
+            };
+
+            // 清空记录按钮
+            clearBtn.onclick = () => {
+                if (confirm("确定要清空所有原文和译文记录吗？")) {
+                    originalTextArea.value = '';
+                    translatedTextArea.value = '';
+                    recordCounter = 1;
+                }
+            };
+
+            // 格式化时间戳
+            function getTimeString() {
+                const now = new Date();
+                return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+            }
+
+            // 语音识别结果处理
+            recognition.onresult = async (event) => {
+                let transcript = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    transcript += event.results[i][0].transcript;
+                }
+                
+                if (transcript.trim() !== '') {
+                    const sourceLang = sourceLangSelect.value;
+                    const targetLang = targetLangSelect.value;
+                    const timeStr = getTimeString();
+                    
+                    // 格式化输出文本，增加对话轮数和时间标识
+                    const originalEntry = `[${timeStr}] 第 ${recordCounter} 句:\n${transcript}\n\n`;
+                    originalTextArea.value += originalEntry;
+                    originalTextArea.scrollTop = originalTextArea.scrollHeight;
+
+                    // 如果源语言和目标语言相同，直接复制
+                    if (sourceLang === targetLang) {
+                        const sameEntry = `[${timeStr}] 第 ${recordCounter} 句:\n${transcript} (无需翻译)\n\n`;
+                        translatedTextArea.value += sameEntry;
+                        translatedTextArea.scrollTop = translatedTextArea.scrollHeight;
+                        recordCounter++;
+                        return;
+                    }
+
+                    // 调用翻译
+                    statusText.textContent = '⏳ 正在翻译...';
+                    await translateText(transcript, sourceLang, targetLang, timeStr, recordCounter);
+                    
+                    recordCounter++;
+                    if(startBtn.disabled) { // 如果还在录音状态
+                        statusText.textContent = `🎤 继续倾听 (${sourceLangSelect.options[sourceLangSelect.selectedIndex].text})...`;
+                    }
+                }
+            };
+
+            recognition.onerror = (event) => {
+                console.error("语音识别错误:", event.error);
+                statusText.textContent = `⚠️ 发生错误: ${event.error}`;
+                stopBtn.click();
+            };
+
+            // 翻译接口请求
+            async function translateText(text, fromLang, toLang, timeStr, counter) {
+                try {
+                    // MyMemory API 支持的语言格式
+                    const langPair = `${fromLang}|${toLang}`;
+                    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${langPair}`;
+                    
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    
+                    let translatedEntry = `[${timeStr}] 第 ${counter} 句:\n`;
+                    
+                    if (data && data.responseData && data.responseData.translatedText) {
+                        translatedEntry += data.responseData.translatedText + '\n\n';
+                    } else {
+                        translatedEntry += "[翻译接口返回异常]\n\n";
+                    }
+                    
+                    translatedTextArea.value += translatedEntry;
+                    translatedTextArea.scrollTop = translatedTextArea.scrollHeight;
+
+                } catch (error) {
+                    console.error("翻译请求失败:", error);
+                    translatedTextArea.value += `[${timeStr}] 第 ${counter} 句:\n[网络异常，翻译失败]\n\n`;
+                }
+            }
+        }
+    </script>
+</body>
+</html>
