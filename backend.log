@@ -179,3 +179,10 @@ Press CTRL+C to quit
 127.0.0.1 - - [16/May/2026 18:08:10] "GET /api/health HTTP/1.1" 200 -
 127.0.0.1 - - [16/May/2026 18:08:34] "POST /api/speech-to-text HTTP/1.1" 200 -
 127.0.0.1 - - [16/May/2026 18:10:46] "POST /api/speech-to-text HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2026 20:18:43] "GET /api/material?difficulty=hard HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2026 20:18:48] "GET /api/material?difficulty=easy HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2026 20:19:06] "POST /api/speech-to-text HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2026 20:19:16] "POST /api/speech-to-text HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2026 20:19:16] "POST /api/speech-to-text HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2026 20:19:17] "POST /api/speech-to-text HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2026 20:19:19] "POST /api/speech-to-text HTTP/1.1" 200 -
