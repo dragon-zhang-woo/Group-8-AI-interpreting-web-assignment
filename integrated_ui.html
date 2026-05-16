@@ -538,9 +538,9 @@
 
         <!-- 标签页 -->
         <div class="tabs">
-            <button class="tab-button active" onclick="switchTab('translator')">📖 AI 翻译机</button>
-            <button class="tab-button" onclick="switchTab('practice')">💪 实战演练</button>
-            <button class="tab-button" onclick="switchTab('records')">📊 学习记录</button>
+            <button class="tab-button active" data-tab="translator" onclick="switchTab('translator')">📖 AI 翻译机</button>
+            <button class="tab-button" data-tab="practice" onclick="switchTab('practice')">💪 实战演练</button>
+            <button class="tab-button" data-tab="records" onclick="switchTab('records')">📊 学习记录</button>
         </div>
 
         <!-- 内容区 -->
@@ -555,16 +555,16 @@
                     <div class="form-group">
                         <label>选择翻译方向</label>
                         <div class="language-selector">
-                            <button class="language-btn active" onclick="setTranslationMode('en2zh')">🇬🇧 英 → 中</button>
-                            <button class="language-btn" onclick="setTranslationMode('zh2en')">🇨🇳 中 → 英</button>
+                            <button class="language-btn active" data-mode="en2zh" onclick="setTranslationMode('en2zh')">🇬🇧 英 → 中</button>
+                            <button class="language-btn" data-mode="zh2en" onclick="setTranslationMode('zh2en')">🇨🇳 中 → 英</button>
                         </div>
                     </div>
 
                     <!-- 输入方式选择 -->
                     <div class="form-group">
                         <div class="input-mode-tabs">
-                            <button class="input-tab-btn active" onclick="switchInputMode('text')">📝 文本输入</button>
-                            <button class="input-tab-btn" onclick="switchInputMode('audio')">🎤 语音输入</button>
+                            <button class="input-tab-btn active" data-input="text" onclick="switchInputMode('text')">📝 文本输入</button>
+                            <button class="input-tab-btn" data-input="audio" onclick="switchInputMode('audio')">🎤 语音输入</button>
                         </div>
                     </div>
 
@@ -776,6 +776,8 @@
         let practiceRecordingStartTime = null;
         let practiceRecordingInterval = null;
 
+        let currentRecords = [];  // 当前加载的记录缓存
+
         // ============================================
         // 标签页切换
         // ============================================
@@ -787,7 +789,8 @@
             buttons.forEach(b => b.classList.remove('active'));
 
             document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
+            const activeBtn = document.querySelector(`.tab-button[data-tab="${tabName}"]`);
+            if (activeBtn) activeBtn.classList.add('active');
 
             if (tabName === 'records') {
                 refreshRecords();
@@ -801,7 +804,8 @@
             currentMode = mode;
             const buttons = document.querySelectorAll('.language-btn');
             buttons.forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
+            const activeBtn = document.querySelector(`.language-btn[data-mode="${mode}"]`);
+            if (activeBtn) activeBtn.classList.add('active');
             showStatus('已切换翻译方向', 'info');
         }
 
@@ -815,7 +819,8 @@
             buttons.forEach(b => b.classList.remove('active'));
             methods.forEach(m => m.classList.remove('active'));
 
-            event.target.classList.add('active');
+            const activeBtn = document.querySelector(`.input-tab-btn[data-input="${mode}"]`);
+            if (activeBtn) activeBtn.classList.add('active');
             if (mode === 'text') {
                 document.getElementById('textInputMode').classList.add('active');
             } else {
@@ -904,10 +909,15 @@
             showStatus('⚠️ 所有翻译服务均不可用，请检查网络连接', 'error');
         }
 
+        let lastTranslation = { text: '', language: '' };
+
         function displayTranslationResult(original, translated) {
             const resultDiv = document.getElementById('translationResult');
             const targetLang = currentMode === 'en2zh' ? 'zh-CN' : 'en-US';
-            
+
+            lastTranslation.text = translated;
+            lastTranslation.language = targetLang;
+
             resultDiv.innerHTML = `
                 <div class="result-card success">
                     <div class="output-label">📝 原文</div>
@@ -915,13 +925,17 @@
                     <div class="output-label" style="margin-top: 15px;">🌍 翻译结果</div>
                     <div class="output-text">${escapeHtml(translated)}</div>
                     <div class="audio-controls">
-                        <button onclick="playAudio('${escapeHtml(translated)}', '${targetLang}')">🔊 播放翻译</button>
-                        <button onclick="downloadAudio('${escapeHtml(translated)}', '${targetLang}')" class="button-secondary">⬇️ 下载音频</button>
-                        <button onclick="copyToClipboard('${escapeHtml(translated)}')" class="button-secondary">📋 复制</button>
+                        <button onclick="playLastTranslation()">🔊 播放翻译</button>
+                        <button onclick="downloadLastTranslation()" class="button-secondary">⬇️ 下载音频</button>
+                        <button onclick="copyLastTranslation()" class="button-secondary">📋 复制</button>
                     </div>
                 </div>
             `;
         }
+
+        function playLastTranslation() { playAudio(lastTranslation.text, lastTranslation.language); }
+        function downloadLastTranslation() { downloadAudio(lastTranslation.text, lastTranslation.language); }
+        function copyLastTranslation() { copyToClipboard(lastTranslation.text); }
 
         // ============================================
         // 语音识别和输出
@@ -1080,6 +1094,30 @@
         }
 
         async function playAudio(text, language) {
+            // 优先尝试后端 TTS 以获得更好音质
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000);
+                const response = await fetch(`${API_BASE}/text-to-speech`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: text, language: language }),
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    const audio = new Audio(url);
+                    audio.onended = () => URL.revokeObjectURL(url);
+                    audio.play();
+                    return;
+                }
+            } catch (error) {
+                console.warn('后端 TTS 不可用，使用浏览器语音合成:', error.message);
+            }
+
+            // 回退：浏览器内置语音合成
             try {
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = language;
@@ -1117,14 +1155,20 @@
                 console.warn('后端 TTS 不可用，使用浏览器朗读替代:', error.message);
             }
 
-            // 回退：使用浏览器内置语音合成朗读（无法下载文件，但能播放）
+            // 回退：后端不可用时下载为文本文件
             try {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = language;
-                window.speechSynthesis.speak(utterance);
-                showStatus('⚠️ 离线模式下无法下载音频，已改为直接播放', 'info');
+                const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `translation_text_${Date.now()}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showStatus('⚠️ 离线模式：翻译文本已保存为 .txt 文件', 'info');
             } catch (err) {
-                showStatus('音频播放失败: ' + err.message, 'error');
+                showStatus('下载失败: ' + err.message, 'error');
             }
         }
 
@@ -1676,19 +1720,23 @@
 
         function displayRecords(records) {
             const tbody = document.getElementById('recordsTable');
-            if (records.length === 0) {
+            const cleanRows = records.filter(r => String(r[0] || '') !== '时间');
+            currentRecords = cleanRows;  // 缓存供 showDetail 使用
+
+            if (cleanRows.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #999;">暂无记录</td></tr>';
+                currentRecords = [];
                 return;
             }
 
-            tbody.innerHTML = records.map((record, index) => `
+            tbody.innerHTML = cleanRows.map((record, index) => `
                 <tr>
-                    <td>${record[0] || '-'}</td>
-                    <td>${(record[1] || '-').substring(0, 30)}...</td>
+                    <td>${escapeHtml(String(record[0] || '-'))}</td>
+                    <td>${escapeHtml(String(record[1] || '-').substring(0, 30))}...</td>
                     <td>${record[3] || '-'}</td>
                     <td>${record[4] || '-'}</td>
                     <td>${record[5] || '-'}</td>
-                    <td style="font-weight: bold; color: #667eea;">${((record[3] + record[4] + record[5]) / 3).toFixed(2)}</td>
+                    <td style="font-weight: bold; color: #667eea;">${((parseFloat(record[3]) + parseFloat(record[4]) + parseFloat(record[5])) / 3).toFixed(2)}</td>
                     <td>
                         <button onclick="showDetail(${index})" class="copy-btn">查看</button>
                     </td>
@@ -1697,15 +1745,16 @@
         }
 
         function calculateStats(records) {
-            if (records.length === 0) {
+            const cleanRows = records.filter(r => String(r[0] || '') !== '时间');
+            if (cleanRows.length === 0) {
                 document.getElementById('totalPractice').textContent = '0';
                 document.getElementById('avgScore').textContent = '0.0';
                 document.getElementById('maxScore').textContent = '0.0';
                 return;
             }
 
-            const totalPractice = records.length;
-            const scores = records.map(r => (r[3] + r[4] + r[5]) / 3);
+            const totalPractice = cleanRows.length;
+            const scores = cleanRows.map(r => (parseFloat(r[3]) + parseFloat(r[4]) + parseFloat(r[5])) / 3);
             const avgScore = (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(2);
             const maxScore = Math.max(...scores).toFixed(2);
 
@@ -1715,7 +1764,25 @@
         }
 
         function showDetail(index) {
-            // 从记录中显示详情（简化版）
+            const record = currentRecords[index];
+            if (!record) return;
+
+            const total = ((parseFloat(record[3]) + parseFloat(record[4]) + parseFloat(record[5])) / 3).toFixed(2);
+            const detailContent = document.getElementById('detailContent');
+            detailContent.innerHTML = `
+                <h3 style="margin-bottom: 15px; color: #667eea;">📋 练习详情</h3>
+                <div style="margin-bottom: 12px;"><strong>时间：</strong>${escapeHtml(String(record[0] || '-'))}</div>
+                <div style="margin-bottom: 12px;"><strong>原文：</strong><br><span style="color: #555;">${escapeHtml(String(record[1] || '-'))}</span></div>
+                <div style="margin-bottom: 12px;"><strong>你的翻译：</strong><br><span style="color: #555;">${escapeHtml(String(record[2] || '-'))}</span></div>
+                <div style="display: flex; gap: 15px; margin-bottom: 12px;">
+                    <div><strong>发音：</strong>${record[3] || '-'}</div>
+                    <div><strong>流畅：</strong>${record[4] || '-'}</div>
+                    <div><strong>准确：</strong>${record[5] || '-'}</div>
+                    <div><strong>总分：</strong><span style="color: #667eea; font-weight: bold;">${total}</span></div>
+                </div>
+                ${record[6] ? `<div style="margin-bottom: 12px; padding: 10px; background: #fff3cd; border-radius: 6px;"><strong>💡 评语：</strong>${escapeHtml(String(record[6]))}</div>` : ''}
+            `;
+
             const modal = document.getElementById('detailModal');
             modal.classList.add('show');
         }
@@ -1773,8 +1840,7 @@
         }
 
         function copyToClipboard(text) {
-            const cleanText = text.replace(/<[^>]*>/g, '').trim();
-            navigator.clipboard.writeText(cleanText).then(() => {
+            navigator.clipboard.writeText(text).then(() => {
                 showStatus('已复制到剪贴板！', 'success');
             }).catch(err => {
                 showStatus('复制失败: ' + err.message, 'error');
@@ -1792,7 +1858,38 @@
         // ============================================
         window.addEventListener('DOMContentLoaded', () => {
             console.log('📱 AI 口译练习网站已加载');
-            // 初始化
+
+            // 初始化上传区域拖拽功能
+            const uploadArea = document.getElementById('uploadArea');
+            const audioFileInput = document.getElementById('audioFile');
+            if (uploadArea && audioFileInput) {
+                uploadArea.addEventListener('click', () => audioFileInput.click());
+
+                uploadArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    uploadArea.classList.add('dragover');
+                });
+
+                uploadArea.addEventListener('dragleave', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    uploadArea.classList.remove('dragover');
+                });
+
+                uploadArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    uploadArea.classList.remove('dragover');
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        currentAudioBlob = files[0];
+                        updateFileInfo();
+                        showStatus('音频文件已加载', 'success');
+                    }
+                });
+            }
+
             showStatus('系统就绪！请开始练习', 'success');
         });
     </script>
