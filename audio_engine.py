@@ -62,7 +62,12 @@ def speech_to_text(audio_path: str, language: str = 'en') -> str:
                 return text if text else "未识别到文本内容"
             else:
                 print(f"❌ [STT] API 返回错误: {response.status_code} - {response.text}")
-                return f"识别失败 (错误代码: {response.status_code})"
+                if response.status_code == 401 or response.status_code == 403:
+                    return "API 密钥无效或已过期，请在 .env 文件中更新 DASHSCOPE_API_KEY。当前已启用离线演示模式。"
+                elif response.status_code == 404:
+                    return "语音识别服务暂时不可用（API端点不存在），已启用离线演示模式，您可以手动输入翻译文本。"
+                else:
+                    return "语音识别服务暂时不可用，已启用离线演示模式，您可以手动输入翻译文本。"
     
     except requests.exceptions.Timeout:
         print("❌ [STT] 请求超时，请检查网络连接")
