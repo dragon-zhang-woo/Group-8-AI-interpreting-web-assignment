@@ -331,28 +331,29 @@
                 </div>
 
                 <div class="form-group" style="margin-top:14px;">
-                    <label>用中文录制你的翻译</label>
+                    <label>用中文录制你的翻译（录音 + 实时识别同步进行）</label>
                     <div class="btn-group">
-                        <button id="practiceRecordBtn" onclick="startPracticeRecord()">开始录音</button>
-                        <button id="practiceStopBtn" onclick="stopPracticeRecord()" disabled class="btn-danger">停止录音</button>
+                        <button id="practiceRecordBtn" onclick="startPracticeRecord()">开始录音并识别</button>
+                        <button id="practiceStopBtn" onclick="stopPracticeRecord()" disabled class="btn-danger">停止</button>
                         <button onclick="clearPracticeRecord()" class="btn-secondary">清除</button>
                     </div>
                     <div class="timer" id="practiceTimer">00:00</div>
                     <div id="practiceRecordInfo" style="padding:8px; background:#f0f0f0; border-radius:6px; font-size:0.9em;"></div>
+                    <div id="practiceLiveText" style="padding:8px; background:#e8f5e9; border-radius:6px; font-size:0.9em; margin-top:8px; display:none;">
+                        <span style="color:#666;">实时识别中：</span><span id="practiceLiveInterim" style="color:#999; font-style:italic;"></span>
+                    </div>
                 </div>
 
-                <button onclick="recognizePracticeAudio()">识别我的翻译</button>
-
                 <div id="practiceRecognition" style="display:none; margin-top:12px;">
-                    <div class="result-card">
+                    <div class="result-card success">
                         <div class="output-label">你的翻译（识别结果）</div>
                         <div class="output-text" id="practiceRecognitionText"></div>
                     </div>
                 </div>
 
                 <div class="form-group" style="margin-top:12px;">
-                    <label>或手动输入 / 修正你的翻译</label>
-                    <textarea id="userTranslationInput" placeholder="如果语音识别不准确，可在此手动输入或修正..."></textarea>
+                    <label>手动修正翻译文本</label>
+                    <textarea id="userTranslationInput" placeholder="识别结果已自动填入，你可以在此修正..."></textarea>
                 </div>
 
                 <button onclick="submitScoring()" class="btn-success" style="margin-top:8px;">提交评分</button>
@@ -440,6 +441,8 @@
     let practiceStart = null;
     let practiceTimer = null;
     let practiceBlob = null;
+    let practiceRecognition = null;   // Web Speech API 实时识别实例
+    let practiceFinalTranscript = ''; // 最终识别文本
     let currentMaterial = '';
     let currentReference = '';
     let recognizedUserTranslation = '';
@@ -655,10 +658,16 @@
         translateText();
     }
 
-    // ==================== 实战演练 - 录音 ====================
+    // ==================== 实战演练 - 录音+识别 (同步) ====================
     async function startPracticeRecord() {
+        if (!currentMaterial) { showPracticeStatus('请先选择练习材料', 'error'); return; }
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SR) { showPracticeStatus('浏览器不支持语音识别，请使用 Chrome 或 Edge', 'error'); return; }
+
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+            // 1. 启动录音 (MediaRecorder — 用于保存音频)
             practiceRecorder = new MediaRecorder(stream);
             practiceChunks = [];
             practiceRecorder.ondataavailable = e => practiceChunks.push(e.data);
@@ -668,22 +677,83 @@
                 updatePracticeInfo();
             };
             practiceRecorder.start();
+
+            // 2. 启动实时语音识别 (Web Speech API)
+            practiceRecognition = new SR();
+            practiceRecognition.lang = 'zh-CN';
+            practiceRecognition.continuous = true;
+            practiceRecognition.interimResults = true;
+            practiceFinalTranscript = '';
+
+            practiceRecognition.onresult = (event) => {
+                let interim = '';
+                let final = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const r = event.results[i];
+                    if (r.isFinal) {
+                        final += r[0].transcript;
+                    } else {
+                        interim += r[0].transcript;
+                    }
+                }
+                if (final) practiceFinalTranscript += final;
+                // 显示实时识别
+                const liveDiv = document.getElementById('practiceLiveText');
+                const liveInterim = document.getElementById('practiceLiveInterim');
+                liveDiv.style.display = 'block';
+                liveInterim.textContent = practiceFinalTranscript + (interim ? ' ' + interim : '');
+            };
+
+            practiceRecognition.onerror = (event) => {
+                console.warn('识别中间错误:', event.error);
+                if (event.error === 'no-speech') {
+                    showPracticeStatus('未检测到语音，请继续说话...', 'info');
+                }
+            };
+
+            practiceRecognition.start();
+
+            // UI 状态
             document.getElementById('practiceRecordBtn').disabled = true;
             document.getElementById('practiceStopBtn').disabled = false;
+            document.getElementById('practiceRecognition').style.display = 'none';
             practiceStart = Date.now();
             practiceTimer = setInterval(updatePracticeTimer, 100);
-            showPracticeStatus('正在录音...', 'info');
-        } catch (e) { showPracticeStatus('无法访问麦克风: ' + e.message, 'error'); }
+            showPracticeStatus('录音中，请对着麦克风说出你的中文翻译...', 'info');
+        } catch (e) {
+            showPracticeStatus('无法访问麦克风: ' + e.message, 'error');
+        }
     }
 
     function stopPracticeRecord() {
+        // 停止语音识别
+        if (practiceRecognition) {
+            try { practiceRecognition.stop(); } catch (e) {}
+            practiceRecognition = null;
+        }
+        // 停止录音
         if (practiceRecorder && practiceRecorder.state === 'recording') {
             practiceRecorder.stop();
-            document.getElementById('practiceRecordBtn').disabled = false;
-            document.getElementById('practiceStopBtn').disabled = true;
-            clearInterval(practiceTimer);
-            showPracticeStatus('录音完成', 'success');
         }
+        // UI 恢复
+        document.getElementById('practiceRecordBtn').disabled = false;
+        document.getElementById('practiceStopBtn').disabled = true;
+        clearInterval(practiceTimer);
+        document.getElementById('practiceLiveText').style.display = 'none';
+
+        // 延迟显示结果（等待最后的 onresult 回调）
+        setTimeout(() => {
+            const transcript = practiceFinalTranscript.trim();
+            if (transcript) {
+                recognizedUserTranslation = transcript;
+                document.getElementById('practiceRecognitionText').textContent = transcript;
+                document.getElementById('practiceRecognition').style.display = 'block';
+                document.getElementById('userTranslationInput').value = transcript;
+                showPracticeStatus('识别完成！音频已保存，文本已自动填入', 'success');
+            } else {
+                showPracticeStatus('录音完成，但未识别到语音内容。请重试或手动输入', 'error');
+            }
+        }, 300);
     }
 
     function updatePracticeTimer() {
@@ -694,31 +764,32 @@
 
     function updatePracticeInfo() {
         document.getElementById('practiceRecordInfo').innerHTML = practiceBlob ?
-            `录音完成 · ${(practiceBlob.size / 1024).toFixed(1)} KB` : '';
+            `录音已保存 · ${(practiceBlob.size / 1024).toFixed(1)} KB` : '';
     }
 
     function clearPracticeRecord() {
+        if (practiceRecognition) {
+            try { practiceRecognition.stop(); } catch (e) {}
+            practiceRecognition = null;
+        }
+        if (practiceRecorder && practiceRecorder.state === 'recording') {
+            practiceRecorder.stop();
+        }
         practiceBlob = null;
         practiceChunks = [];
+        practiceFinalTranscript = '';
+        if (practiceTimer) clearInterval(practiceTimer);
         document.getElementById('practiceTimer').textContent = '00:00';
         document.getElementById('practiceRecordInfo').innerHTML = '';
+        document.getElementById('practiceLiveText').style.display = 'none';
+        document.getElementById('practiceLiveInterim').textContent = '';
         document.getElementById('practiceRecordBtn').disabled = false;
         document.getElementById('practiceStopBtn').disabled = true;
         document.getElementById('practiceRecognition').style.display = 'none';
+        document.getElementById('practiceRecognitionText').textContent = '';
     }
 
-    // ==================== 实战演练 - 识别 ====================
-    function recognizePracticeAudio() {
-        if (!practiceBlob) { showPracticeStatus('请先录音', 'error'); return; }
-        fallbackSpeechRecognition(transcript => {
-            recognizedUserTranslation = transcript;
-            document.getElementById('practiceRecognitionText').textContent = transcript;
-            document.getElementById('practiceRecognition').style.display = 'block';
-            document.getElementById('userTranslationInput').value = transcript;
-            showPracticeStatus('识别成功', 'success');
-        }, 'zh-CN');
-    }
-
+    // ==================== 翻译机 - 实时识别回退 ====================
     function fallbackSpeechRecognition(callback, lang) {
         const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!SR) {
