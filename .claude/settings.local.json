@@ -16,7 +16,13 @@
       "Bash(python run_tests.py)",
       "Bash(python quick_test.py)",
       "Bash(PYTHONIOENCODING=utf-8 python quick_test.py)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(taskkill /PID 78676 /F)",
+      "Bash(PYTHONIOENCODING=utf-8 python app.py)",
+      "Bash(taskkill /PID 98332 /F)",
+      "Bash(powershell *)",
+      "Bash(cmd *)",
+      "Bash(python -c \"import subprocess; [subprocess.run\\(['taskkill','/F','/PID',str\\(p\\)], capture_output=True\\) for p in [78676, 98332]]; import time; time.sleep\\(2\\)\")"
     ]
   }
 }
