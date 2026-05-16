@@ -265,6 +265,34 @@ def api_get_records():
         return jsonify({'error': str(e), 'success': False}), 500
 
 # ==========================================
+# API 端点 6.5：清除所有学习记录
+# ==========================================
+@app.route('/api/records/clear', methods=['POST'])
+def api_clear_records():
+    """
+    清除所有学习记录
+    """
+    try:
+        print("🗑️  [记录] 清除所有学习记录...")
+        
+        # 清除 CSV 文件
+        records_file = 'records.csv'
+        if os.path.exists(records_file):
+            # 写入空的CSV（仅保留表头）
+            with open(records_file, 'w', encoding='utf-8') as f:
+                f.write('时间,素材,你的翻译,发音,流畅,准确\n')
+        
+        return jsonify({
+            'success': True,
+            'message': '所有记录已清除',
+            'timestamp': datetime.now().isoformat()
+        }), 200
+    
+    except Exception as e:
+        print(f"❌ [清除错误] {str(e)}")
+        return jsonify({'error': str(e), 'success': False}), 500
+
+# ==========================================
 # API 端点 7：获取随机练习材料
 # ==========================================
 @app.route('/api/material', methods=['GET'])
