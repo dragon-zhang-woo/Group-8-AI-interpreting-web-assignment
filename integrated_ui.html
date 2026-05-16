@@ -1039,13 +1039,13 @@
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
                 const data = await response.json();
-                if (data.success) {
+                if (data.success && data.text && !isErrorText(data.text)) {
                     document.getElementById('recognitionText').textContent = data.text;
                     document.getElementById('recognitionResult').style.display = 'block';
                     showStatus('识别成功！', 'success');
                     return;
                 } else {
-                    throw new Error(data.error || '识别失败');
+                    throw new Error(data.error || data.text || '识别失败');
                 }
             } catch (error) {
                 console.warn('后端识别不可用，切换到浏览器语音识别:', error.message);
@@ -1393,7 +1393,7 @@
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
                 const data = await response.json();
-                if (data.success) {
+                if (data.success && data.text && !isErrorText(data.text)) {
                     userTranslationRecognized = data.text;
                     document.getElementById('userTranslationText').textContent = data.text;
                     document.getElementById('practiceRecognitionResult').style.display = 'block';
@@ -1401,7 +1401,7 @@
                     showStatus('识别成功！', 'success');
                     return;
                 } else {
-                    throw new Error(data.error || '识别失败');
+                    throw new Error(data.error || data.text || '识别失败');
                 }
             } catch (error) {
                 console.warn('后端识别不可用，切换到浏览器语音识别:', error.message);
@@ -1851,6 +1851,11 @@
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
+        }
+
+        function isErrorText(text) {
+            const errorPatterns = ['错误代码', '识别失败', '演示文本', '演示模式', '离线模式', '不可用', 'API 密钥无效'];
+            return errorPatterns.some(p => text.includes(p));
         }
 
         // ============================================
