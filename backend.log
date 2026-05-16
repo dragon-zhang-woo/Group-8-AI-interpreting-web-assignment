@@ -178,3 +178,4 @@ Press CTRL+C to quit
  * Debugger PIN: 138-680-501
 127.0.0.1 - - [16/May/2026 18:08:10] "GET /api/health HTTP/1.1" 200 -
 127.0.0.1 - - [16/May/2026 18:08:34] "POST /api/speech-to-text HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2026 18:10:46] "POST /api/speech-to-text HTTP/1.1" 200 -
