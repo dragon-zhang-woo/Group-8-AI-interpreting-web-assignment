@@ -7,7 +7,16 @@
       "Bash(git add *)",
       "Bash(git commit -m 'fix: 修复实战演练模块离线时所有API调用失败问题 *)",
       "Bash(git push *)",
-      "Bash(git config *)"
+      "Bash(git config *)",
+      "Bash(pip list *)",
+      "Bash(curl *)",
+      "Bash(wc -l integrated_ui.html)",
+      "Bash(awk 'END {print NR}' integrated_ui.html)",
+      "Bash(start \"\" \"integrated_ui.html\")",
+      "Bash(python run_tests.py)",
+      "Bash(python quick_test.py)",
+      "Bash(PYTHONIOENCODING=utf-8 python quick_test.py)",
+      "Bash(git commit -m ' *)"
     ]
   }
 }
