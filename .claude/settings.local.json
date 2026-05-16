@@ -22,7 +22,8 @@
       "Bash(taskkill /PID 98332 /F)",
       "Bash(powershell *)",
       "Bash(cmd *)",
-      "Bash(python -c \"import subprocess; [subprocess.run\\(['taskkill','/F','/PID',str\\(p\\)], capture_output=True\\) for p in [78676, 98332]]; import time; time.sleep\\(2\\)\")"
+      "Bash(python -c \"import subprocess; [subprocess.run\\(['taskkill','/F','/PID',str\\(p\\)], capture_output=True\\) for p in [78676, 98332]]; import time; time.sleep\\(2\\)\")",
+      "Bash(start \"\" \"interpreter_v2.html\")"
     ]
   }
 }
