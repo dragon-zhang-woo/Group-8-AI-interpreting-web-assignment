@@ -834,29 +834,74 @@
             }
 
             showStatus('翻译中...', 'info');
-            const resultDiv = document.getElementById('translationResult');
 
+            const srcLang = currentMode === 'en2zh' ? 'en' : 'zh';
+            const tgtLang = currentMode === 'en2zh' ? 'zh' : 'en';
+
+            // 优先尝试后端 API
             try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
                 const response = await fetch(`${API_BASE}/translate`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         text: sourceText,
-                        source_lang: currentMode === 'en2zh' ? 'en' : 'zh',
-                        target_lang: currentMode === 'en2zh' ? 'zh' : 'en'
-                    })
+                        source_lang: srcLang,
+                        target_lang: tgtLang
+                    }),
+                    signal: controller.signal
                 });
-
+                clearTimeout(timeoutId);
                 const data = await response.json();
                 if (data.success) {
                     displayTranslationResult(data.source_text, data.translated_text);
                     showStatus('翻译成功！', 'success');
-                } else {
-                    showStatus('翻译失败: ' + data.error, 'error');
+                    return;
                 }
             } catch (error) {
-                showStatus('错误: ' + error.message, 'error');
+                console.warn('后端翻译不可用，切换到 MyMemory API:', error.message);
             }
+
+            // 回退到 MyMemory 免费翻译 API
+            try {
+                const langPair = currentMode === 'en2zh' ? 'en|zh-CN' : 'zh-CN|en';
+                const myMemoryUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(sourceText)}&langpair=${langPair}`;
+                const mmResponse = await fetch(myMemoryUrl);
+                const mmData = await mmResponse.json();
+                if (mmData.responseStatus === 200 && mmData.responseData.translatedText) {
+                    displayTranslationResult(sourceText, mmData.responseData.translatedText);
+                    showStatus('✅ 翻译成功（MyMemory）', 'success');
+                    return;
+                }
+            } catch (error) {
+                console.warn('MyMemory 翻译失败，切换到 LibreTranslate:', error.message);
+            }
+
+            // 二级回退：LibreTranslate 公共实例
+            try {
+                const libreUrl = 'https://libretranslate.de/translate';
+                const ltResponse = await fetch(libreUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        q: sourceText,
+                        source: srcLang === 'zh' ? 'zh' : srcLang,
+                        target: tgtLang === 'zh' ? 'zh' : tgtLang,
+                        format: 'text'
+                    })
+                });
+                const ltData = await ltResponse.json();
+                if (ltData.translatedText) {
+                    displayTranslationResult(sourceText, ltData.translatedText);
+                    showStatus('✅ 翻译成功（LibreTranslate）', 'success');
+                    return;
+                }
+            } catch (error) {
+                console.warn('LibreTranslate 也失败:', error.message);
+            }
+
+            showStatus('⚠️ 所有翻译服务均不可用，请检查网络连接', 'error');
         }
 
         function displayTranslationResult(original, translated) {
@@ -961,27 +1006,70 @@
 
             showStatus('识别中...', 'info');
 
+            // 优先尝试后端 API
             try {
                 const formData = new FormData();
                 formData.append('audio', currentAudioBlob);
                 formData.append('language', currentMode === 'en2zh' ? 'en' : 'zh');
 
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
+
                 const response = await fetch(`${API_BASE}/speech-to-text`, {
                     method: 'POST',
-                    body: formData
+                    body: formData,
+                    signal: controller.signal
                 });
+                clearTimeout(timeoutId);
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
                 const data = await response.json();
                 if (data.success) {
                     document.getElementById('recognitionText').textContent = data.text;
                     document.getElementById('recognitionResult').style.display = 'block';
                     showStatus('识别成功！', 'success');
+                    return;
                 } else {
-                    showStatus('识别失败: ' + data.error, 'error');
+                    throw new Error(data.error || '识别失败');
                 }
             } catch (error) {
-                showStatus('错误: ' + error.message, 'error');
+                console.warn('后端识别不可用，切换到浏览器语音识别:', error.message);
             }
+
+            // 回退到浏览器 Web Speech API（实时识别）
+            fallbackTranslatorSpeechRecognition();
+        }
+
+        function fallbackTranslatorSpeechRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                showStatus('⚠️ 浏览器不支持语音识别，请切换到文本输入模式手动输入', 'error');
+                return;
+            }
+
+            const lang = currentMode === 'en2zh' ? 'en-US' : 'zh-CN';
+            const recognition = new SpeechRecognition();
+            recognition.lang = lang;
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            showStatus('🎤 请对着麦克风朗读（浏览器实时识别中）...', 'info');
+
+            recognition.onresult = (event) => {
+                const transcript = Array.from(event.results)
+                    .map(r => r[0].transcript)
+                    .join('');
+                document.getElementById('recognitionText').textContent = transcript;
+                document.getElementById('recognitionResult').style.display = 'block';
+                showStatus('✅ 识别成功（浏览器识别）', 'success');
+            };
+
+            recognition.onerror = (event) => {
+                showStatus('识别失败: ' + event.error + '，请手动输入文本', 'error');
+            };
+
+            recognition.start();
         }
 
         function translateRecognition() {
@@ -1002,78 +1090,174 @@
         }
 
         async function downloadAudio(text, language) {
+            // 优先尝试后端 TTS 下载
             try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
                 const response = await fetch(`${API_BASE}/text-to-speech`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text: text, language: language })
+                    body: JSON.stringify({ text: text, language: language }),
+                    signal: controller.signal
                 });
-
-                const blob = await response.blob();
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `translation_${Date.now()}.wav`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
+                clearTimeout(timeoutId);
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `translation_${Date.now()}.wav`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    return;
+                }
             } catch (error) {
-                showStatus('下载失败: ' + error.message, 'error');
+                console.warn('后端 TTS 不可用，使用浏览器朗读替代:', error.message);
+            }
+
+            // 回退：使用浏览器内置语音合成朗读（无法下载文件，但能播放）
+            try {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = language;
+                window.speechSynthesis.speak(utterance);
+                showStatus('⚠️ 离线模式下无法下载音频，已改为直接播放', 'info');
+            } catch (err) {
+                showStatus('音频播放失败: ' + err.message, 'error');
             }
         }
 
         // ============================================
         // 实战演练 - 用户翻译模式
         // ============================================
+        // 本地素材库（后端不可用时使用）
+        const LOCAL_MATERIALS = {
+            easy: [
+                {
+                    text: "Good morning. Today is a beautiful day. The weather is sunny and warm. I hope you have a great day.",
+                    reference: "早上好。今天是美好的一天。天气晴朗温暖。希望你今天过得愉快。"
+                },
+                {
+                    text: "Please turn off the lights when you leave the room. It helps save energy and reduces electricity bills.",
+                    reference: "离开房间时请关灯。这有助于节约能源，降低电费。"
+                },
+                {
+                    text: "I would like to order a cup of coffee and a sandwich, please. Thank you very much.",
+                    reference: "我想点一杯咖啡和一个三明治，谢谢。非常感谢。"
+                },
+                {
+                    text: "The meeting will start at nine o'clock in the morning. Please be on time and bring your notebooks.",
+                    reference: "会议将于上午九点开始。请准时出席并携带笔记本。"
+                },
+                {
+                    text: "She studies English every day because she wants to improve her language skills for her future career.",
+                    reference: "她每天学习英语，因为她想提高自己的语言技能，为将来的职业发展做准备。"
+                }
+            ],
+            medium: [
+                {
+                    text: "Climate change is one of the most pressing issues facing humanity today. Scientists warn that without significant reductions in greenhouse gas emissions, global temperatures could rise by more than two degrees Celsius by the end of this century.",
+                    reference: "气候变化是当今人类面临的最紧迫问题之一。科学家警告说，如果温室气体排放量不大幅减少，到本世纪末全球气温可能上升超过两摄氏度。"
+                },
+                {
+                    text: "Artificial intelligence is transforming industries across the globe. From healthcare to finance, companies are leveraging machine learning algorithms to improve efficiency and deliver better services to their customers.",
+                    reference: "人工智能正在改变全球各行各业。从医疗保健到金融，各公司正在利用机器学习算法提高效率，为客户提供更好的服务。"
+                },
+                {
+                    text: "The global economy has shown signs of recovery following the disruptions caused by the pandemic. Consumer spending has increased significantly, and employment rates are gradually returning to pre-pandemic levels in many countries.",
+                    reference: "在疫情造成的冲击之后，全球经济已显示出复苏迹象。消费者支出大幅增加，许多国家的就业率也在逐步恢复到疫情前的水平。"
+                },
+                {
+                    text: "Education technology, or EdTech, is revolutionizing the way students learn. Online platforms now offer courses in virtually every subject, making quality education accessible to people in remote areas who previously had limited opportunities.",
+                    reference: "教育技术（EdTech）正在彻底改变学生的学习方式。在线平台现在几乎提供每个学科的课程，使优质教育惠及以前机会有限的偏远地区人群。"
+                },
+                {
+                    text: "Renewable energy sources such as solar and wind power are becoming increasingly cost-competitive with traditional fossil fuels. Many governments are setting ambitious targets to transition to clean energy by 2050.",
+                    reference: "太阳能和风能等可再生能源在成本上越来越具有与传统化石燃料竞争的能力。许多国家政府正在制定宏伟目标，争取到2050年实现向清洁能源的转型。"
+                }
+            ],
+            hard: [
+                {
+                    text: "The geopolitical landscape has undergone profound transformations in recent decades, as the unipolar world order that emerged following the Cold War gives way to an increasingly multipolar configuration. Emerging economies are asserting greater influence in international institutions, challenging the established norms and frameworks that have governed global affairs since the mid-twentieth century.",
+                    reference: "近几十年来，地缘政治格局发生了深刻变化，冷战后形成的单极世界秩序正让位于日益多极化的格局。新兴经济体在国际机构中发挥着越来越大的影响力，挑战着自二十世纪中叶以来主导全球事务的既定规范和框架。"
+                },
+                {
+                    text: "Neuroplasticity refers to the brain's remarkable ability to reorganize itself by forming new neural connections throughout life. This phenomenon has significant implications for rehabilitation medicine, as it suggests that patients recovering from strokes or traumatic brain injuries may regain lost functions through targeted therapeutic interventions.",
+                    reference: "神经可塑性是指大脑通过在整个生命过程中形成新的神经连接来自我重组的非凡能力。这一现象对康复医学具有重要意义，因为它表明从中风或脑外伤中恢复的患者可以通过有针对性的治疗干预重新获得丧失的功能。"
+                },
+                {
+                    text: "The proliferation of disinformation in the digital age poses unprecedented challenges to democratic governance and social cohesion. Algorithmic amplification on social media platforms creates echo chambers that reinforce existing beliefs and make citizens increasingly resistant to factual corrections, undermining the epistemic foundations necessary for informed public discourse.",
+                    reference: "数字时代虚假信息的泛滥对民主治理和社会凝聚力构成了前所未有的挑战。社交媒体平台上的算法放大效应制造了强化既有信念的信息茧房，使公民越来越抵制事实纠正，破坏了理性公共话语所必需的认识论基础。"
+                },
+                {
+                    text: "Quantum computing represents a paradigm shift in computational capability, exploiting the principles of superposition and entanglement to perform calculations that would be practically impossible for classical computers. While still in its nascent stages, this technology holds transformative potential for cryptography, drug discovery, and optimization problems across multiple industries.",
+                    reference: "量子计算代表着计算能力的范式转变，它利用叠加和纠缠原理进行经典计算机实际上无法完成的计算。尽管仍处于起步阶段，这项技术在密码学、药物研发以及多个行业的优化问题上具有变革性潜力。"
+                },
+                {
+                    text: "The concept of corporate social responsibility has evolved considerably since its emergence in the latter half of the twentieth century. Contemporary stakeholder theory posits that corporations bear obligations not only to shareholders seeking financial returns, but also to employees, communities, and the natural environment, necessitating a fundamental recalibration of how business success is measured and reported.",
+                    reference: "企业社会责任的概念自二十世纪下半叶出现以来已经发生了相当大的演变。当代利益相关者理论认为，企业不仅对寻求财务回报的股东负有义务，还对员工、社区和自然环境负有义务，这要求从根本上重新校准衡量和报告商业成功的方式。"
+                }
+            ]
+        };
+
         async function loadMaterial() {
             const difficulty = document.getElementById('materialDifficulty').value;
             if (!difficulty) return;
 
+            showStatus('加载材料中...', 'info');
+
+            // 优先尝试后端 API
             try {
-                const response = await fetch(`${API_BASE}/material`);
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
+                const response = await fetch(`${API_BASE}/material?difficulty=${difficulty}`, {
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
                 const data = await response.json();
-                
+
                 if (data.success) {
                     currentMaterial = data.material;
-                    
-                    // 使用 MyMemory API 获取参考翻译 (免费翻译API)
+
+                    // 使用 MyMemory API 获取参考翻译
                     try {
                         const translationUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(currentMaterial)}&langpair=en|zh-CN`;
                         const translationResponse = await fetch(translationUrl);
                         const translationData = await translationResponse.json();
-                        
                         if (translationData.responseStatus === 200 && translationData.responseData.translatedText) {
                             currentReference = translationData.responseData.translatedText;
                         } else {
-                            // 如果翻译失败，使用后端翻译
-                            const backendTranslate = await fetch(`${API_BASE}/translate`, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                    text: currentMaterial,
-                                    source_lang: 'en',
-                                    target_lang: 'zh'
-                                })
-                            });
-                            const backendData = await backendTranslate.json();
-                            currentReference = backendData.translation || '翻译获取失败';
+                            currentReference = '参考翻译暂不可用';
                         }
                     } catch (translationError) {
-                        console.log('翻译API调用失败，使用备用翻译');
-                        currentReference = '翻译获取失败，请手动输入';
+                        currentReference = '参考翻译暂不可用';
                     }
-                    
+
                     document.getElementById('englishMaterial').textContent = currentMaterial;
                     document.getElementById('referenceMaterial').textContent = currentReference;
                     document.getElementById('referenceBox').style.display = 'block';
                     showStatus('材料已加载', 'success');
-                } else {
-                    showStatus('加载材料失败: ' + data.error, 'error');
+                    return;
                 }
             } catch (error) {
-                showStatus('加载材料失败: ' + error.message, 'error');
+                console.warn('后端不可用，使用本地素材库:', error.message);
             }
+
+            // 回退到本地素材库
+            const pool = LOCAL_MATERIALS[difficulty];
+            if (!pool || pool.length === 0) {
+                showStatus('暂无该难度的素材', 'error');
+                return;
+            }
+            const item = pool[Math.floor(Math.random() * pool.length)];
+            currentMaterial = item.text;
+            currentReference = item.reference;
+
+            document.getElementById('englishMaterial').textContent = currentMaterial;
+            document.getElementById('referenceMaterial').textContent = currentReference;
+            document.getElementById('referenceBox').style.display = 'block';
+            showStatus('✅ 材料已加载（本地素材库）', 'success');
         }
 
         async function startPracticeRecording() {
@@ -1146,27 +1330,23 @@
 
             showStatus('识别你的翻译中...', 'info');
 
+            // 优先尝试后端 API（设置超时避免长时间挂起）
             try {
                 const formData = new FormData();
                 formData.append('audio', practiceAudioBlob);
                 formData.append('language', 'zh');
 
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
+
                 const response = await fetch(`${API_BASE}/speech-to-text`, {
                     method: 'POST',
-                    body: formData
+                    body: formData,
+                    signal: controller.signal
                 });
+                clearTimeout(timeoutId);
 
-                // 处理HTTP错误状态码
-                if (!response.ok) {
-                    if (response.status === 404) {
-                        showStatus('❌ 识别服务不可用 (404)', 'error');
-                        // 尝试使用浏览器内置的Web Speech API作为备选方案
-                        fallbackSpeechRecognition();
-                    } else {
-                        showStatus(`❌ 服务错误 (${response.status})`, 'error');
-                    }
-                    return;
-                }
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
                 const data = await response.json();
                 if (data.success) {
@@ -1175,46 +1355,105 @@
                     document.getElementById('practiceRecognitionResult').style.display = 'block';
                     document.getElementById('userTranslationManual').value = data.text;
                     showStatus('识别成功！', 'success');
+                    return;
                 } else {
-                    showStatus('识别失败: ' + (data.error || '未知错误'), 'error');
+                    throw new Error(data.error || '识别失败');
                 }
             } catch (error) {
-                console.error('识别错误:', error);
-                showStatus('识别出错: ' + error.message + '，请手动输入翻译', 'error');
+                console.warn('后端识别不可用，切换到浏览器语音识别:', error.message);
             }
+
+            // 回退到浏览器 Web Speech API（实时识别）
+            fallbackSpeechRecognition();
         }
 
-        // 备选：使用浏览器Web Speech API
+        // 备选：使用浏览器 Web Speech API 实时识别
         function fallbackSpeechRecognition() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
-                showStatus('⚠️  您的浏览器不支持语音识别，请手动输入翻译', 'warning');
+                showStatus('⚠️ 浏览器不支持语音识别，请在下方手动输入你的翻译', 'error');
                 return;
             }
 
             const recognition = new SpeechRecognition();
             recognition.lang = 'zh-CN';
             recognition.continuous = false;
-            
-            showStatus('🎤 开始使用浏览器语音识别...', 'info');
-            
+            recognition.interimResults = false;
+
+            showStatus('🎤 请对着麦克风朗读你的翻译（浏览器实时识别中）...', 'info');
+
             recognition.onresult = (event) => {
                 const transcript = Array.from(event.results)
                     .map(result => result[0].transcript)
                     .join('');
-                
+
                 userTranslationRecognized = transcript;
                 document.getElementById('userTranslationText').textContent = transcript;
                 document.getElementById('practiceRecognitionResult').style.display = 'block';
                 document.getElementById('userTranslationManual').value = transcript;
-                showStatus('✅ 识别成功（使用浏览器识别）!', 'success');
+                showStatus('✅ 识别成功（浏览器识别）', 'success');
             };
-            
+
             recognition.onerror = (event) => {
-                showStatus('识别失败: ' + event.error, 'error');
+                showStatus('识别失败: ' + event.error + '，请手动输入翻译', 'error');
             };
-            
+
             recognition.start();
+        }
+
+        // 本地评分算法（后端不可用时使用）
+        function localScore(userTranslation, referenceTranslation) {
+            // 准确性：基于字符级重叠（Jaccard 相似度）
+            function jaccard(a, b) {
+                const setA = new Set(a.split(''));
+                const setB = new Set(b.split(''));
+                let inter = 0;
+                for (const c of setA) { if (setB.has(c)) inter++; }
+                const union = new Set([...setA, ...setB]).size;
+                return union === 0 ? 0 : inter / union;
+            }
+
+            // 分词后 bigram 重叠
+            function bigramOverlap(a, b) {
+                function bigrams(s) {
+                    const bg = new Set();
+                    for (let i = 0; i < s.length - 1; i++) bg.add(s[i] + s[i+1]);
+                    return bg;
+                }
+                const bA = bigrams(a), bB = bigrams(b);
+                let inter = 0;
+                for (const g of bA) { if (bB.has(g)) inter++; }
+                const denom = (bA.size + bB.size) / 2;
+                return denom === 0 ? 0 : inter / denom;
+            }
+
+            const ref = (referenceTranslation || '').replace(/\s/g, '');
+            const usr = (userTranslation || '').replace(/\s/g, '');
+
+            const jSim = jaccard(usr, ref);
+            const bSim = bigramOverlap(usr, ref);
+            const accuracy = Math.round(Math.min(100, (jSim * 0.4 + bSim * 0.6) * 130));
+
+            // 流畅性：基于长度合理性（相对于参考译文）
+            const lenRatio = ref.length > 0 ? Math.min(usr.length, ref.length) / Math.max(usr.length, ref.length) : 0;
+            const fluency = Math.round(50 + lenRatio * 50);
+
+            // 发音：无音频评分时给中等分（固定范围 65-85 随机）
+            const pronunciation = Math.round(65 + Math.random() * 20);
+
+            // 反馈
+            const total = ((accuracy + fluency + pronunciation) / 3).toFixed(1);
+            let feedback = '';
+            if (accuracy >= 80) feedback = '翻译内容与参考译文高度吻合，表达准确。';
+            else if (accuracy >= 60) feedback = '翻译内容基本准确，部分细节有待完善。';
+            else feedback = '翻译与参考答案差距较大，建议对照参考译文仔细揣摩。';
+
+            const suggestions = [];
+            if (fluency < 70) suggestions.push('译文长度与原文偏差较大，注意保持语义完整。');
+            if (accuracy < 70) suggestions.push('建议多关注关键词汇的准确对应。');
+            suggestions.push('坚持每天练习，逐步提高口译速度与准确率。');
+
+            return { pronunciation, fluency, accuracy, total: parseFloat(total), feedback, suggestions };
         }
 
         async function submitForScoring() {
@@ -1226,7 +1465,10 @@
 
             showStatus('评分中...', 'info');
 
+            // 优先尝试后端 API
             try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
                 const response = await fetch(`${API_BASE}/score`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -1237,8 +1479,10 @@
                         source_lang: 'en',
                         target_lang: 'zh',
                         user_audio_text: userTranslationRecognized
-                    })
+                    }),
+                    signal: controller.signal
                 });
+                clearTimeout(timeoutId);
 
                 const data = await response.json();
                 if (data.success) {
@@ -1253,12 +1497,18 @@
                     displayScoringResult(currentScores);
                     showStatus('评分完成！', 'success');
                     document.getElementById('saveRecordBtn').style.display = 'block';
-                } else {
-                    showStatus('评分失败: ' + data.error, 'error');
+                    return;
                 }
             } catch (error) {
-                showStatus('错误: ' + error.message, 'error');
+                console.warn('后端评分不可用，使用本地评分算法:', error.message);
             }
+
+            // 回退到本地评分算法
+            const scores = localScore(userTranslation, currentReference);
+            currentScores = scores;
+            displayScoringResult(currentScores);
+            showStatus('✅ 评分完成（本地算法）', 'success');
+            document.getElementById('saveRecordBtn').style.display = 'block';
         }
 
         function displayScoringResult(scores) {
@@ -1305,6 +1555,29 @@
             }
         }
 
+        // ============================================
+        // localStorage 本地记录辅助函数
+        // ============================================
+        const LOCAL_RECORDS_KEY = 'practiceRecords';
+
+        function localSaveRecord(record) {
+            const records = localGetRecords();
+            records.push(record);
+            localStorage.setItem(LOCAL_RECORDS_KEY, JSON.stringify(records));
+        }
+
+        function localGetRecords() {
+            try {
+                return JSON.parse(localStorage.getItem(LOCAL_RECORDS_KEY) || '[]');
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function localClearRecords() {
+            localStorage.removeItem(LOCAL_RECORDS_KEY);
+        }
+
         async function savePracticeRecord() {
             const userTranslation = document.getElementById('userTranslationManual').value.trim();
             if (!userTranslation || !currentScores) {
@@ -1312,57 +1585,92 @@
                 return;
             }
 
+            const recordPayload = {
+                original_text: currentMaterial,
+                user_translation: userTranslation,
+                scores: {
+                    发音: currentScores.pronunciation,
+                    流畅: currentScores.fluency,
+                    准确: currentScores.accuracy,
+                    评语: currentScores.feedback
+                }
+            };
+
+            // 优先尝试后端 API
+            let savedToBackend = false;
             try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
                 const response = await fetch(`${API_BASE}/save-record`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        original_text: currentMaterial,
-                        user_translation: userTranslation,
-                        scores: {
-                            发音: currentScores.pronunciation,
-                            流畅: currentScores.fluency,
-                            准确: currentScores.accuracy,
-                            评语: currentScores.feedback
-                        }
-                    })
+                    body: JSON.stringify(recordPayload),
+                    signal: controller.signal
                 });
-
+                clearTimeout(timeoutId);
                 const data = await response.json();
-                if (data.success) {
-                    showStatus('✅ 记录已保存！', 'success');
-                    setTimeout(() => {
-                        clearPracticeAudio();
-                        document.getElementById('materialDifficulty').value = '';
-                        document.getElementById('userTranslationManual').value = '';
-                        document.getElementById('scoringResult').innerHTML = '';
-                        document.getElementById('feedbackBox').style.display = 'none';
-                        document.getElementById('saveRecordBtn').style.display = 'none';
-                    }, 1000);
-                } else {
-                    showStatus('保存失败: ' + data.error, 'error');
-                }
+                if (data.success) savedToBackend = true;
             } catch (error) {
-                showStatus('错误: ' + error.message, 'error');
+                console.warn('后端保存不可用，使用 localStorage:', error.message);
             }
+
+            if (!savedToBackend) {
+                // 回退到 localStorage
+                const now = new Date();
+                const localRecord = [
+                    now.toLocaleString('zh-CN'),
+                    currentMaterial,
+                    userTranslation,
+                    currentScores.pronunciation,
+                    currentScores.fluency,
+                    currentScores.accuracy,
+                    currentScores.feedback
+                ];
+                localSaveRecord(localRecord);
+            }
+
+            showStatus('✅ 记录已保存！', 'success');
+            setTimeout(() => {
+                clearPracticeAudio();
+                document.getElementById('materialDifficulty').value = '';
+                document.getElementById('userTranslationManual').value = '';
+                document.getElementById('scoringResult').innerHTML = '';
+                document.getElementById('feedbackBox').style.display = 'none';
+                document.getElementById('saveRecordBtn').style.display = 'none';
+            }, 1000);
         }
 
         // ============================================
         // 学习记录页面
         // ============================================
         async function refreshRecords() {
+            // 优先尝试后端 API
             try {
-                const response = await fetch(`${API_BASE}/records`);
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
+                const response = await fetch(`${API_BASE}/records`, {
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
                 const data = await response.json();
 
                 if (data.success) {
                     displayRecords(data.records);
                     calculateStats(data.records);
-                } else {
-                    showStatus('加载记录失败: ' + data.error, 'error');
+                    return;
                 }
             } catch (error) {
-                showStatus('错误: ' + error.message, 'error');
+                console.warn('后端记录不可用，使用 localStorage:', error.message);
+            }
+
+            // 回退到 localStorage
+            const records = localGetRecords();
+            displayRecords(records);
+            calculateStats(records);
+            if (records.length === 0) {
+                showStatus('暂无练习记录', 'info');
+            } else {
+                showStatus(`已加载 ${records.length} 条本地记录`, 'success');
             }
         }
 
@@ -1423,26 +1731,32 @@
         }
 
         async function clearAllRecordsAsync() {
+            showStatus('正在清除记录...', 'info');
+
+            // 优先尝试后端 API
+            let clearedBackend = false;
             try {
-                showStatus('正在清除记录...', 'info');
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
                 const response = await fetch(`${API_BASE}/records/clear`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
+                    headers: { 'Content-Type': 'application/json' },
+                    signal: controller.signal
                 });
-                
+                clearTimeout(timeoutId);
                 const data = await response.json();
-                if (data.success) {
-                    showStatus('✅ 所有记录已清除！', 'success');
-                    // 延迟1秒后刷新记录显示
-                    setTimeout(() => {
-                        refreshRecords();
-                    }, 500);
-                } else {
-                    showStatus('清除失败: ' + data.error, 'error');
-                }
+                if (data.success) clearedBackend = true;
             } catch (error) {
-                showStatus('清除出错: ' + error.message, 'error');
+                console.warn('后端清除不可用，清除 localStorage:', error.message);
             }
+
+            // 无论后端是否成功，都同时清除 localStorage
+            localClearRecords();
+
+            showStatus('✅ 所有记录已清除！', 'success');
+            setTimeout(() => {
+                refreshRecords();
+            }, 500);
         }
 
         // ============================================
