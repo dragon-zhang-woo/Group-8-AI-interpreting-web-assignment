@@ -57,3 +57,5 @@ Press CTRL+C to quit
 127.0.0.1 - - [16/May/2026 17:13:00] "POST /api/save-record HTTP/1.1" 500 -
 127.0.0.1 - - [16/May/2026 17:13:14] "POST /api/score HTTP/1.1" 200 -
 127.0.0.1 - - [16/May/2026 17:13:15] "POST /api/text-to-speech HTTP/1.1" 500 -
+127.0.0.1 - - [16/May/2026 17:25:24] "GET /api/material?difficulty=hard HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2026 17:25:32] "POST /api/speech-to-text HTTP/1.1" 200 -
