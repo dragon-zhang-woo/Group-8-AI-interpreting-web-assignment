@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(netstat -ano)",
+      "Bash(./venv/Scripts/python.exe app.py)",
+      "Bash(echo \"PID: $!\")",
+      "Bash(git add *)",
+      "Bash(git commit -m 'fix: 修复实战演练模块离线时所有API调用失败问题 *)",
+      "Bash(git push *)",
+      "Bash(git config *)"
+    ]
+  }
+}

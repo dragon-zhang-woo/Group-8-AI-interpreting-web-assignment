@@ -1,0 +1,14 @@
+[*] Starting AI Interpretation Practice Backend Service...
+[*] Service: http://localhost:5000
+[*] API Doc: http://localhost:5000/api/health
+ * Serving Flask app 'app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.26.46.101:5000
+Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 138-680-501
+127.0.0.1 - - [16/May/2026 16:24:01] "GET /api/material?difficulty=hard HTTP/1.1" 200 -
