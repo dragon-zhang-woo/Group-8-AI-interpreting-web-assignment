@@ -1036,13 +1036,40 @@
                 
                 if (data.success) {
                     currentMaterial = data.material;
-                    // 这里应该有对应的参考翻译，现在用模拟数据
-                    currentReference = '这是一个参考翻译示例';
+                    
+                    // 使用 MyMemory API 获取参考翻译 (免费翻译API)
+                    try {
+                        const translationUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(currentMaterial)}&langpair=en|zh-CN`;
+                        const translationResponse = await fetch(translationUrl);
+                        const translationData = await translationResponse.json();
+                        
+                        if (translationData.responseStatus === 200 && translationData.responseData.translatedText) {
+                            currentReference = translationData.responseData.translatedText;
+                        } else {
+                            // 如果翻译失败，使用后端翻译
+                            const backendTranslate = await fetch(`${API_BASE}/translate`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    text: currentMaterial,
+                                    source_lang: 'en',
+                                    target_lang: 'zh'
+                                })
+                            });
+                            const backendData = await backendTranslate.json();
+                            currentReference = backendData.translation || '翻译获取失败';
+                        }
+                    } catch (translationError) {
+                        console.log('翻译API调用失败，使用备用翻译');
+                        currentReference = '翻译获取失败，请手动输入';
+                    }
                     
                     document.getElementById('englishMaterial').textContent = currentMaterial;
                     document.getElementById('referenceMaterial').textContent = currentReference;
                     document.getElementById('referenceBox').style.display = 'block';
                     showStatus('材料已加载', 'success');
+                } else {
+                    showStatus('加载材料失败: ' + data.error, 'error');
                 }
             } catch (error) {
                 showStatus('加载材料失败: ' + error.message, 'error');
@@ -1129,6 +1156,18 @@
                     body: formData
                 });
 
+                // 处理HTTP错误状态码
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        showStatus('❌ 识别服务不可用 (404)', 'error');
+                        // 尝试使用浏览器内置的Web Speech API作为备选方案
+                        fallbackSpeechRecognition();
+                    } else {
+                        showStatus(`❌ 服务错误 (${response.status})`, 'error');
+                    }
+                    return;
+                }
+
                 const data = await response.json();
                 if (data.success) {
                     userTranslationRecognized = data.text;
@@ -1137,11 +1176,45 @@
                     document.getElementById('userTranslationManual').value = data.text;
                     showStatus('识别成功！', 'success');
                 } else {
-                    showStatus('识别失败: ' + data.error, 'error');
+                    showStatus('识别失败: ' + (data.error || '未知错误'), 'error');
                 }
             } catch (error) {
-                showStatus('错误: ' + error.message, 'error');
+                console.error('识别错误:', error);
+                showStatus('识别出错: ' + error.message + '，请手动输入翻译', 'error');
             }
+        }
+
+        // 备选：使用浏览器Web Speech API
+        function fallbackSpeechRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                showStatus('⚠️  您的浏览器不支持语音识别，请手动输入翻译', 'warning');
+                return;
+            }
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'zh-CN';
+            recognition.continuous = false;
+            
+            showStatus('🎤 开始使用浏览器语音识别...', 'info');
+            
+            recognition.onresult = (event) => {
+                const transcript = Array.from(event.results)
+                    .map(result => result[0].transcript)
+                    .join('');
+                
+                userTranslationRecognized = transcript;
+                document.getElementById('userTranslationText').textContent = transcript;
+                document.getElementById('practiceRecognitionResult').style.display = 'block';
+                document.getElementById('userTranslationManual').value = transcript;
+                showStatus('✅ 识别成功（使用浏览器识别）!', 'success');
+            };
+            
+            recognition.onerror = (event) => {
+                showStatus('识别失败: ' + event.error, 'error');
+            };
+            
+            recognition.start();
         }
 
         async function submitForScoring() {
@@ -1345,9 +1418,30 @@
 
         function clearAllRecords() {
             if (confirm('确定要清除所有记录吗？此操作不可撤销！')) {
-                // 这里需要后端支持清除接口
-                showStatus('已清除所有记录', 'success');
-                refreshRecords();
+                clearAllRecordsAsync();
+            }
+        }
+
+        async function clearAllRecordsAsync() {
+            try {
+                showStatus('正在清除记录...', 'info');
+                const response = await fetch(`${API_BASE}/records/clear`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    showStatus('✅ 所有记录已清除！', 'success');
+                    // 延迟1秒后刷新记录显示
+                    setTimeout(() => {
+                        refreshRecords();
+                    }, 500);
+                } else {
+                    showStatus('清除失败: ' + data.error, 'error');
+                }
+            } catch (error) {
+                showStatus('清除出错: ' + error.message, 'error');
             }
         }
 
