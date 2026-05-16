@@ -59,3 +59,122 @@ Press CTRL+C to quit
 127.0.0.1 - - [16/May/2026 17:13:15] "POST /api/text-to-speech HTTP/1.1" 500 -
 127.0.0.1 - - [16/May/2026 17:25:24] "GET /api/material?difficulty=hard HTTP/1.1" 200 -
 127.0.0.1 - - [16/May/2026 17:25:32] "POST /api/speech-to-text HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2026 18:00:36] "GET /api/material?difficulty=hard HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2026 18:00:43] "POST /api/speech-to-text HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2026 18:00:59] "OPTIONS /api/score HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2026 18:00:59] "POST /api/score HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2026 18:01:09] "OPTIONS /api/save-record HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2026 18:01:09] "POST /api/save-record HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2026 18:02:36] "POST /api/speech-to-text HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2026 18:02:37] "POST /api/speech-to-text HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2026 18:05:45] "POST /api/speech-to-text HTTP/1.1" 400 -
+ * Detected change in 'D:\\操作系统原理实验\\口译AI实践项目\\Group-8-AI-interpreting-web-assignment\\audio_engine.py', reloading
+[*] Starting AI Interpretation Practice Backend Service...
+[*] Service: http://localhost:5000
+[*] API Doc: http://localhost:5000/api/health
+📚 [材料] 获取随机练习材料...
+🎤 [STT] 处理音频: uploads\1778919850.62472.wav, 语言: zh
+🎤 [STT] 正在识别音频: uploads\1778919850.62472.wav, 语言: en
+❌ [STT] API 返回错误: 404 - 
+🎤 [STT] 处理音频: uploads\1778919852.896724.wav, 语言: zh
+🎤 [STT] 正在识别音频: uploads\1778919852.896724.wav, 语言: en
+❌ [STT] API 返回错误: 404 - 
+🎤 [STT] 处理音频: uploads\1778919853.326289.wav, 语言: zh
+🎤 [STT] 正在识别音频: uploads\1778919853.326289.wav, 语言: en
+❌ [STT] API 返回错误: 404 - 
+🎤 [STT] 处理音频: uploads\1778919853.826886.wav, 语言: zh
+🎤 [STT] 正在识别音频: uploads\1778919853.826886.wav, 语言: en
+❌ [STT] API 返回错误: 404 - 
+🎤 [STT] 处理音频: uploads\1778919854.075806.wav, 语言: zh
+🎤 [STT] 正在识别音频: uploads\1778919854.075806.wav, 语言: en
+❌ [STT] API 返回错误: 404 - 
+📋 [记录] 获取所有学习记录...
+📋 [记录] 获取所有学习记录...
+📋 [记录] 获取所有学习记录...
+📋 [记录] 获取所有学习记录...
+📊 [评分] 原文: Welcome to the school of compu... 用户翻译: 识别失败 (错误代码: 404)...
+💾 [记录] 保存练习记录: Welcome to the school of compu...
+📋 [记录] 获取所有学习记录...
+📚 [材料] 获取随机练习材料...
+🎤 [STT] 处理音频: uploads\1778920173.698285.wav, 语言: zh
+🎤 [STT] 正在识别音频: uploads\1778920173.698285.wav, 语言: en
+❌ [STT] API 返回错误: 404 - 
+📊 [评分] 原文: Artificial intelligence is rev... 用户翻译: 识别失败 (错误代码: 404)...
+💾 [记录] 保存练习记录: Artificial intelligence is rev...
+🎤 [STT] 处理音频: uploads\1778920349.46472.wav, 语言: zh
+🎤 [STT] 正在识别音频: uploads\1778920349.46472.wav, 语言: en
+❌ [STT] 网络连接失败，已启用离线模式
+🎤 [STT] 处理音频: uploads\1778920466.7217.wav, 语言: zh
+🎤 [STT] 正在识别音频: uploads\1778920466.7217.wav, 语言: en
+❌ [STT] API 返回错误: 404 - 
+🎤 [STT] 处理音频: uploads\1778920833.535929.wav, 语言: zh
+🎤 [STT] 正在识别音频: uploads\1778920833.535929.wav, 语言: en
+❌ [STT] API 返回错误: 404 - 
+🎤 [STT] 处理音频: uploads\1778920834.684058.wav, 语言: zh
+🎤 [STT] 正在识别音频: uploads\1778920834.684058.wav, 语言: en
+❌ [STT] API 返回错误: 404 - 
+🎤 [STT] 处理音频: uploads\1778920835.162604.wav, 语言: zh
+🎤 [STT] 正在识别音频: uploads\1778920835.162604.wav, 语言: en
+🎤 [STT] 处理音频: uploads\1778920835.284411.wav, 语言: zh
+🎤 [STT] 正在识别音频: uploads\1778920835.284411.wav, 语言: en
+❌ [STT] API 返回错误: 404 - 
+🎤 [STT] 处理音频: uploads\1778920835.428915.wav, 语言: zh
+🎤 [STT] 正在识别音频: uploads\1778920835.428915.wav, 语言: en
+❌ [STT] API 返回错误: 404 - 
+🎤 [STT] 处理音频: uploads\1778920835.565162.wav, 语言: zh
+🎤 [STT] 正在识别音频: uploads\1778920835.565162.wav, 语言: en
+❌ [STT] API 返回错误: 404 - 
+🎤 [STT] 处理音频: uploads\1778920835.706019.wav, 语言: zh
+🎤 [STT] 正在识别音频: uploads\1778920835.706019.wav, 语言: en
+❌ [STT] API 返回错误: 404 - 
+❌ [STT] API 返回错误: 404 - 
+🎤 [STT] 处理音频: uploads\1778920960.05687.wav, 语言: zh
+🎤 [STT] 正在识别音频: uploads\1778920960.05687.wav, 语言: en
+❌ [STT] API 返回错误: 404 - 
+📚 [材料] 获取随机练习材料...
+🎤 [STT] 处理音频: uploads\1778921116.027791.wav, 语言: zh
+🎤 [STT] 正在识别音频: uploads\1778921116.027791.wav, 语言: en
+❌ [STT] API 返回错误: 404 - 
+📚 [材料] 获取随机练习材料...
+🎤 [STT] 处理音频: uploads\1778921199.753448.wav, 语言: zh
+🎤 [STT] 正在识别音频: uploads\1778921199.753448.wav, 语言: en
+❌ [STT] API 返回错误: 404 - 
+🎤 [STT] 处理音频: uploads\1778921214.163872.wav, 语言: zh
+🎤 [STT] 正在识别音频: uploads\1778921214.163872.wav, 语言: en
+❌ [STT] API 返回错误: 404 - 
+🎤 [STT] 处理音频: uploads\1778921227.694189.wav, 语言: zh
+🎤 [STT] 正在识别音频: uploads\1778921227.694189.wav, 语言: en
+❌ [STT] API 返回错误: 404 - 
+📋 [记录] 获取所有学习记录...
+📝 [翻译] en → zh: Hello, how are you?...
+🌍 [翻译] en → zh: Hello, how are you?...
+📚 [材料] 获取随机练习材料...
+❌ [评分错误] 400 Bad Request: Failed to decode JSON object: 'utf-8' codec can't decode byte 0xc4 in position 51: invalid continuation byte
+❌ [TTS错误] 400 Bad Request: Failed to decode JSON object: 'utf-8' codec can't decode byte 0xc4 in position 9: invalid continuation byte
+❌ [保存错误] 400 Bad Request: Failed to decode JSON object: 'utf-8' codec can't decode byte 0xb2 in position 44: invalid start byte
+📊 [评分] 原文: Hello world... 用户翻译: Hello world...
+🔊 [TTS] en-US: Hello...
+🔊 [TTS] 生成语音: Hello... (语言: en-US)
+❌ [TTS] 异步错误: 403, message='Invalid response status', url='wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=6A5AA1D4EAFF4E9FB37E23D68491D6F4&ConnectionId=2ce18c62ecc94c779355b015935d096a'
+❌ [TTS] 生成的文件无效
+📚 [材料] 获取随机练习材料...
+🎤 [STT] 处理音频: uploads\1778923532.307994.wav, 语言: zh
+🎤 [STT] 正在识别音频: uploads\1778923532.307994.wav, 语言: en
+❌ [STT] API 返回错误: 404 - 
+📚 [材料] 获取随机练习材料...
+🎤 [STT] 处理音频: uploads\1778925643.281683.wav, 语言: zh
+🎤 [STT] 正在识别音频: uploads\1778925643.281683.wav, 语言: en
+❌ [STT] API 返回错误: 404 - 
+📊 [评分] 原文: Welcome to the school of compu... 用户翻译: 识别失败 (错误代码: 404)...
+💾 [记录] 保存练习记录: Welcome to the school of compu...
+🎤 [STT] 处理音频: uploads\1778925756.697023.wav, 语言: zh
+🎤 [STT] 正在识别音频: uploads\1778925756.697023.wav, 语言: en
+❌ [STT] API 返回错误: 404 - 
+🎤 [STT] 处理音频: uploads\1778925756.953644.wav, 语言: zh
+🎤 [STT] 正在识别音频: uploads\1778925756.953644.wav, 语言: en
+❌ [STT] API 返回错误: 404 - 
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 138-680-501
+127.0.0.1 - - [16/May/2026 18:08:10] "GET /api/health HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2026 18:08:34] "POST /api/speech-to-text HTTP/1.1" 200 -
