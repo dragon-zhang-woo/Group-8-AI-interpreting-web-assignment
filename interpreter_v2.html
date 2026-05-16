@@ -5,283 +5,1008 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI 口译训练助手 V2</title>
     <style>
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            max-width: 950px; 
-            margin: 0 auto; 
-            padding: 30px 20px; 
-            background-color: #f5f7fa;
-            color: #333;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
         }
-        h1 { text-align: center; color: #2c3e50; }
-        
-        .settings {
-            text-align: center;
-            margin-bottom: 20px;
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
             background: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
         }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 2.2em; margin-bottom: 6px; }
+        .header p { font-size: 1em; opacity: 0.9; }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e0e0e0;
+            background: #f5f5f5;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.3s;
+        }
+        .tab-btn:hover { color: #667eea; }
+        .tab-btn.active { color: #667eea; border-bottom-color: #667eea; }
+
+        .content { padding: 25px 30px; }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .section { margin-bottom: 22px; }
+        .section-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        label { display: block; margin-bottom: 6px; font-weight: 600; color: #333; }
+        textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 90px;
+            transition: border-color 0.3s;
+        }
+        textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
         select {
-            padding: 8px 12px;
-            font-size: 16px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-            margin: 0 10px;
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+            font-family: inherit;
+            background: white;
         }
-        
-        .controls { text-align: center; margin-bottom: 20px; }
-        button { 
-            padding: 12px 24px; 
-            font-size: 16px; 
-            margin: 0 10px; 
-            cursor: pointer; 
+
+        button {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
             border: none;
             border-radius: 6px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-        button:active { transform: translateY(2px); box-shadow: none; }
-        
-        #startBtn { background-color: #27ae60; color: white; }
-        #startBtn:hover { background-color: #219653; }
-        #startBtn:disabled { background-color: #95a5a6; cursor: not-allowed; transform: none; box-shadow: none;}
-        
-        #stopBtn { background-color: #e74c3c; color: white; }
-        #stopBtn:hover { background-color: #c0392b; }
-        #stopBtn:disabled { background-color: #95a5a6; cursor: not-allowed; transform: none; box-shadow: none;}
+        button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102,126,234,0.4); }
+        button:active { transform: translateY(0); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        button:disabled:hover { transform: none; box-shadow: none; }
 
-        #clearBtn { background-color: #f39c12; color: white; }
-        #clearBtn:hover { background-color: #d68910; }
+        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn-secondary { background: #e0e0e0; color: #333; }
+        .btn-secondary:hover { box-shadow: 0 3px 10px rgba(0,0,0,0.1); }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-success { background: #28a745; color: white; }
 
-        .container { display: flex; gap: 20px; }
-        .box { 
-            flex: 1; 
+        .direction-selector { display: flex; gap: 10px; margin-bottom: 12px; }
+        .dir-btn {
+            padding: 8px 16px;
+            background: #f0f0f0;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .dir-btn.active { background: #667eea; color: white; border-color: #667eea; }
+
+        .mode-tabs { display: flex; gap: 10px; margin-bottom: 12px; }
+        .mode-btn {
+            padding: 7px 14px;
+            background: #f0f0f0;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .mode-btn.active { background: #667eea; color: white; border-color: #667eea; }
+
+        .input-mode { display: none; }
+        .input-mode.active { display: block; }
+
+        .result-card {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+        .result-card.success { background: #d4edda; border-left-color: #28a745; }
+        .result-card.error { background: #f8d7da; border-left-color: #dc3545; }
+
+        .output-label { font-weight: 600; color: #666; margin-bottom: 6px; }
+        .output-text { color: #333; line-height: 1.6; word-break: break-word; }
+
+        .score-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .score-item {
             background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            padding: 16px;
+            border-radius: 6px;
+            text-align: center;
+            border: 2px solid #ddd;
         }
-        h3 { margin-top: 0; color: #34495e; font-size: 18px; display: flex; justify-content: space-between; align-items: center;}
-        textarea { 
-            width: 100%; 
-            height: 400px; 
-            font-size: 16px; 
-            padding: 12px; 
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            resize: vertical; 
-            box-sizing: border-box;
-            line-height: 1.6;
-            background-color: #fafafa;
+        .score-num { font-size: 2.2em; font-weight: 700; color: #667eea; }
+        .score-label { font-size: 0.85em; color: #666; font-weight: 600; }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+            margin-bottom: 18px;
         }
-        .status { text-align: center; margin-top: 15px; font-weight: bold; font-size: 15px; color: #7f8c8d; }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 18px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        .stat-num { font-size: 1.8em; font-weight: 700; }
+        .stat-label { font-size: 0.85em; opacity: 0.9; }
+
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th { background: #667eea; color: white; padding: 10px 12px; text-align: left; font-weight: 600; }
+        td { padding: 10px 12px; border-bottom: 1px solid #ddd; }
+        tr:hover { background: #f5f5f5; }
+        .table-wrap { overflow-x: auto; }
+
+        .status-msg {
+            padding: 10px 14px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            display: none;
+            font-weight: 500;
+        }
+        .status-msg.show { display: block; }
+        .status-msg.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .status-msg.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .status-msg.info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+
+        .timer { font-size: 1.3em; color: #dc3545; font-weight: 700; margin: 8px 0; }
+        .material-box { background: #f8f9fa; border-left: 4px solid #667eea; padding: 12px 15px; border-radius: 6px; }
+        .ref-box { background: #e8eaf6; padding: 12px 15px; border-radius: 6px; border-left: 4px solid #667eea; }
+
+        .feedback-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px 15px;
+            margin-top: 12px;
+            border-radius: 6px;
+            color: #856404;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+        .modal.show { display: block; }
+        .modal-content {
+            background: white;
+            margin: 8% auto;
+            padding: 25px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 580px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .close-btn { color: #aaa; font-size: 26px; font-weight: bold; cursor: pointer; float: right; }
+        .close-btn:hover { color: #000; }
+
+        audio { width: 100%; margin-top: 8px; }
+
+        @media (max-width: 768px) {
+            .content { padding: 15px; }
+            .tabs { flex-direction: column; }
+            .tab-btn { border-bottom: none; border-left: 3px solid transparent; }
+            .tab-btn.active { border-bottom: none; border-left-color: #667eea; }
+        }
     </style>
 </head>
 <body>
-    <h1>AI 口译训练助手 V2</h1>
-    
-    <div class="settings">
-        <label for="sourceLang">源语言 (你说的话): </label>
-        <select id="sourceLang">
-            <option value="zh">简体中文</option>
-            <option value="en">English (英语)</option>
-            <option value="ja">日本語 (日语)</option>
-        </select>
-        
-        <span style="font-weight: bold; margin: 0 10px; color: #7f8c8d;">➔</span>
-        
-        <label for="targetLang">目标语言 (翻译为): </label>
-        <select id="targetLang">
-            <option value="en">English (英语)</option>
-            <option value="zh">简体中文</option>
-            <option value="ja">日本語 (日语)</option>
-        </select>
-    </div>
-
-    <div class="controls">
-        <button id="startBtn">开始录音</button>
-        <button id="stopBtn" disabled>停止录音</button>
-        <button id="clearBtn">清空记录</button>
-        <div id="statusText" class="status">准备就绪</div>
-    </div>
-
     <div class="container">
-        <div class="box">
-            <h3 id="sourceTitle">原文记录</h3>
-            <textarea id="originalText" readonly placeholder="这里将实时保留并显示您的多次语音记录..."></textarea>
+        <div class="header">
+            <h1>AI 口译训练助手 V2</h1>
+            <p>纯前端实现 · Web Speech API + MyMemory 翻译 · 智能评分 · 记录成长</p>
         </div>
-        <div class="box">
-            <h3 id="targetTitle">参考译文</h3>
-            <textarea id="translatedText" readonly placeholder="这里将保留对应的翻译结果..."></textarea>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="translator" onclick="switchTab('translator')">AI 翻译机</button>
+            <button class="tab-btn" data-tab="practice" onclick="switchTab('practice')">实战演练</button>
+            <button class="tab-btn" data-tab="records" onclick="switchTab('records')">学习记录</button>
+        </div>
+
+        <div class="content">
+            <!-- ====== 标签页 1: AI 翻译机 ====== -->
+            <div id="translator" class="tab-panel active">
+                <div class="section-title">AI 翻译机</div>
+                <p style="color:#666; margin-bottom:14px;">英文输入 / 录音 → 中文翻译文本 + 语音输出</p>
+
+                <div class="form-group">
+                    <label>翻译方向</label>
+                    <div class="direction-selector">
+                        <button class="dir-btn active" data-dir="en2zh" onclick="setDirection('en2zh')">英 → 中</button>
+                        <button class="dir-btn" data-dir="zh2en" onclick="setDirection('zh2en')">中 → 英</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="mode-tabs">
+                        <button class="mode-btn active" data-mode="text" onclick="switchInputMode('text')">文本输入</button>
+                        <button class="mode-btn" data-mode="voice" onclick="switchInputMode('voice')">语音输入</button>
+                    </div>
+                </div>
+
+                <div id="textMode" class="input-mode active">
+                    <textarea id="sourceText" placeholder="在此输入要翻译的文本..."></textarea>
+                    <button onclick="translateText()" style="margin-top:10px;">开始翻译</button>
+                </div>
+
+                <div id="voiceMode" class="input-mode">
+                    <div class="btn-group">
+                        <button id="recordBtn" onclick="startRecording()">开始录音</button>
+                        <button id="stopRecordBtn" onclick="stopRecording()" disabled class="btn-danger">停止录音</button>
+                        <button onclick="clearRecording()" class="btn-secondary">清除</button>
+                    </div>
+                    <div class="timer" id="recordTimer">00:00</div>
+                    <div id="recordInfo" style="padding:8px; background:#f0f0f0; border-radius:6px; font-size:0.9em;"></div>
+                    <button onclick="recognizeRecording()" style="margin-top:10px;">识别语音</button>
+                </div>
+
+                <div id="translatorStatus" class="status-msg"></div>
+                <div id="recognitionResult" style="display:none; margin-top:12px;">
+                    <div class="result-card">
+                        <div class="output-label">识别结果</div>
+                        <div class="output-text" id="recognitionText"></div>
+                        <button onclick="translateRecognition()" style="margin-top:8px;">翻译此文本</button>
+                    </div>
+                </div>
+                <div id="translationResult"></div>
+            </div>
+
+            <!-- ====== 标签页 2: 实战演练 ====== -->
+            <div id="practice" class="tab-panel">
+                <div class="section-title">实战演练 - 用户翻译评分模式</div>
+                <p style="color:#666; margin-bottom:14px;">选择材料 → 查看英文原文 → 用户录制中文翻译 → 自动评分（发音3 + 流畅3 + 准确3）</p>
+
+                <div class="form-group">
+                    <label>选择练习难度</label>
+                    <select id="difficulty" onchange="loadMaterial()">
+                        <option value="">-- 请选择 --</option>
+                        <option value="easy">简单 - 日常对话</option>
+                        <option value="medium">中等 - 商务/科技</option>
+                        <option value="hard">困难 - 学术/演讲</option>
+                    </select>
+                </div>
+
+                <div class="material-box">
+                    <div class="output-label">英文原文</div>
+                    <div class="output-text" id="englishSource">请先选择练习材料</div>
+                </div>
+
+                <div class="ref-box" id="refBox" style="display:none;">
+                    <div class="output-label">参考翻译（提交评分后可查看）</div>
+                    <div class="output-text" id="referenceText"></div>
+                </div>
+
+                <div class="form-group" style="margin-top:14px;">
+                    <label>用中文录制你的翻译</label>
+                    <div class="btn-group">
+                        <button id="practiceRecordBtn" onclick="startPracticeRecord()">开始录音</button>
+                        <button id="practiceStopBtn" onclick="stopPracticeRecord()" disabled class="btn-danger">停止录音</button>
+                        <button onclick="clearPracticeRecord()" class="btn-secondary">清除</button>
+                    </div>
+                    <div class="timer" id="practiceTimer">00:00</div>
+                    <div id="practiceRecordInfo" style="padding:8px; background:#f0f0f0; border-radius:6px; font-size:0.9em;"></div>
+                </div>
+
+                <button onclick="recognizePracticeAudio()">识别我的翻译</button>
+
+                <div id="practiceRecognition" style="display:none; margin-top:12px;">
+                    <div class="result-card">
+                        <div class="output-label">你的翻译（识别结果）</div>
+                        <div class="output-text" id="practiceRecognitionText"></div>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top:12px;">
+                    <label>或手动输入 / 修正你的翻译</label>
+                    <textarea id="userTranslationInput" placeholder="如果语音识别不准确，可在此手动输入或修正..."></textarea>
+                </div>
+
+                <button onclick="submitScoring()" class="btn-success" style="margin-top:8px;">提交评分</button>
+
+                <div id="scoringResult"></div>
+                <div id="feedbackBox" class="feedback-box" style="display:none;">
+                    <div class="output-label">改进建议</div>
+                    <div id="feedbackContent"></div>
+                </div>
+
+                <button onclick="saveRecord()" id="saveRecordBtn" class="btn-secondary" style="display:none; margin-top:8px;">保存记录</button>
+            </div>
+
+            <!-- ====== 标签页 3: 学习记录 ====== -->
+            <div id="records" class="tab-panel">
+                <div class="section-title">学习记录</div>
+
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-num" id="totalCount">0</div>
+                        <div class="stat-label">练习次数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-num" id="avgScore">0.0</div>
+                        <div class="stat-label">平均得分</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-num" id="maxScore">0.0</div>
+                        <div class="stat-label">最高得分</div>
+                    </div>
+                </div>
+
+                <div class="btn-group" style="margin-bottom:14px;">
+                    <button onclick="loadRecords()" class="btn-secondary">刷新记录</button>
+                    <button onclick="exportCSV()" class="btn-secondary">导出 CSV</button>
+                    <button onclick="clearRecords()" class="btn-danger">清除所有记录</button>
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>时间</th>
+                                <th>原文</th>
+                                <th>发音</th>
+                                <th>流畅</th>
+                                <th>准确</th>
+                                <th>总分</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recordsBody">
+                            <tr><td colspan="7" style="text-align:center; color:#999;">暂无记录</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 详情弹窗 -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeDetail()">&times;</span>
+            <div id="detailContent"></div>
         </div>
     </div>
 
     <script>
-        // 浏览器 API 兼容处理
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        
-        if (!SpeechRecognition) {
-            alert("抱歉，您的浏览器不支持语音识别功能。请使用最新版本的 Google Chrome 或 Microsoft Edge。");
+    "use strict";
+
+    // ==================== 全局状态 ====================
+    const LS_RECORDS = 'interpreter_v2_records';
+    let direction = 'en2zh';           // en2zh | zh2en
+    let inputMode = 'text';            // text | voice
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let recordStart = null;
+    let recordTimer = null;
+    let currentBlob = null;
+
+    // 实战演练状态
+    let practiceRecorder = null;
+    let practiceChunks = [];
+    let practiceStart = null;
+    let practiceTimer = null;
+    let practiceBlob = null;
+    let currentMaterial = '';
+    let currentReference = '';
+    let recognizedUserTranslation = '';
+    let currentScores = null;
+
+    // ==================== 本地素材库 ====================
+    const MATERIALS = {
+        easy: [
+            { en: "Good morning. Today is a beautiful day. The weather is sunny and warm. I hope you have a great day.", zh: "早上好。今天是美好的一天。天气晴朗温暖。希望你今天过得愉快。" },
+            { en: "Please turn off the lights when you leave the room. It helps save energy.", zh: "离开房间时请关灯。这有助于节约能源。" },
+            { en: "I would like to order a cup of coffee and a sandwich, please.", zh: "我想点一杯咖啡和一个三明治，谢谢。" },
+            { en: "The meeting will start at nine o'clock tomorrow morning. Please be on time.", zh: "会议将于明早九点开始。请准时出席。" },
+            { en: "She studies English every day because she wants to improve her language skills.", zh: "她每天学习英语，因为她想提高语言能力。" }
+        ],
+        medium: [
+            { en: "Climate change is one of the most pressing issues facing humanity today. Scientists warn that global temperatures could rise significantly without immediate action.", zh: "气候变化是当今人类面临的最紧迫问题之一。科学家警告，若不立即采取行动，全球气温可能大幅上升。" },
+            { en: "Artificial intelligence is transforming industries across the globe. From healthcare to finance, companies are using machine learning to improve efficiency.", zh: "人工智能正在改变全球各行各业。从医疗到金融，企业正利用机器学习提高效率。" },
+            { en: "The global economy has shown signs of recovery following the pandemic. Consumer spending has increased and employment rates are gradually returning to normal.", zh: "疫情后全球经济已显现复苏迹象。消费者支出增加，就业率逐步恢复正常。" },
+            { en: "Online education platforms now offer courses in virtually every subject, making quality education accessible to people in remote areas.", zh: "在线教育平台如今几乎提供所有学科的课程，使偏远地区的人们也能获得优质教育。" },
+            { en: "Renewable energy sources such as solar and wind power are becoming increasingly cost-competitive with fossil fuels.", zh: "太阳能和风能等可再生能源在成本上正越来越具竞争力。" }
+        ],
+        hard: [
+            { en: "Neuroplasticity refers to the brain's remarkable ability to reorganize itself by forming new neural connections throughout life. This has significant implications for rehabilitation medicine.", zh: "神经可塑性指大脑通过形成新神经连接进行自我重组的非凡能力。这对康复医学有重大意义。" },
+            { en: "The proliferation of disinformation in the digital age poses unprecedented challenges to democratic governance and social cohesion.", zh: "数字时代虚假信息的泛滥对民主治理和社会凝聚力构成了前所未有的挑战。" },
+            { en: "Quantum computing exploits the principles of superposition and entanglement to perform calculations that would be practically impossible for classical computers.", zh: "量子计算利用叠加和纠缠原理，执行经典计算机实际上无法完成的计算。" },
+            { en: "The concept of corporate social responsibility has evolved considerably, with contemporary stakeholder theory positing obligations beyond shareholders.", zh: "企业社会责任概念已发生显著演变，当代利益相关者理论认为企业义务超越股东范畴。" },
+            { en: "The geopolitical landscape has undergone profound transformations as the unipolar world order gives way to an increasingly multipolar configuration.", zh: "地缘政治格局已发生深刻变化，单极世界秩序正让位于日益多极化的格局。" }
+        ]
+    };
+
+    // ==================== 标签页切换 ====================
+    function switchTab(name) {
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(name).classList.add('active');
+        document.querySelector(`.tab-btn[data-tab="${name}"]`).classList.add('active');
+        if (name === 'records') loadRecords();
+    }
+
+    // ==================== 翻译方向 ====================
+    function setDirection(dir) {
+        direction = dir;
+        document.querySelectorAll('.dir-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector(`.dir-btn[data-dir="${dir}"]`).classList.add('active');
+        showStatus(null, 'info');
+    }
+
+    // ==================== 输入模式 ====================
+    function switchInputMode(mode) {
+        inputMode = mode;
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector(`.mode-btn[data-mode="${mode}"]`).classList.add('active');
+        document.querySelectorAll('.input-mode').forEach(m => m.classList.remove('active'));
+        document.getElementById(mode === 'text' ? 'textMode' : 'voiceMode').classList.add('active');
+    }
+
+    // ==================== 状态消息 ====================
+    function showStatus(msg, type) {
+        const el = document.getElementById('translatorStatus');
+        if (!msg) { el.classList.remove('show'); return; }
+        el.textContent = msg;
+        el.className = `status-msg show ${type}`;
+        setTimeout(() => el.classList.remove('show'), 4000);
+    }
+
+    function showPracticeStatus(msg, type) {
+        const el = document.getElementById('translatorStatus');
+        el.textContent = msg;
+        el.className = `status-msg show ${type}`;
+        setTimeout(() => el.classList.remove('show'), 4000);
+    }
+
+    // ==================== 翻译 (MyMemory API) ====================
+    async function translateText() {
+        const text = document.getElementById('sourceText').value.trim();
+        if (!text) { showStatus('请输入要翻译的文本', 'error'); return; }
+        showStatus('翻译中...', 'info');
+
+        const src = direction === 'en2zh' ? 'en' : 'zh-CN';
+        const tgt = direction === 'en2zh' ? 'zh-CN' : 'en';
+        const result = await callMyMemory(text, src, tgt);
+
+        if (result) {
+            displayTranslationResult(text, result);
+            showStatus('翻译成功', 'success');
         } else {
-            const recognition = new SpeechRecognition();
-            recognition.continuous = true; 
-            recognition.interimResults = false; 
-
-            // DOM 元素绑定
-            const startBtn = document.getElementById('startBtn');
-            const stopBtn = document.getElementById('stopBtn');
-            const clearBtn = document.getElementById('clearBtn');
-            const originalTextArea = document.getElementById('originalText');
-            const translatedTextArea = document.getElementById('translatedText');
-            const statusText = document.getElementById('statusText');
-            const sourceLangSelect = document.getElementById('sourceLang');
-            const targetLangSelect = document.getElementById('targetLang');
-
-            // 语言代码映射 (用于语音识别)
-            const speechLangMap = {
-                'zh': 'zh-CN',
-                'en': 'en-US',
-                'ja': 'ja-JP'
-            };
-
-            let recordCounter = 1; // 记录对话轮数
-
-            // 更新标题显示
-            function updateTitles() {
-                const sourceText = sourceLangSelect.options[sourceLangSelect.selectedIndex].text;
-                const targetText = targetLangSelect.options[targetLangSelect.selectedIndex].text;
-                document.getElementById('sourceTitle').textContent = `原文 (${sourceText})`;
-                document.getElementById('targetTitle').textContent = `译文 (${targetText})`;
-            }
-
-            // 监听语言选择改变
-            sourceLangSelect.addEventListener('change', () => {
-                if (!startBtn.disabled) { 
-                    updateTitles();
-                } else {
-                    alert("请先停止当前录音再切换语言。");
-                }
-            });
-            targetLangSelect.addEventListener('change', updateTitles);
-            
-            // 初始化标题
-            updateTitles();
-
-            // 开始按钮
-            startBtn.onclick = () => {
-                const sourceLangCode = sourceLangSelect.value;
-                recognition.lang = speechLangMap[sourceLangCode]; // 根据下拉框设置识别语言
-                
-                try {
-                    recognition.start();
-                    startBtn.disabled = true;
-                    stopBtn.disabled = false;
-                    sourceLangSelect.disabled = true; // 录音时禁止切换语言
-                    statusText.textContent = `🎤 正在倾听 (${sourceLangSelect.options[sourceLangSelect.selectedIndex].text})...`;
-                    statusText.style.color = '#e67e22';
-                } catch (e) {
-                    console.error("启动识别失败:", e);
-                }
-            };
-
-            // 停止按钮
-            stopBtn.onclick = () => {
-                recognition.stop();
-                startBtn.disabled = false;
-                stopBtn.disabled = true;
-                sourceLangSelect.disabled = false;
-                statusText.textContent = '录音已停止';
-                statusText.style.color = '#7f8c8d';
-            };
-
-            // 清空记录按钮
-            clearBtn.onclick = () => {
-                if (confirm("确定要清空所有原文和译文记录吗？")) {
-                    originalTextArea.value = '';
-                    translatedTextArea.value = '';
-                    recordCounter = 1;
-                }
-            };
-
-            // 格式化时间戳
-            function getTimeString() {
-                const now = new Date();
-                return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
-            }
-
-            // 语音识别结果处理
-            recognition.onresult = async (event) => {
-                let transcript = '';
-                for (let i = event.resultIndex; i < event.results.length; i++) {
-                    transcript += event.results[i][0].transcript;
-                }
-                
-                if (transcript.trim() !== '') {
-                    const sourceLang = sourceLangSelect.value;
-                    const targetLang = targetLangSelect.value;
-                    const timeStr = getTimeString();
-                    
-                    // 格式化输出文本，增加对话轮数和时间标识
-                    const originalEntry = `[${timeStr}] 第 ${recordCounter} 句:\n${transcript}\n\n`;
-                    originalTextArea.value += originalEntry;
-                    originalTextArea.scrollTop = originalTextArea.scrollHeight;
-
-                    // 如果源语言和目标语言相同，直接复制
-                    if (sourceLang === targetLang) {
-                        const sameEntry = `[${timeStr}] 第 ${recordCounter} 句:\n${transcript} (无需翻译)\n\n`;
-                        translatedTextArea.value += sameEntry;
-                        translatedTextArea.scrollTop = translatedTextArea.scrollHeight;
-                        recordCounter++;
-                        return;
-                    }
-
-                    // 调用翻译
-                    statusText.textContent = '⏳ 正在翻译...';
-                    await translateText(transcript, sourceLang, targetLang, timeStr, recordCounter);
-                    
-                    recordCounter++;
-                    if(startBtn.disabled) { // 如果还在录音状态
-                        statusText.textContent = `🎤 继续倾听 (${sourceLangSelect.options[sourceLangSelect.selectedIndex].text})...`;
-                    }
-                }
-            };
-
-            recognition.onerror = (event) => {
-                console.error("语音识别错误:", event.error);
-                statusText.textContent = `⚠️ 发生错误: ${event.error}`;
-                stopBtn.click();
-            };
-
-            // 翻译接口请求
-            async function translateText(text, fromLang, toLang, timeStr, counter) {
-                try {
-                    // MyMemory API 支持的语言格式
-                    const langPair = `${fromLang}|${toLang}`;
-                    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${langPair}`;
-                    
-                    const response = await fetch(url);
-                    const data = await response.json();
-                    
-                    let translatedEntry = `[${timeStr}] 第 ${counter} 句:\n`;
-                    
-                    if (data && data.responseData && data.responseData.translatedText) {
-                        translatedEntry += data.responseData.translatedText + '\n\n';
-                    } else {
-                        translatedEntry += "[翻译接口返回异常]\n\n";
-                    }
-                    
-                    translatedTextArea.value += translatedEntry;
-                    translatedTextArea.scrollTop = translatedTextArea.scrollHeight;
-
-                } catch (error) {
-                    console.error("翻译请求失败:", error);
-                    translatedTextArea.value += `[${timeStr}] 第 ${counter} 句:\n[网络异常，翻译失败]\n\n`;
-                }
-            }
+            showStatus('翻译失败，请检查网络连接', 'error');
         }
+    }
+
+    async function callMyMemory(text, from, to) {
+        const langPair = `${from}|${to}`;
+        try {
+            const resp = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${langPair}`);
+            const data = await resp.json();
+            if (data.responseStatus === 200 && data.responseData.translatedText) {
+                return data.responseData.translatedText;
+            }
+        } catch (e) { console.warn('MyMemory failed:', e.message); }
+
+        // 回退：LibreTranslate
+        try {
+            const resp = await fetch('https://libretranslate.de/translate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ q: text, source: from === 'zh-CN' ? 'zh' : from, target: to === 'zh-CN' ? 'zh' : to, format: 'text' })
+            });
+            const data = await resp.json();
+            if (data.translatedText) return data.translatedText;
+        } catch (e) { console.warn('LibreTranslate failed:', e.message); }
+        return null;
+    }
+
+    let lastTranslation = { text: '', lang: '' };
+
+    function displayTranslationResult(original, translated) {
+        const tgtLang = direction === 'en2zh' ? 'zh-CN' : 'en-US';
+        lastTranslation.text = translated;
+        lastTranslation.lang = tgtLang;
+
+        document.getElementById('translationResult').innerHTML = `
+            <div class="result-card success">
+                <div class="output-label">原文</div>
+                <div class="output-text">${escHtml(original)}</div>
+                <div class="output-label" style="margin-top:12px;">翻译结果</div>
+                <div class="output-text">${escHtml(translated)}</div>
+                <div class="btn-group" style="margin-top:10px;">
+                    <button onclick="speakLast()">播放翻译语音</button>
+                    <button onclick="copyLast()" class="btn-secondary">复制</button>
+                </div>
+            </div>`;
+    }
+
+    function speakLast() { speak(lastTranslation.text, lastTranslation.lang); }
+    function copyLast() { navigator.clipboard.writeText(lastTranslation.text).then(() => showStatus('已复制', 'success')).catch(() => {}); }
+
+    function speak(text, lang) {
+        if (!window.speechSynthesis) return;
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = lang;
+        u.rate = 0.9;
+        window.speechSynthesis.speak(u);
+    }
+
+    // ==================== 语音录制 ====================
+    async function startRecording() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
+            mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+            mediaRecorder.onstop = () => {
+                currentBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                stream.getTracks().forEach(t => t.stop());
+                updateRecordInfo();
+            };
+            mediaRecorder.start();
+            document.getElementById('recordBtn').disabled = true;
+            document.getElementById('stopRecordBtn').disabled = false;
+            recordStart = Date.now();
+            recordTimer = setInterval(updateRecordTimer, 100);
+            showStatus('正在录音...', 'info');
+        } catch (e) { showStatus('无法访问麦克风: ' + e.message, 'error'); }
+    }
+
+    function stopRecording() {
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+            document.getElementById('recordBtn').disabled = false;
+            document.getElementById('stopRecordBtn').disabled = true;
+            clearInterval(recordTimer);
+            showStatus('录音完成', 'success');
+        }
+    }
+
+    function updateRecordTimer() {
+        const elapsed = Date.now() - recordStart;
+        document.getElementById('recordTimer').textContent =
+            `${String(Math.floor(elapsed / 60000)).padStart(2, '0')}:${String(Math.floor((elapsed % 60000) / 1000)).padStart(2, '0')}`;
+    }
+
+    function updateRecordInfo() {
+        document.getElementById('recordInfo').innerHTML = currentBlob ?
+            `录音完成 · ${(currentBlob.size / 1024).toFixed(1)} KB` : '';
+    }
+
+    function clearRecording() {
+        currentBlob = null;
+        audioChunks = [];
+        document.getElementById('recordTimer').textContent = '00:00';
+        document.getElementById('recordInfo').innerHTML = '';
+        document.getElementById('recordBtn').disabled = false;
+        document.getElementById('stopRecordBtn').disabled = true;
+        document.getElementById('recognitionResult').style.display = 'none';
+    }
+
+    // ==================== 识别录音 (Web Speech API) ====================
+    async function recognizeRecording() {
+        if (!currentBlob) { showStatus('请先录音', 'error'); return; }
+        fallbackSpeechRecognition(id => {
+            document.getElementById('recognitionText').textContent = id;
+            document.getElementById('recognitionResult').style.display = 'block';
+            showStatus('识别成功', 'success');
+        }, direction === 'en2zh' ? 'en-US' : 'zh-CN');
+    }
+
+    function translateRecognition() {
+        const text = document.getElementById('recognitionText').textContent;
+        if (!text) return;
+        document.getElementById('sourceText').value = text;
+        switchInputMode('text');
+        translateText();
+    }
+
+    // ==================== 实战演练 - 录音 ====================
+    async function startPracticeRecord() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            practiceRecorder = new MediaRecorder(stream);
+            practiceChunks = [];
+            practiceRecorder.ondataavailable = e => practiceChunks.push(e.data);
+            practiceRecorder.onstop = () => {
+                practiceBlob = new Blob(practiceChunks, { type: 'audio/webm' });
+                stream.getTracks().forEach(t => t.stop());
+                updatePracticeInfo();
+            };
+            practiceRecorder.start();
+            document.getElementById('practiceRecordBtn').disabled = true;
+            document.getElementById('practiceStopBtn').disabled = false;
+            practiceStart = Date.now();
+            practiceTimer = setInterval(updatePracticeTimer, 100);
+            showPracticeStatus('正在录音...', 'info');
+        } catch (e) { showPracticeStatus('无法访问麦克风: ' + e.message, 'error'); }
+    }
+
+    function stopPracticeRecord() {
+        if (practiceRecorder && practiceRecorder.state === 'recording') {
+            practiceRecorder.stop();
+            document.getElementById('practiceRecordBtn').disabled = false;
+            document.getElementById('practiceStopBtn').disabled = true;
+            clearInterval(practiceTimer);
+            showPracticeStatus('录音完成', 'success');
+        }
+    }
+
+    function updatePracticeTimer() {
+        const elapsed = Date.now() - practiceStart;
+        document.getElementById('practiceTimer').textContent =
+            `${String(Math.floor(elapsed / 60000)).padStart(2, '0')}:${String(Math.floor((elapsed % 60000) / 1000)).padStart(2, '0')}`;
+    }
+
+    function updatePracticeInfo() {
+        document.getElementById('practiceRecordInfo').innerHTML = practiceBlob ?
+            `录音完成 · ${(practiceBlob.size / 1024).toFixed(1)} KB` : '';
+    }
+
+    function clearPracticeRecord() {
+        practiceBlob = null;
+        practiceChunks = [];
+        document.getElementById('practiceTimer').textContent = '00:00';
+        document.getElementById('practiceRecordInfo').innerHTML = '';
+        document.getElementById('practiceRecordBtn').disabled = false;
+        document.getElementById('practiceStopBtn').disabled = true;
+        document.getElementById('practiceRecognition').style.display = 'none';
+    }
+
+    // ==================== 实战演练 - 识别 ====================
+    function recognizePracticeAudio() {
+        if (!practiceBlob) { showPracticeStatus('请先录音', 'error'); return; }
+        fallbackSpeechRecognition(transcript => {
+            recognizedUserTranslation = transcript;
+            document.getElementById('practiceRecognitionText').textContent = transcript;
+            document.getElementById('practiceRecognition').style.display = 'block';
+            document.getElementById('userTranslationInput').value = transcript;
+            showPracticeStatus('识别成功', 'success');
+        }, 'zh-CN');
+    }
+
+    function fallbackSpeechRecognition(callback, lang) {
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SR) {
+            showStatus('浏览器不支持语音识别，请使用 Chrome 或 Edge，或手动输入文本', 'error');
+            return;
+        }
+        const rec = new SR();
+        rec.lang = lang;
+        rec.continuous = false;
+        rec.interimResults = false;
+        showStatus('请对着麦克风说话...', 'info');
+        rec.onresult = e => {
+            const text = Array.from(e.results).map(r => r[0].transcript).join('');
+            callback(text);
+        };
+        rec.onerror = e => {
+            showStatus('识别失败: ' + e.error + '，请重试或手动输入', 'error');
+        };
+        rec.start();
+    }
+
+    // ==================== 实战演练 - 加载材料 ====================
+    function loadMaterial() {
+        const diff = document.getElementById('difficulty').value;
+        if (!diff) return;
+        const pool = MATERIALS[diff];
+        const item = pool[Math.floor(Math.random() * pool.length)];
+        currentMaterial = item.en;
+        currentReference = item.zh;
+        document.getElementById('englishSource').textContent = currentMaterial;
+        document.getElementById('refBox').style.display = 'none';
+        document.getElementById('scoringResult').innerHTML = '';
+        document.getElementById('feedbackBox').style.display = 'none';
+        document.getElementById('saveRecordBtn').style.display = 'none';
+        currentScores = null;
+        showPracticeStatus('材料已加载', 'success');
+    }
+
+    // ==================== 实战演练 - 评分 ====================
+    function submitScoring() {
+        const userTranslation = document.getElementById('userTranslationInput').value.trim();
+        if (!userTranslation) { showPracticeStatus('请先输入或识别你的翻译', 'error'); return; }
+        if (!currentMaterial) { showPracticeStatus('请先选择练习材料', 'error'); return; }
+
+        currentScores = localScore(userTranslation, currentReference);
+        displayScoringResult(currentScores);
+        showPracticeStatus('评分完成', 'success');
+        document.getElementById('refBox').style.display = 'block';
+        document.getElementById('referenceText').textContent = currentReference;
+        document.getElementById('saveRecordBtn').style.display = 'inline-block';
+    }
+
+    function localScore(userTr, refTr) {
+        const usr = (userTr || '').replace(/\s/g, '');
+        const ref = (refTr || '').replace(/\s/g, '');
+
+        // --- 发音标准性 (0-3): 基于文本结构 ---
+        let pron = 0;
+        if (usr.length >= 5) pron += 1;
+        if (!/(.)\1{3,}/.test(usr)) pron += 1;   // 无连续重复字符
+        if (/[，。！？、,\.\!\?]/.test(usr)) pron += 1;
+
+        // --- 语言流畅性 (0-3): 基于句子结构 ---
+        let flu = 0;
+        if (/[。！？\.\!\?]/.test(usr)) flu += 1;  // 含结束标点
+        const lenRatio = ref.length > 0 ? Math.min(usr.length, ref.length) / Math.max(usr.length, ref.length) : 0;
+        if (lenRatio >= 0.3) flu += 1;
+        const words = usr.split('');
+        const uniqueRatio = new Set(words).size / Math.max(1, words.length);
+        if (uniqueRatio >= 0.4) flu += 1;
+
+        // --- 翻译准确性 (0-3): 基于字符相似度 ---
+        function jaccardSim(a, b) {
+            const sa = new Set(a.split('')), sb = new Set(b.split(''));
+            let inter = 0;
+            for (const c of sa) { if (sb.has(c)) inter++; }
+            const union = new Set([...sa, ...sb]).size;
+            return union === 0 ? 0 : inter / union;
+        }
+        function bigramSim(a, b) {
+            const bg = s => { const set = new Set(); for (let i = 0; i < s.length - 1; i++) set.add(s[i] + s[i + 1]); return set; };
+            const ba = bg(a), bb = bg(b);
+            let inter = 0;
+            for (const g of ba) { if (bb.has(g)) inter++; }
+            const denom = (ba.size + bb.size) / 2;
+            return denom === 0 ? 0 : inter / denom;
+        }
+        const jSim = jaccardSim(usr, ref);
+        const bSim = bigramSim(usr, ref);
+        const sim = jSim * 0.4 + bSim * 0.6;
+        let acc = 0;
+        if (sim >= 0.8) acc = 3;
+        else if (sim >= 0.6) acc = 2.5;
+        else if (sim >= 0.4) acc = 2;
+        else if (sim >= 0.2) acc = 1;
+        else acc = 0.5;
+
+        const total = (pron + flu + acc) / 3;
+        let feedback = '';
+        if (total >= 2.5) feedback = '表现优秀！翻译质量较高，继续保持。';
+        else if (total >= 2.0) feedback = '表现良好，部分细节有待完善。';
+        else if (total >= 1.5) feedback = '表现尚可，建议多加练习以提高准确度。';
+        else feedback = '需要改进，建议对照参考译文仔细揣摩。';
+
+        const suggestions = [];
+        if (pron < 2) suggestions.push('发音维度：尝试增加翻译内容的长度和完整性。');
+        if (flu < 2) suggestions.push('流畅维度：注意句子结构，适当使用标点符号断句。');
+        if (acc < 2) suggestions.push('准确维度：关注关键词汇的准确对应，多对照参考译文。');
+        if (suggestions.length === 0) suggestions.push('各方面表现均衡，坚持练习会越来越好！');
+
+        return {
+            pronunciation: pron,
+            fluency: flu,
+            accuracy: acc,
+            total: parseFloat(total.toFixed(1)),
+            feedback,
+            suggestions
+        };
+    }
+
+    function displayScoringResult(s) {
+        document.getElementById('scoringResult').innerHTML = `
+            <div class="result-card success">
+                <div class="section-title">评分结果</div>
+                <div class="score-grid">
+                    <div class="score-item">
+                        <div class="score-num">${s.pronunciation}</div>
+                        <div class="score-label">发音标准性 /3</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-num">${s.fluency}</div>
+                        <div class="score-label">语言流畅性 /3</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-num">${s.accuracy}</div>
+                        <div class="score-label">翻译准确性 /3</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-num" style="color:#28a745;">${s.total.toFixed(1)}</div>
+                        <div class="score-label">总分 /3</div>
+                    </div>
+                </div>
+                <p style="margin-top:10px;">${s.feedback}</p>
+            </div>`;
+
+        const fb = document.getElementById('feedbackBox');
+        fb.style.display = 'block';
+        fb.innerHTML = '<div class="output-label">改进建议</div><ul style="margin-left:18px;">' +
+            s.suggestions.map(t => `<li>${t}</li>`).join('') + '</ul>';
+    }
+
+    // ==================== 保存记录 (localStorage) ====================
+    function saveRecord() {
+        if (!currentScores || !currentMaterial) {
+            showPracticeStatus('没有可保存的评分结果', 'error');
+            return;
+        }
+        const userTr = document.getElementById('userTranslationInput').value.trim();
+        const record = {
+            time: new Date().toLocaleString('zh-CN'),
+            original: currentMaterial,
+            userTranslation: userTr,
+            pronunciation: currentScores.pronunciation,
+            fluency: currentScores.fluency,
+            accuracy: currentScores.accuracy,
+            feedback: currentScores.feedback
+        };
+        const records = getRecords();
+        records.push(record);
+        localStorage.setItem(LS_RECORDS, JSON.stringify(records));
+        showPracticeStatus('记录已保存', 'success');
+        // 重置表单
+        setTimeout(() => {
+            document.getElementById('difficulty').value = '';
+            document.getElementById('englishSource').textContent = '请先选择练习材料';
+            document.getElementById('refBox').style.display = 'none';
+            document.getElementById('userTranslationInput').value = '';
+            document.getElementById('scoringResult').innerHTML = '';
+            document.getElementById('feedbackBox').style.display = 'none';
+            document.getElementById('saveRecordBtn').style.display = 'none';
+            clearPracticeRecord();
+            currentMaterial = '';
+            currentReference = '';
+            currentScores = null;
+        }, 800);
+    }
+
+    function getRecords() {
+        try { return JSON.parse(localStorage.getItem(LS_RECORDS) || '[]'); } catch (e) { return []; }
+    }
+
+    // ==================== 学习记录 ====================
+    let cachedRecords = [];
+
+    function loadRecords() {
+        cachedRecords = getRecords();
+        const tbody = document.getElementById('recordsBody');
+
+        if (cachedRecords.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#999;">暂无记录</td></tr>';
+        } else {
+            tbody.innerHTML = cachedRecords.map((r, i) => {
+                const total = ((r.pronunciation + r.fluency + r.accuracy) / 3).toFixed(1);
+                return `<tr>
+                    <td>${escHtml(r.time)}</td>
+                    <td>${escHtml(r.original.substring(0, 28))}...</td>
+                    <td>${r.pronunciation}</td>
+                    <td>${r.fluency}</td>
+                    <td>${r.accuracy}</td>
+                    <td style="font-weight:bold;color:#667eea;">${total}</td>
+                    <td><button onclick="showDetail(${i})" style="padding:5px 10px;font-size:0.85em;">查看</button></td>
+                </tr>`;
+            }).join('');
+        }
+        updateStats();
+    }
+
+    function updateStats() {
+        const total = cachedRecords.length;
+        document.getElementById('totalCount').textContent = total;
+        if (total === 0) {
+            document.getElementById('avgScore').textContent = '0.0';
+            document.getElementById('maxScore').textContent = '0.0';
+            return;
+        }
+        const scores = cachedRecords.map(r => (r.pronunciation + r.fluency + r.accuracy) / 3);
+        document.getElementById('avgScore').textContent = (scores.reduce((a, b) => a + b, 0) / total).toFixed(1);
+        document.getElementById('maxScore').textContent = Math.max(...scores).toFixed(1);
+    }
+
+    function showDetail(i) {
+        const r = cachedRecords[i];
+        if (!r) return;
+        const total = ((r.pronunciation + r.fluency + r.accuracy) / 3).toFixed(1);
+        document.getElementById('detailContent').innerHTML = `
+            <h3 style="color:#667eea; margin-bottom:12px;">练习详情</h3>
+            <p><strong>时间：</strong>${escHtml(r.time)}</p>
+            <p><strong>英文原文：</strong><br>${escHtml(r.original)}</p>
+            <p><strong>你的翻译：</strong><br>${escHtml(r.userTranslation || '(无)')}</p>
+            <p><strong>发音：</strong>${r.pronunciation}/3 &nbsp; <strong>流畅：</strong>${r.fluency}/3 &nbsp; <strong>准确：</strong>${r.accuracy}/3 &nbsp; <strong>总分：</strong><span style="color:#667eea;font-weight:bold;">${total}/3</span></p>
+            ${r.feedback ? `<p style="padding:8px;background:#fff3cd;border-radius:4px;"><strong>评语：</strong>${escHtml(r.feedback)}</p>` : ''}`;
+        document.getElementById('detailModal').classList.add('show');
+    }
+
+    function closeDetail() {
+        document.getElementById('detailModal').classList.remove('show');
+    }
+
+    function clearRecords() {
+        if (!confirm('确定要清除所有学习记录吗？此操作不可撤销！')) return;
+        localStorage.removeItem(LS_RECORDS);
+        cachedRecords = [];
+        loadRecords();
+        showPracticeStatus('所有记录已清除', 'success');
+    }
+
+    function exportCSV() {
+        const records = getRecords();
+        if (records.length === 0) { alert('暂无记录可导出'); return; }
+        let csv = '﻿时间,原文,你的翻译,发音,流畅,准确,评语\n';
+        csv += records.map(r =>
+            `"${r.time}","${r.original}","${r.userTranslation || ''}",${r.pronunciation},${r.fluency},${r.accuracy},"${r.feedback || ''}"`
+        ).join('\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `口译练习记录_${new Date().toISOString().slice(0, 10)}.csv`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+    }
+
+    // ==================== 工具函数 ====================
+    function escHtml(s) {
+        const div = document.createElement('div');
+        div.textContent = s;
+        return div.innerHTML;
+    }
+
+    // ==================== 初始化 ====================
+    window.addEventListener('DOMContentLoaded', () => {
+        console.log('AI 口译训练助手 V2 已加载');
+        loadRecords();
+    });
+
+    // 点击模态框背景关闭
+    document.getElementById('detailModal').addEventListener('click', function(e) {
+        if (e.target === this) closeDetail();
+    });
     </script>
 </body>
 </html>
