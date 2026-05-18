@@ -23,7 +23,12 @@
       "Bash(powershell *)",
       "Bash(cmd *)",
       "Bash(python -c \"import subprocess; [subprocess.run\\(['taskkill','/F','/PID',str\\(p\\)], capture_output=True\\) for p in [78676, 98332]]; import time; time.sleep\\(2\\)\")",
-      "Bash(start \"\" \"interpreter_v2.html\")"
+      "Bash(start \"\" \"interpreter_v2.html\")",
+      "Bash(node -e \"const fs = require\\('fs'\\); const html = fs.readFileSync\\('interpreter_v2.html', 'utf8'\\); const match = html.match\\(/const MATERIALS = \\({[\\\\s\\\\S]*?}\\\\s*\\);/\\); if \\(match\\) { const m = eval\\('\\(' + match[1] + '\\)'\\); console.log\\('MATERIALS easy:', m.easy.length\\); console.log\\('MATERIALS medium:', m.medium.length\\); console.log\\('MATERIALS hard:', m.hard.length\\); } else { console.log\\('MATERIALS not found'\\); } const match2 = html.match\\(/const MATERIALS_REVERSE = \\({[\\\\s\\\\S]*?}\\\\s*\\);/\\); if \\(match2\\) { const mr = eval\\('\\(' + match2[1] + '\\)'\\); console.log\\('MATERIALS_REVERSE easy:', mr.easy.length\\); console.log\\('MATERIALS_REVERSE medium:', mr.medium.length\\); console.log\\('MATERIALS_REVERSE hard:', mr.hard.length\\); } else { console.log\\('MATERIALS_REVERSE not found'\\); }\")",
+      "Bash(node -e \"const fs = require\\('fs'\\); const lines = fs.readFileSync\\('interpreter_v2.html', 'utf8'\\).split\\('\\\\n'\\); const l = lines[640]; for\\(let i = 0; i < l.length; i++\\) { const c = l.charCodeAt\\(i\\); if\\(c > 127\\) console.log\\('pos', i, 'char:', l[i], 'code:', c.toString\\(16\\)\\); }\")",
+      "Bash(node -e \"const fs = require\\('fs'\\); const lines = fs.readFileSync\\('interpreter_v2.html', 'utf8'\\).split\\('\\\\n'\\); const l = lines[640]; console.log\\('pos 33 code:', l.charCodeAt\\(33\\).toString\\(16\\), 'char:', JSON.stringify\\(l[33]\\)\\); console.log\\('pos 38 code:', l.charCodeAt\\(38\\).toString\\(16\\), 'char:', JSON.stringify\\(l[38]\\)\\);\")",
+      "Bash(node -e \"const fs = require\\('fs'\\); const html = fs.readFileSync\\('interpreter_v2.html', 'utf8'\\); const match = html.match\\(/const MATERIALS = \\({[\\\\s\\\\S]*?}\\\\s*\\);/\\); if \\(match\\) { const m = eval\\('\\(' + match[1] + '\\)'\\); console.log\\('MATERIALS easy:', m.easy.length\\); console.log\\('MATERIALS medium:', m.medium.length\\); console.log\\('MATERIALS hard:', m.hard.length\\); } const match2 = html.match\\(/const MATERIALS_REVERSE = \\({[\\\\s\\\\S]*?}\\\\s*\\);/\\); if \\(match2\\) { const mr = eval\\('\\(' + match2[1] + '\\)'\\); console.log\\('REVERSE easy:', mr.easy.length\\); console.log\\('REVERSE medium:', mr.medium.length\\); console.log\\('REVERSE hard:', mr.hard.length\\); }\")",
+      "Bash(awk '{print $5}')"
     ]
   }
 }
