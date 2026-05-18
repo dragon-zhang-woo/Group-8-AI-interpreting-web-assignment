@@ -122,6 +122,17 @@
         }
         .dir-btn.active { background: #667eea; color: white; border-color: #667eea; }
 
+        .practice-dir-btn {
+            padding: 8px 16px;
+            background: #f0f0f0;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .practice-dir-btn.active { background: #667eea; color: white; border-color: #667eea; }
+
         .mode-tabs { display: flex; gap: 10px; margin-bottom: 12px; }
         .mode-btn {
             padding: 7px 14px;
@@ -308,7 +319,15 @@
             <!-- ====== 标签页 2: 实战演练 ====== -->
             <div id="practice" class="tab-panel">
                 <div class="section-title">实战演练 - 用户翻译评分模式</div>
-                <p style="color:#666; margin-bottom:14px;">选择材料 → 查看英文原文 → 用户录制中文翻译 → 自动评分（发音3 + 流畅3 + 准确3）</p>
+                <p style="color:#666; margin-bottom:14px;">选择材料和翻译方向 → 查看原文 → 用户录制翻译 → 自动评分（发音3 + 流畅3 + 准确3）</p>
+
+                <div class="form-group">
+                    <label>选择翻译方向</label>
+                    <div style="display:flex; gap:10px; margin-bottom:12px;">
+                        <button class="practice-dir-btn active" data-direction="en2zh" onclick="setPracticeDirection('en2zh')">英→中 (中文翻译)</button>
+                        <button class="practice-dir-btn" data-direction="zh2en" onclick="setPracticeDirection('zh2en')">中→英 (英文翻译)</button>
+                    </div>
+                </div>
 
                 <div class="form-group">
                     <label>选择练习难度</label>
@@ -321,17 +340,17 @@
                 </div>
 
                 <div class="material-box">
-                    <div class="output-label">英文原文</div>
+                    <div class="output-label" id="sourceLabel">英文原文</div>
                     <div class="output-text" id="englishSource">请先选择练习材料</div>
                 </div>
 
                 <div class="ref-box" id="refBox" style="display:none;">
-                    <div class="output-label">参考翻译（提交评分后可查看）</div>
+                    <div class="output-label" id="refLabel">参考翻译（提交评分后可查看）</div>
                     <div class="output-text" id="referenceText"></div>
                 </div>
 
                 <div class="form-group" style="margin-top:14px;">
-                    <label>用中文录制你的翻译（录音 + 实时识别同步进行）</label>
+                    <label id="recordLabel">用中文录制你的翻译（录音 + 实时识别同步进行）</label>
                     <div class="btn-group">
                         <button id="practiceRecordBtn" onclick="startPracticeRecord()">开始录音并识别</button>
                         <button id="practiceStopBtn" onclick="stopPracticeRecord()" disabled class="btn-danger">停止</button>
@@ -473,6 +492,31 @@
         ]
     };
 
+    // 为素材库添加反向对照（中→英）
+    const MATERIALS_REVERSE = {
+        easy: [
+            { zh: "早上好。今天是美好的一天。天气晴朗温暖。希望你今天过得愉快。", en: "Good morning. Today is a beautiful day. The weather is sunny and warm. I hope you have a great day." },
+            { zh: "离开房间时请关灯。这有助于节约能源。", en: "Please turn off the lights when you leave the room. It helps save energy." },
+            { zh: "我想点一杯咖啡和一个三明治，谢谢。", en: "I would like to order a cup of coffee and a sandwich, please." },
+            { zh: "会议将于明早九点开始。请准时出席。", en: "The meeting will start at nine o'clock tomorrow morning. Please be on time." },
+            { zh: "她每天学习英语，因为她想提高语言能力。", en: "She studies English every day because she wants to improve her language skills." }
+        ],
+        medium: [
+            { zh: "气候变化是当今人类面临的最紧迫问题之一。科学家警告，若不立即采取行动，全球气温可能大幅上升。", en: "Climate change is one of the most pressing issues facing humanity today. Scientists warn that global temperatures could rise significantly without immediate action." },
+            { zh: "人工智能正在改变全球各行各业。从医疗到金融，企业正利用机器学习提高效率。", en: "Artificial intelligence is transforming industries across the globe. From healthcare to finance, companies are using machine learning to improve efficiency." },
+            { zh: "疫情后全球经济已显现复苏迹象。消费者支出增加，就业率逐步恢复正常。", en: "The global economy has shown signs of recovery following the pandemic. Consumer spending has increased and employment rates are gradually returning to normal." },
+            { zh: "在线教育平台如今几乎提供所有学科的课程，使偏远地区的人们也能获得优质教育。", en: "Online education platforms now offer courses in virtually every subject, making quality education accessible to people in remote areas." },
+            { zh: "太阳能和风能等可再生能源在成本上正越来越具竞争力。", en: "Renewable energy sources such as solar and wind power are becoming increasingly cost-competitive with fossil fuels." }
+        ],
+        hard: [
+            { zh: "神经可塑性指大脑通过形成新神经连接进行自我重组的非凡能力。这对康复医学有重大意义。", en: "Neuroplasticity refers to the brain's remarkable ability to reorganize itself by forming new neural connections throughout life. This has significant implications for rehabilitation medicine." },
+            { zh: "数字时代虚假信息的泛滥对民主治理和社会凝聚力构成了前所未有的挑战。", en: "The proliferation of disinformation in the digital age poses unprecedented challenges to democratic governance and social cohesion." },
+            { zh: "量子计算利用叠加和纠缠原理，执行经典计算机实际上无法完成的计算。", en: "Quantum computing exploits the principles of superposition and entanglement to perform calculations that would be practically impossible for classical computers." },
+            { zh: "企业社会责任概念已发生显著演变，当代利益相关者理论认为企业义务超越股东范畴。", en: "The concept of corporate social responsibility has evolved considerably, with contemporary stakeholder theory positing obligations beyond shareholders." },
+            { zh: "地缘政治格局已发生深刻变化，单极世界秩序正让位于日益多极化的格局。", en: "The geopolitical landscape has undergone profound transformations as the unipolar world order gives way to an increasingly multipolar configuration." }
+        ]
+    };
+
     // ==================== 标签页切换 ====================
     function switchTab(name) {
         document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
@@ -488,6 +532,17 @@
         document.querySelectorAll('.dir-btn').forEach(b => b.classList.remove('active'));
         document.querySelector(`.dir-btn[data-dir="${dir}"]`).classList.add('active');
         showStatus(null, 'info');
+    }
+
+    // 实战演练翻译方向选择
+    let practiceDirection = 'en2zh';  // en2zh | zh2en
+    function setPracticeDirection(dir) {
+        practiceDirection = dir;
+        document.querySelectorAll('.practice-dir-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector(`.practice-dir-btn[data-direction="${dir}"]`).classList.add('active');
+        // 重置材料显示
+        document.getElementById('englishSource').textContent = '请先选择练习材料';
+        showPracticeStatus('翻译方向已切换，请重新选择材料', 'info');
     }
 
     // ==================== 输入模式 ====================
@@ -680,7 +735,8 @@
 
             // 2. 启动实时语音识别 (Web Speech API)
             practiceRecognition = new SR();
-            practiceRecognition.lang = 'zh-CN';
+            // 根据翻译方向设置语言
+            practiceRecognition.lang = practiceDirection === 'en2zh' ? 'zh-CN' : 'en-US';
             practiceRecognition.continuous = true;
             practiceRecognition.interimResults = true;
             practiceFinalTranscript = '';
@@ -719,7 +775,10 @@
             document.getElementById('practiceRecognition').style.display = 'none';
             practiceStart = Date.now();
             practiceTimer = setInterval(updatePracticeTimer, 100);
-            showPracticeStatus('录音中，请对着麦克风说出你的中文翻译...', 'info');
+            const msg = practiceDirection === 'en2zh' 
+                ? '录音中，请对着麦克风说出你的中文翻译...' 
+                : '录音中，请对着麦克风说出你的英文翻译...';
+            showPracticeStatus(msg, 'info');
         } catch (e) {
             showPracticeStatus('无法访问麦克风: ' + e.message, 'error');
         }
@@ -815,10 +874,26 @@
     function loadMaterial() {
         const diff = document.getElementById('difficulty').value;
         if (!diff) return;
-        const pool = MATERIALS[diff];
-        const item = pool[Math.floor(Math.random() * pool.length)];
-        currentMaterial = item.en;
-        currentReference = item.zh;
+        
+        let item;
+        if (practiceDirection === 'en2zh') {
+            const pool = MATERIALS[diff];
+            item = pool[Math.floor(Math.random() * pool.length)];
+            currentMaterial = item.en;
+            currentReference = item.zh;
+            document.getElementById('sourceLabel').textContent = '英文原文';
+            document.getElementById('refLabel').textContent = '参考翻译（提交评分后可查看）';
+            document.getElementById('recordLabel').textContent = '用中文录制你的翻译（录音 + 实时识别同步进行）';
+        } else {  // zh2en
+            const pool = MATERIALS_REVERSE[diff];
+            item = pool[Math.floor(Math.random() * pool.length)];
+            currentMaterial = item.zh;
+            currentReference = item.en;
+            document.getElementById('sourceLabel').textContent = '中文原文';
+            document.getElementById('refLabel').textContent = '参考翻译（提交评分后可查看）';
+            document.getElementById('recordLabel').textContent = '用英文录制你的翻译（录音 + 实时识别同步进行）';
+        }
+        
         document.getElementById('englishSource').textContent = currentMaterial;
         document.getElementById('refBox').style.display = 'none';
         document.getElementById('scoringResult').innerHTML = '';
