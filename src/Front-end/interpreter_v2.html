@@ -271,7 +271,10 @@
         <div class="content">
             <!-- ====== 标签页 1: AI 翻译机 ====== -->
             <div id="translator" class="tab-panel active">
-                <div class="section-title">AI 翻译机</div>
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+                    <div class="section-title" style="margin-bottom:0; border-bottom:none; padding-bottom:0;">AI 翻译机</div>
+                    <button onclick="resetTranslator()" class="btn-secondary" title="恢复翻译机初始状态">刷新</button>
+                </div>
                 <p style="color:#666; margin-bottom:14px;">英文输入 / 录音 → 中文翻译文本 + 语音输出</p>
 
                 <div class="form-group">
@@ -696,6 +699,55 @@
         document.querySelector(`.mode-btn[data-mode="${mode}"]`).classList.add('active');
         document.querySelectorAll('.input-mode').forEach(m => m.classList.remove('active'));
         document.getElementById(mode === 'text' ? 'textMode' : 'voiceMode').classList.add('active');
+    }
+
+    // ==================== 翻译机重置 ====================
+    function resetTranslator() {
+        // 停止正在进行的录音
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+        }
+        if (recordTimer) clearInterval(recordTimer);
+
+        // 重置全局状态
+        mediaRecorder = null;
+        audioChunks = [];
+        recordStart = null;
+        recordTimer = null;
+        currentBlob = null;
+        lastTranslation = { text: '', lang: '' };
+
+        // 重置翻译方向为默认值
+        direction = 'en2zh';
+        document.querySelectorAll('.dir-btn').forEach(b => b.classList.remove('active'));
+        const defaultDirBtn = document.querySelector('.dir-btn[data-dir="en2zh"]');
+        if (defaultDirBtn) defaultDirBtn.classList.add('active');
+
+        // 重置输入模式为文本输入
+        inputMode = 'text';
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        const defaultModeBtn = document.querySelector('.mode-btn[data-mode="text"]');
+        if (defaultModeBtn) defaultModeBtn.classList.add('active');
+        document.querySelectorAll('.input-mode').forEach(m => m.classList.remove('active'));
+        document.getElementById('textMode').classList.add('active');
+
+        // 清空文本输入
+        document.getElementById('sourceText').value = '';
+
+        // 清空录音相关 UI
+        document.getElementById('recordTimer').textContent = '00:00';
+        document.getElementById('recordInfo').innerHTML = '';
+        document.getElementById('recordBtn').disabled = false;
+        document.getElementById('stopRecordBtn').disabled = true;
+
+        // 隐藏识别结果和翻译结果
+        document.getElementById('recognitionResult').style.display = 'none';
+        document.getElementById('translationResult').innerHTML = '';
+
+        // 清除状态消息
+        const statusEl = document.getElementById('translatorStatus');
+        statusEl.classList.remove('show');
+        statusEl.textContent = '';
     }
 
     // ==================== 状态消息 ====================
