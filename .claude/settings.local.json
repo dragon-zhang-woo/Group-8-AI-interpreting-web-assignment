@@ -33,7 +33,8 @@
       "Bash(where node *)",
       "Read(//c//**)",
       "Bash(\"C:/Program Files/nodejs/node.exe\" -e \"console.log\\('OK'\\)\")",
-      "Bash(\"C:/Program Files \\(x86\\)/nodejs/node.exe\" -e \"console.log\\('OK'\\)\")"
+      "Bash(\"C:/Program Files \\(x86\\)/nodejs/node.exe\" -e \"console.log\\('OK'\\)\")",
+      "Bash(git check-ignore *)"
     ]
   }
 }
