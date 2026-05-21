@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 口译训练助手 V2</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 2.2em; margin-bottom: 6px; }
+        .header p { font-size: 1em; opacity: 0.9; }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e0e0e0;
+            background: #f5f5f5;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.3s;
+        }
+        .tab-btn:hover { color: #667eea; }
+        .tab-btn.active { color: #667eea; border-bottom-color: #667eea; }
+
+        .content { padding: 25px 30px; }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .section { margin-bottom: 22px; }
+        .section-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        label { display: block; margin-bottom: 6px; font-weight: 600; color: #333; }
+        textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 90px;
+            transition: border-color 0.3s;
+        }
+        textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
+        select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+            font-family: inherit;
+            background: white;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102,126,234,0.4); }
+        button:active { transform: translateY(0); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        button:disabled:hover { transform: none; box-shadow: none; }
+
+        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn-secondary { background: #e0e0e0; color: #333; }
+        .btn-secondary:hover { box-shadow: 0 3px 10px rgba(0,0,0,0.1); }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-success { background: #28a745; color: white; }
+
+        .direction-selector { display: flex; gap: 10px; margin-bottom: 12px; }
+        .dir-btn {
+            padding: 8px 16px;
+            background: #f0f0f0;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .dir-btn.active { background: #667eea; color: white; border-color: #667eea; }
+
+        .practice-dir-btn {
+            padding: 8px 16px;
+            background: #f0f0f0;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .practice-dir-btn.active { background: #667eea; color: white; border-color: #667eea; }
+
+        .mode-tabs { display: flex; gap: 10px; margin-bottom: 12px; }
+        .mode-btn {
+            padding: 7px 14px;
+            background: #f0f0f0;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .mode-btn.active { background: #667eea; color: white; border-color: #667eea; }
+
+        .input-mode { display: none; }
+        .input-mode.active { display: block; }
+
+        .result-card {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+        .result-card.success { background: #d4edda; border-left-color: #28a745; }
+        .result-card.error { background: #f8d7da; border-left-color: #dc3545; }
+
+        .output-label { font-weight: 600; color: #666; margin-bottom: 6px; }
+        .output-text { color: #333; line-height: 1.6; word-break: break-word; }
+
+        .score-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .score-item {
+            background: white;
+            padding: 16px;
+            border-radius: 6px;
+            text-align: center;
+            border: 2px solid #ddd;
+        }
+        .score-num { font-size: 2.2em; font-weight: 700; color: #667eea; }
+        .score-label { font-size: 0.85em; color: #666; font-weight: 600; }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 18px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        .stat-num { font-size: 1.8em; font-weight: 700; }
+        .stat-label { font-size: 0.85em; opacity: 0.9; }
+
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th { background: #667eea; color: white; padding: 10px 12px; text-align: left; font-weight: 600; }
+        td { padding: 10px 12px; border-bottom: 1px solid #ddd; }
+        tr:hover { background: #f5f5f5; }
+        .table-wrap { overflow-x: auto; }
+
+        .status-msg {
+            padding: 10px 14px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            display: none;
+            font-weight: 500;
+        }
+        .status-msg.show { display: block; }
+        .status-msg.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .status-msg.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .status-msg.info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+
+        .timer { font-size: 1.3em; color: #dc3545; font-weight: 700; margin: 8px 0; }
+        .material-box { background: #f8f9fa; border-left: 4px solid #667eea; padding: 12px 15px; border-radius: 6px; }
+        .ref-box { background: #e8eaf6; padding: 12px 15px; border-radius: 6px; border-left: 4px solid #667eea; }
+
+        .feedback-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px 15px;
+            margin-top: 12px;
+            border-radius: 6px;
+            color: #856404;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+        .modal.show { display: block; }
+        .modal-content {
+            background: white;
+            margin: 8% auto;
+            padding: 25px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 580px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .close-btn { color: #aaa; font-size: 26px; font-weight: bold; cursor: pointer; float: right; }
+        .close-btn:hover { color: #000; }
+
+        audio { width: 100%; margin-top: 8px; }
+
+        @media (max-width: 768px) {
+            .content { padding: 15px; }
+            .tabs { flex-direction: column; }
+            .tab-btn { border-bottom: none; border-left: 3px solid transparent; }
+            .tab-btn.active { border-bottom: none; border-left-color: #667eea; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>AI 口译训练助手 V2</h1>
+            <p>纯前端实现 · Web Speech API + MyMemory 翻译 · 智能评分 · 记录成长</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="translator" onclick="switchTab('translator')">AI 翻译机</button>
+            <button class="tab-btn" data-tab="practice" onclick="switchTab('practice')">实战演练</button>
+            <button class="tab-btn" data-tab="records" onclick="switchTab('records')">学习记录</button>
+        </div>
+
+        <div class="content">
+            <!-- ====== 标签页 1: AI 翻译机 ====== -->
+            <div id="translator" class="tab-panel active">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+                    <div class="section-title" style="margin-bottom:0; border-bottom:none; padding-bottom:0;">AI 翻译机</div>
+                    <button onclick="resetTranslator()" class="btn-secondary" title="恢复翻译机初始状态">刷新</button>
+                </div>
+                <p style="color:#666; margin-bottom:14px;">英文输入 / 录音 → 中文翻译文本 + 语音输出</p>
+
+                <div class="form-group">
+                    <label>翻译方向</label>
+                    <div class="direction-selector">
+                        <button class="dir-btn active" data-dir="en2zh" onclick="setDirection('en2zh')">英 → 中</button>
+                        <button class="dir-btn" data-dir="zh2en" onclick="setDirection('zh2en')">中 → 英</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="mode-tabs">
+                        <button class="mode-btn active" data-mode="text" onclick="switchInputMode('text')">文本输入</button>
+                        <button class="mode-btn" data-mode="voice" onclick="switchInputMode('voice')">语音输入</button>
+                    </div>
+                </div>
+
+                <div id="textMode" class="input-mode active">
+                    <textarea id="sourceText" placeholder="在此输入要翻译的文本..."></textarea>
+                    <button onclick="translateText()" style="margin-top:10px;">开始翻译</button>
+                </div>
+
+                <div id="voiceMode" class="input-mode">
+                    <div class="btn-group">
+                        <button id="recordBtn" onclick="startRecording()">开始录音</button>
+                        <button id="stopRecordBtn" onclick="stopRecording()" disabled class="btn-danger">停止录音</button>
+                        <button onclick="clearRecording()" class="btn-secondary">清除</button>
+                    </div>
+                    <div class="timer" id="recordTimer">00:00</div>
+                    <div id="recordInfo" style="padding:8px; background:#f0f0f0; border-radius:6px; font-size:0.9em;"></div>
+                    <button onclick="recognizeRecording()" style="margin-top:10px;">识别语音</button>
+                </div>
+
+                <div id="translatorStatus" class="status-msg"></div>
+                <div id="recognitionResult" style="display:none; margin-top:12px;">
+                    <div class="result-card">
+                        <div class="output-label">识别结果</div>
+                        <div class="output-text" id="recognitionText"></div>
+                        <button onclick="translateRecognition()" style="margin-top:8px;">翻译此文本</button>
+                    </div>
+                </div>
+                <div id="translationResult"></div>
+            </div>
+
+            <!-- ====== 标签页 2: 实战演练 ====== -->
+            <div id="practice" class="tab-panel">
+                <div class="section-title">实战演练 - 用户翻译评分模式</div>
+                <p style="color:#666; margin-bottom:14px;">选择材料和翻译方向 → 查看原文 → 用户录制翻译 → 自动评分（发音3 + 流畅3 + 准确3）</p>
+
+                <div class="form-group">
+                    <label>选择翻译方向</label>
+                    <div style="display:flex; gap:10px; margin-bottom:12px;">
+                        <button class="practice-dir-btn active" data-direction="en2zh" onclick="setPracticeDirection('en2zh')">英→中 (中文翻译)</button>
+                        <button class="practice-dir-btn" data-direction="zh2en" onclick="setPracticeDirection('zh2en')">中→英 (英文翻译)</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>选择练习难度</label>
+                    <select id="difficulty" onchange="loadMaterial()">
+                        <option value="">-- 请选择 --</option>
+                        <option value="easy">简单 - 日常对话</option>
+                        <option value="medium">中等 - 商务/科技</option>
+                        <option value="hard">困难 - 学术/演讲</option>
+                    </select>
+                </div>
+
+                <div class="material-box">
+                    <div class="output-label" id="sourceLabel">英文原文</div>
+                    <div class="output-text" id="englishSource">请先选择练习材料</div>
+                </div>
+
+                <div class="ref-box" id="refBox" style="display:none;">
+                    <div class="output-label" id="refLabel">参考翻译（提交评分后可查看）</div>
+                    <div class="output-text" id="referenceText"></div>
+                </div>
+
+                <div class="form-group" style="margin-top:14px;">
+                    <label id="recordLabel">用中文录制你的翻译（录音 + 实时识别同步进行）</label>
+                    <div class="btn-group">
+                        <button id="practiceRecordBtn" onclick="startPracticeRecord()">开始录音并识别</button>
+                        <button id="practiceStopBtn" onclick="stopPracticeRecord()" disabled class="btn-danger">停止</button>
+                        <button onclick="clearPracticeRecord()" class="btn-secondary">清除</button>
+                    </div>
+                    <div class="timer" id="practiceTimer">00:00</div>
+                    <div id="practiceRecordInfo" style="padding:8px; background:#f0f0f0; border-radius:6px; font-size:0.9em;"></div>
+                    <div id="practiceLiveText" style="padding:8px; background:#e8f5e9; border-radius:6px; font-size:0.9em; margin-top:8px; display:none;">
+                        <span style="color:#666;">实时识别中：</span><span id="practiceLiveInterim" style="color:#999; font-style:italic;"></span>
+                    </div>
+                </div>
+
+                <div id="practiceRecognition" style="display:none; margin-top:12px;">
+                    <div class="result-card success">
+                        <div class="output-label">你的翻译（识别结果）</div>
+                        <div class="output-text" id="practiceRecognitionText"></div>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top:12px;">
+                    <label>手动修正翻译文本</label>
+                    <textarea id="userTranslationInput" placeholder="识别结果已自动填入，你可以在此修正..."></textarea>
+                </div>
+
+                <button onclick="submitScoring()" class="btn-success" style="margin-top:8px;">提交评分</button>
+
+                <div id="scoringResult"></div>
+                <div id="feedbackBox" class="feedback-box" style="display:none;">
+                    <div class="output-label">改进建议</div>
+                    <div id="feedbackContent"></div>
+                </div>
+
+                <button onclick="saveRecord()" id="saveRecordBtn" class="btn-secondary" style="display:none; margin-top:8px;">保存记录</button>
+            </div>
+
+            <!-- ====== 标签页 3: 学习记录 ====== -->
+            <div id="records" class="tab-panel">
+                <div class="section-title">学习记录</div>
+
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-num" id="totalCount">0</div>
+                        <div class="stat-label">练习次数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-num" id="avgScore">0.0</div>
+                        <div class="stat-label">平均得分</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-num" id="maxScore">0.0</div>
+                        <div class="stat-label">最高得分</div>
+                    </div>
+                </div>
+
+                <div class="btn-group" style="margin-bottom:14px;">
+                    <button onclick="loadRecords()" class="btn-secondary">刷新记录</button>
+                    <button onclick="exportCSV()" class="btn-secondary">导出 CSV</button>
+                    <button onclick="clearRecords()" class="btn-danger">清除所有记录</button>
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>时间</th>
+                                <th>原文</th>
+                                <th>发音</th>
+                                <th>流畅</th>
+                                <th>准确</th>
+                                <th>总分</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recordsBody">
+                            <tr><td colspan="7" style="text-align:center; color:#999;">暂无记录</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 详情弹窗 -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeDetail()">&times;</span>
+            <div id="detailContent"></div>
+        </div>
+    </div>
+
+    <script>
+    "use strict";
+
+    // ==================== 全局状态 ====================
+    const LS_RECORDS = 'interpreter_v2_records';
+    let direction = 'en2zh';           // en2zh | zh2en
+    let inputMode = 'text';            // text | voice
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let recordStart = null;
+    let recordTimer = null;
+    let currentBlob = null;
+
+    // 实战演练状态
+    let practiceRecorder = null;
+    let practiceChunks = [];
+    let practiceStart = null;
+    let practiceTimer = null;
+    let practiceBlob = null;
+    let practiceRecognition = null;   // Web Speech API 实时识别实例
+    let practiceFinalTranscript = ''; // 最终识别文本
+    let currentMaterial = '';
+    let currentReference = '';
+    let recognizedUserTranslation = '';
+    let currentScores = null;
+
+    // ==================== 本地素材库 ====================
+    const MATERIALS = {
+        easy: [
+            { en: "Good morning. Today is a beautiful day. The weather is sunny and warm. I hope you have a great day.", zh: "早上好。今天是美好的一天。天气晴朗温暖。希望你今天过得愉快。" },
+            { en: "Please turn off the lights when you leave the room. It helps save energy.", zh: "离开房间时请关灯。这有助于节约能源。" },
+            { en: "I would like to order a cup of coffee and a sandwich, please.", zh: "我想点一杯咖啡和一个三明治，谢谢。" },
+            { en: "The meeting will start at nine o'clock tomorrow morning. Please be on time.", zh: "会议将于明早九点开始。请准时出席。" },
+            { en: "She studies English every day because she wants to improve her language skills.", zh: "她每天学习英语，因为她想提高语言能力。" },
+            { en: "Hello, my name is Li Ming. I am from Beijing. Nice to meet you.", zh: "你好，我叫李明。我来自北京。很高兴认识你。" },
+            { en: "Excuse me, could you tell me how to get to the train station?", zh: "打扰一下，你能告诉我去火车站怎么走吗？" },
+            { en: "I need to buy some milk, bread, and eggs at the supermarket.", zh: "我需要在超市买些牛奶、面包和鸡蛋。" },
+            { en: "I'd like to make a reservation for two people at seven o'clock this evening.", zh: "我想预订今晚七点两个人的位置。" },
+            { en: "My favorite food is dumplings. My grandmother makes the best dumplings in the world.", zh: "我最喜欢的食物是饺子。我奶奶做的饺子是世界上最好吃的。" },
+            { en: "I grew up in a small town near the sea. It is very peaceful and beautiful.", zh: "我在一个海边小镇长大。那里非常宁静美丽。" },
+            { en: "This weekend I plan to go hiking with my friends. We will leave early in the morning.", zh: "这个周末我打算和朋友去徒步。我们会一大早出发。" },
+            { en: "I'd like to buy a one-way ticket to Shanghai, please.", zh: "我想买一张去上海的单程票，谢谢。" },
+            { en: "I want to send this package to the United States. How long will it take?", zh: "我想把这个包裹寄到美国。需要多长时间？" },
+            { en: "I have a small dog named Doudou. He is very cute and loves to play fetch.", zh: "我有一只叫豆豆的小狗。它很可爱，喜欢玩接球游戏。" },
+            { en: "What should I get for my sister's birthday? She likes reading books and listening to music.", zh: "我该给妹妹买什么生日礼物？她喜欢读书和听音乐。" },
+            { en: "The weather forecast says it will rain tomorrow. Don't forget to bring an umbrella.", zh: "天气预报说明天会下雨。别忘了带伞。" },
+            { en: "I need to see a doctor. I have a headache and a sore throat.", zh: "我需要看医生。我头疼而且喉咙痛。" },
+            { en: "Hello, I'd like to order a large pepperoni pizza and two bottles of cola.", zh: "你好，我想点一个大份意大利辣肠披萨和两瓶可乐。" },
+            { en: "In my free time, I enjoy painting and playing the guitar. It helps me relax.", zh: "在空闲时间，我喜欢画画和弹吉他。这能帮我放松。" },
+            { en: "My father is a teacher and my mother works in a hospital. I have one younger brother.", zh: "我父亲是老师，母亲在医院工作。我有一个弟弟。" },
+            { en: "I have English class on Monday and Wednesday, and math class on Tuesday and Thursday.", zh: "我周一和周三有英语课，周二和周四有数学课。" },
+            { en: "Let's go watch the new animated movie this Friday. I heard it's really good.", zh: "我们这周五去看那部新动画电影吧。我听说很好看。" },
+            { en: "Does this bus go to the city center? What time does the last bus leave?", zh: "这辆公交车去市中心吗？末班车几点发车？" },
+            { en: "To make scrambled eggs, you need two eggs, a little salt, and some cooking oil.", zh: "做炒鸡蛋需要两个鸡蛋、一点盐和一些食用油。" },
+            { en: "I go jogging every morning for about thirty minutes. It keeps me healthy and energetic.", zh: "我每天早上慢跑大约三十分钟。这让我保持健康和精力充沛。" },
+            { en: "I enjoy reading novels, especially mystery and science fiction. What kind of books do you like?", zh: "我喜欢读小说，尤其是悬疑和科幻类。你喜欢什么类型的书？" },
+            { en: "Last summer I visited Japan. The food was delicious and the temples were stunning.", zh: "去年夏天我去了日本。食物很美味，寺庙令人惊叹。" },
+            { en: "Every morning I wake up at seven, brush my teeth, eat breakfast, and then go to work.", zh: "每天早上我七点起床，刷牙，吃早餐，然后去上班。" }
+        ],
+        medium: [
+            { en: "Climate change is one of the most pressing issues facing humanity today. Scientists warn that global temperatures could rise significantly without immediate action.", zh: "气候变化是当今人类面临的最紧迫问题之一。科学家警告，若不立即采取行动，全球气温可能大幅上升。" },
+            { en: "Artificial intelligence is transforming industries across the globe. From healthcare to finance, companies are using machine learning to improve efficiency.", zh: "人工智能正在改变全球各行各业。从医疗到金融，企业正利用机器学习提高效率。" },
+            { en: "The global economy has shown signs of recovery following the pandemic. Consumer spending has increased and employment rates are gradually returning to normal.", zh: "疫情后全球经济已显现复苏迹象。消费者支出增加，就业率逐步恢复正常。" },
+            { en: "Online education platforms now offer courses in virtually every subject, making quality education accessible to people in remote areas.", zh: "在线教育平台如今几乎提供所有学科的课程，使偏远地区的人们也能获得优质教育。" },
+            { en: "Renewable energy sources such as solar and wind power are becoming increasingly cost-competitive with fossil fuels.", zh: "太阳能和风能等可再生能源在成本上正越来越具竞争力。" },
+            { en: "Remote work has fundamentally changed how companies operate. While it offers flexibility and cost savings, it also presents challenges in team collaboration and maintaining company culture.", zh: "远程工作从根本上改变了公司的运营方式。它提供了灵活性和成本节约，但在团队协作和维护公司文化方面也带来了挑战。" },
+            { en: "E-commerce platforms have transformed the retail industry by enabling small businesses to reach global markets without the need for physical storefronts.", zh: "电子商务平台通过使小企业无需实体店面就能触达全球市场，从而改变了零售业。" },
+            { en: "Cybersecurity has become a top priority for organizations worldwide. Data breaches can result in significant financial losses and damage to a company's reputation.", zh: "网络安全已成为全球组织的首要任务。数据泄露可能导致重大财务损失和公司声誉受损。" },
+            { en: "With the implementation of stricter data privacy regulations, companies must be more transparent about how they collect and use personal information.", zh: "随着更严格的数据隐私法规的实施，公司必须更加透明地说明如何收集和使用个人信息。" },
+            { en: "Digital marketing strategies now rely heavily on data analytics to understand consumer behavior and deliver personalized advertising content.", zh: "数字营销策略如今高度依赖数据分析来了解消费者行为，并提供个性化广告内容。" },
+            { en: "The global supply chain has faced unprecedented disruptions in recent years, prompting companies to diversify their supplier networks and increase inventory reserves.", zh: "近年来，全球供应链面临前所未有的中断，促使企业多元化供应商网络并增加库存储备。" },
+            { en: "Startup companies often rely on venture capital funding to scale their operations. A compelling business model and strong team are essential to attract investors.", zh: "初创公司通常依赖风险投资来扩大业务。引人注目的商业模式和强大的团队是吸引投资者的关键。" },
+            { en: "Mobile payment systems have revolutionized the way people conduct daily transactions, especially in countries where traditional banking infrastructure is less developed.", zh: "移动支付系统彻底改变了人们进行日常交易的方式，尤其是在传统银行基础设施欠发达的国家。" },
+            { en: "The Internet of Things enables smart city applications such as intelligent traffic management, energy-efficient buildings, and real-time environmental monitoring.", zh: "物联网实现了智能城市应用，如智能交通管理、节能建筑和实时环境监测。" },
+            { en: "Cloud computing allows enterprises to scale their IT resources dynamically, reducing infrastructure costs while improving operational efficiency.", zh: "云计算使企业能够动态扩展IT资源，降低基础设施成本，同时提高运营效率。" },
+            { en: "Gene editing technologies such as CRISPR have opened new possibilities for treating genetic diseases, but they also raise important ethical questions about human enhancement.", zh: "CRISPR等基因编辑技术为治疗遗传疾病开辟了新可能，但也引发了关于人类增强的重要伦理问题。" },
+            { en: "Digital transformation in manufacturing involves integrating sensors, artificial intelligence, and robotics to create smart factories with predictive maintenance capabilities.", zh: "制造业的数字化转型涉及集成传感器、人工智能和机器人技术，创建具有预测性维护能力的智能工厂。" },
+            { en: "Many countries have announced ambitious carbon neutrality targets, requiring fundamental shifts in energy production, transportation, and industrial processes.", zh: "许多国家宣布了雄心勃勃的碳中和目标，这需要能源生产、交通运输和工业流程的根本性转变。" },
+            { en: "Educational technology tools, from interactive whiteboards to adaptive learning platforms, are reshaping classroom dynamics and personalizing the learning experience.", zh: "从交互式白板到自适应学习平台，教育技术工具正在重塑课堂动态并个性化学习体验。" },
+            { en: "Urban traffic congestion remains a persistent problem in megacities. Solutions include expanding public transit, implementing congestion pricing, and promoting shared mobility.", zh: "城市交通拥堵仍然是特大城市的一个持续性问题。解决方案包括扩建公共交通、实施拥堵收费和推广共享出行。" },
+            { en: "Effective public health emergency response requires coordinated efforts across multiple sectors, including healthcare, logistics, communications, and government agencies.", zh: "有效的公共卫生应急响应需要跨多个部门的协调努力，包括医疗、物流、通信和政府机构。" },
+            { en: "The commercialization of space travel marks a new era in human exploration. Private companies are now launching rockets and planning missions to the Moon and Mars.", zh: "太空旅行的商业化标志着人类探索的新纪元。私营公司正在发射火箭，并计划前往月球和火星的任务。" },
+            { en: "Industrial automation through robotics and AI is increasing productivity, but it also raises concerns about workforce displacement and the need for re-skilling programs.", zh: "通过机器人和人工智能实现的工业自动化正在提高生产力，但也引发了关于劳动力替代和再培训需求的担忧。" },
+            { en: "Blockchain technology extends far beyond cryptocurrency. Its applications include supply chain traceability, digital identity verification, and decentralized finance services.", zh: "区块链技术的应用远超加密货币范畴。其应用包括供应链追溯、数字身份验证和去中心化金融服务。" },
+            { en: "The rollout of 5G networks is enabling new telemedicine applications, allowing doctors to perform remote surgeries and monitor patients in real time.", zh: "5G网络的推广正在实现新的远程医疗应用，使医生能够进行远程手术并实时监测患者。" },
+            { en: "Green building design principles emphasize energy efficiency, sustainable materials, and healthy indoor environments to reduce the environmental footprint of construction.", zh: "绿色建筑设计原则强调能源效率、可持续材料和健康的室内环境，以减少建筑的环境足迹。" },
+            { en: "Fostering a culture of innovation requires companies to encourage experimentation, tolerate calculated risks, and reward creative problem-solving.", zh: "培养创新文化要求公司鼓励实验、容忍经过计算的风险，并奖励创造性解决问题的能力。" },
+            { en: "Cross-border e-commerce has created new opportunities for international trade, but it also involves navigating complex customs regulations and cross-cultural communication challenges.", zh: "跨境电商为国际贸易创造了新机遇，但也涉及应对复杂的海关法规和跨文化交流挑战。" },
+            { en: "Social media platforms have fundamentally altered the landscape of journalism by enabling citizen reporting while also contributing to the spread of misinformation.", zh: "社交媒体平台通过使公民报道成为可能，从根本上改变了新闻业的格局，同时也助长了错误信息的传播。" }
+        ],
+        hard: [
+            { en: "Neuroplasticity refers to the brain's remarkable ability to reorganize itself by forming new neural connections throughout life. This has significant implications for rehabilitation medicine.", zh: "神经可塑性指大脑通过形成新神经连接进行自我重组的非凡能力。这对康复医学有重大意义。" },
+            { en: "The proliferation of disinformation in the digital age poses unprecedented challenges to democratic governance and social cohesion.", zh: "数字时代虚假信息的泛滥对民主治理和社会凝聚力构成了前所未有的挑战。" },
+            { en: "Quantum computing exploits the principles of superposition and entanglement to perform calculations that would be practically impossible for classical computers.", zh: "量子计算利用叠加和纠缠原理，执行经典计算机实际上无法完成的计算。" },
+            { en: "The concept of corporate social responsibility has evolved considerably, with contemporary stakeholder theory positing obligations beyond shareholders.", zh: "企业社会责任概念已发生显著演变，当代利益相关者理论认为企业义务超越股东范畴。" },
+            { en: "The geopolitical landscape has undergone profound transformations as the unipolar world order gives way to an increasingly multipolar configuration.", zh: "地缘政治格局已发生深刻变化，单极世界秩序正让位于日益多极化的格局。" },
+            { en: "Cognitive psychology research on memory formation suggests that the consolidation of episodic memories during slow-wave sleep is critical for long-term retention and knowledge integration.", zh: "关于记忆形成的认知心理学研究表明，慢波睡眠期间情景记忆的巩固对于长期保持和知识整合至关重要。" },
+            { en: "Central banks transmit monetary policy through multiple channels, including the interest rate channel, the credit channel, and the exchange rate channel, each operating with varying lags and effectiveness.", zh: "中央银行通过多种渠道传导货币政策，包括利率渠道、信贷渠道和汇率渠道，每种渠道的传导滞后和有效性各不相同。" },
+            { en: "The principle of distinction in international humanitarian law requires combatants to differentiate between military objectives and civilian objects, imposing obligations of precaution in attack planning.", zh: "国际人道法中的区分原则要求战斗人员区分军事目标与民用物体，在攻击规划中施加预防义务。" },
+            { en: "The transition to a circular economy requires systemic redesign of production and consumption patterns, moving beyond waste management to fundamentally rethinking material flows and product lifecycles.", zh: "向循环经济转型需要系统性地重新设计生产和消费模式，超越废弃物管理，从根本上重新思考物质流和产品生命周期。" },
+            { en: "Philosophical inquiries into consciousness grapple with the hard problem of explaining why and how subjective qualitative experiences arise from neurobiological processes.", zh: "关于意识的哲学探究致力于解决「困难问题」：解释主观定性体验为何以及如何从神经生物学过程中产生。" },
+            { en: "Language death occurs when a speech community shifts to another language, resulting in the loss of unique cultural knowledge encoded in linguistic structures accumulated over generations.", zh: "当语言社区转向使用另一种语言时，语言消亡就会发生，导致世代积累的、编码在语言结构中的独特文化知识的丧失。" },
+            { en: "The phenomenon of democratic backsliding involves the gradual erosion of institutional checks and balances, often through legally sanctioned measures that preserve a facade of constitutional legitimacy.", zh: "民主倒退现象涉及制度制衡的逐步侵蚀，通常通过法律认可的措施实现，从而维持宪法合法性的表象。" },
+            { en: "Poverty trap mechanisms in development economics describe self-reinforcing equilibria whereby low income prevents investment in human capital and physical assets, perpetuating intergenerational disadvantage.", zh: "发展经济学中的贫困陷阱机制描述了自我强化的均衡状态，低收入阻碍了对人力资本和物质资产的投资，从而延续了代际劣势。" },
+            { en: "Global health governance frameworks for pandemic preparedness emphasize the importance of early warning surveillance systems, equitable vaccine distribution, and coordinated international response protocols.", zh: "大流行防范的全球卫生治理框架强调早期预警监测系统、疫苗公平分配和协调一致的国际响应协议的重要性。" },
+            { en: "The Standard Model of particle physics successfully describes three of the four fundamental forces, yet it does not incorporate gravity, leaving a significant theoretical gap in our understanding of the universe.", zh: "粒子物理学的标准模型成功描述了四种基本力中的三种，但未能纳入引力，在我们对宇宙的理解中留下了重大的理论空白。" },
+            { en: "Comparative constitutional interpretation examines how different legal traditions approach the balance between judicial review and legislative supremacy in defining fundamental rights.", zh: "比较宪法解释研究不同法律传统如何在界定基本权利时处理司法审查与立法至上之间的平衡。" },
+            { en: "Ethnographic research methodology emphasizes prolonged immersion in the field and the importance of reflexivity, requiring researchers to critically examine their own positionality and its influence on data collection.", zh: "民族志研究方法论强调长期田野沉浸和反思性的重要性，要求研究者批判性地审视自身立场及其对数据收集的影响。" },
+            { en: "Prospect theory, developed by Kahneman and Tversky, demonstrates that individuals exhibit loss aversion and evaluate outcomes relative to a reference point rather than in absolute terms.", zh: "卡尼曼和特沃斯基提出的前景理论证明，个体表现出损失厌恶，并相对于参照点而非绝对值来评估结果。" },
+            { en: "Track II diplomacy engages non-state actors in informal dialogue processes to complement official negotiations, often succeeding in building trust where formal diplomatic channels have stalled.", zh: "第二轨道外交让非国家行为体参与非正式对话进程以补充官方谈判，通常在正式外交渠道停滞时成功建立信任。" },
+            { en: "Agenda-setting theory in mass communication research posits that the media does not tell people what to think, but is remarkably effective in telling them what to think about.", zh: "大众传播研究中的议程设置理论认为，媒体不会告诉人们思考什么，但在告诉人们关注什么方面却非常有效。" },
+            { en: "Financing the United Nations Sustainable Development Goals requires mobilizing resources at an unprecedented scale, combining public finance, private investment, and innovative blended finance mechanisms.", zh: "为联合国可持续发展目标筹资需要以前所未有的规模调动资源，结合公共财政、私人投资和创新的混合融资机制。" },
+            { en: "The regulation of somatic gene therapy involves balancing the therapeutic promise of genetic modification against concerns regarding off-target effects, germline alterations, and equitable access to treatment.", zh: "体细胞基因治疗的监管需要在基因修饰的治疗前景与脱靶效应、生殖系改变和治疗公平获取的担忧之间取得平衡。" },
+            { en: "The transformer architecture in deep learning, which relies entirely on self-attention mechanisms rather than recurrence, has become the foundation for state-of-the-art large language models.", zh: "深度学习中的Transformer架构完全依赖自注意力机制而非循环结构，已成为最先进大语言模型的基础。" },
+            { en: "Nash equilibrium characterizes strategic interactions in which no player can unilaterally deviate to improve their payoff, providing a foundational solution concept for analyzing oligopolistic market behavior.", zh: "纳什均衡描述了没有任何参与者可以通过单方面偏离来提高收益的战略互动，为分析寡头垄断市场行为提供了基础性解决方案概念。" },
+            { en: "Edward Said's critique of Orientalism examines how Western scholarly and artistic representations of the Middle East have historically served to justify colonial domination and construct cultural otherness.", zh: "爱德华·萨义德对东方主义的批判审视了西方对中东的学术和艺术表征如何历史性地为殖民统治辩护并建构文化他者性。" },
+            { en: "Transit-oriented development planning integrates high-density mixed-use development around public transportation nodes, aiming to reduce automobile dependency and promote sustainable urban growth patterns.", zh: "公交导向型发展规划围绕公共交通节点整合高密度混合用途开发，旨在减少汽车依赖并促进可持续的城市增长模式。" },
+            { en: "Cost-benefit analysis in regulatory policy requires quantifying non-market values such as environmental quality and human life, raising profound methodological and ethical questions about commensurability.", zh: "监管政策中的成本效益分析需要对环境质量和人类生命等非市场价值进行量化，引发了关于可通约性的深刻方法论和伦理问题。" },
+            { en: "Restorative justice approaches in post-conflict societies prioritize repairing harm through dialogue between victims and perpetrators, offering an alternative to purely retributive models of transitional justice.", zh: "冲突后社会中的恢复性司法方法优先通过受害者与施害者之间的对话来修复伤害，为纯粹惩罚性的过渡司法模式提供了替代方案。" },
+            { en: "Thomas Kuhn's concept of paradigm shifts describes how scientific progress occurs not through gradual accumulation but through revolutionary periods when dominant theoretical frameworks are overturned.", zh: "托马斯·库恩的范式转换概念描述了科学进步不是通过渐进积累发生的，而是通过主导理论框架被推翻的革命性时期发生的。" }
+        ]
+    };
+
+    // 为素材库添加反向对照（中→英）
+    const MATERIALS_REVERSE = {
+        easy: [
+            { zh: "早上好。今天是美好的一天。天气晴朗温暖。希望你今天过得愉快。", en: "Good morning. Today is a beautiful day. The weather is sunny and warm. I hope you have a great day." },
+            { zh: "离开房间时请关灯。这有助于节约能源。", en: "Please turn off the lights when you leave the room. It helps save energy." },
+            { zh: "我想点一杯咖啡和一个三明治，谢谢。", en: "I would like to order a cup of coffee and a sandwich, please." },
+            { zh: "会议将于明早九点开始。请准时出席。", en: "The meeting will start at nine o'clock tomorrow morning. Please be on time." },
+            { zh: "她每天学习英语，因为她想提高语言能力。", en: "She studies English every day because she wants to improve her language skills." },
+            { zh: "你好，我叫李明。我来自北京。很高兴认识你。", en: "Hello, my name is Li Ming. I am from Beijing. Nice to meet you." },
+            { zh: "打扰一下，你能告诉我去火车站怎么走吗？", en: "Excuse me, could you tell me how to get to the train station?" },
+            { zh: "我需要在超市买些牛奶、面包和鸡蛋。", en: "I need to buy some milk, bread, and eggs at the supermarket." },
+            { zh: "我想预订今晚七点两个人的位置。", en: "I'd like to make a reservation for two people at seven o'clock this evening." },
+            { zh: "我最喜欢的食物是饺子。我奶奶做的饺子是世界上最好吃的。", en: "My favorite food is dumplings. My grandmother makes the best dumplings in the world." },
+            { zh: "我在一个海边小镇长大。那里非常宁静美丽。", en: "I grew up in a small town near the sea. It is very peaceful and beautiful." },
+            { zh: "这个周末我打算和朋友去徒步。我们会一大早出发。", en: "This weekend I plan to go hiking with my friends. We will leave early in the morning." },
+            { zh: "我想买一张去上海的单程票，谢谢。", en: "I'd like to buy a one-way ticket to Shanghai, please." },
+            { zh: "我想把这个包裹寄到美国。需要多长时间？", en: "I want to send this package to the United States. How long will it take?" },
+            { zh: "我有一只叫豆豆的小狗。它很可爱，喜欢玩接球游戏。", en: "I have a small dog named Doudou. He is very cute and loves to play fetch." },
+            { zh: "我该给妹妹买什么生日礼物？她喜欢读书和听音乐。", en: "What should I get for my sister's birthday? She likes reading books and listening to music." },
+            { zh: "天气预报说明天会下雨。别忘了带伞。", en: "The weather forecast says it will rain tomorrow. Don't forget to bring an umbrella." },
+            { zh: "我需要看医生。我头疼而且喉咙痛。", en: "I need to see a doctor. I have a headache and a sore throat." },
+            { zh: "你好，我想点一个大份意大利辣肠披萨和两瓶可乐。", en: "Hello, I'd like to order a large pepperoni pizza and two bottles of cola." },
+            { zh: "在空闲时间，我喜欢画画和弹吉他。这能帮我放松。", en: "In my free time, I enjoy painting and playing the guitar. It helps me relax." },
+            { zh: "我父亲是老师，母亲在医院工作。我有一个弟弟。", en: "My father is a teacher and my mother works in a hospital. I have one younger brother." },
+            { zh: "我周一和周三有英语课，周二和周四有数学课。", en: "I have English class on Monday and Wednesday, and math class on Tuesday and Thursday." },
+            { zh: "我们这周五去看那部新动画电影吧。我听说很好看。", en: "Let's go watch the new animated movie this Friday. I heard it's really good." },
+            { zh: "这辆公交车去市中心吗？末班车几点发车？", en: "Does this bus go to the city center? What time does the last bus leave?" },
+            { zh: "做炒鸡蛋需要两个鸡蛋、一点盐和一些食用油。", en: "To make scrambled eggs, you need two eggs, a little salt, and some cooking oil." },
+            { zh: "我每天早上慢跑大约三十分钟。这让我保持健康和精力充沛。", en: "I go jogging every morning for about thirty minutes. It keeps me healthy and energetic." },
+            { zh: "我喜欢读小说，尤其是悬疑和科幻类。你喜欢什么类型的书？", en: "I enjoy reading novels, especially mystery and science fiction. What kind of books do you like?" },
+            { zh: "去年夏天我去了日本。食物很美味，寺庙令人惊叹。", en: "Last summer I visited Japan. The food was delicious and the temples were stunning." },
+            { zh: "每天早上我七点起床，刷牙，吃早餐，然后去上班。", en: "Every morning I wake up at seven, brush my teeth, eat breakfast, and then go to work." }
+        ],
+        medium: [
+            { zh: "气候变化是当今人类面临的最紧迫问题之一。科学家警告，若不立即采取行动，全球气温可能大幅上升。", en: "Climate change is one of the most pressing issues facing humanity today. Scientists warn that global temperatures could rise significantly without immediate action." },
+            { zh: "人工智能正在改变全球各行各业。从医疗到金融，企业正利用机器学习提高效率。", en: "Artificial intelligence is transforming industries across the globe. From healthcare to finance, companies are using machine learning to improve efficiency." },
+            { zh: "疫情后全球经济已显现复苏迹象。消费者支出增加，就业率逐步恢复正常。", en: "The global economy has shown signs of recovery following the pandemic. Consumer spending has increased and employment rates are gradually returning to normal." },
+            { zh: "在线教育平台如今几乎提供所有学科的课程，使偏远地区的人们也能获得优质教育。", en: "Online education platforms now offer courses in virtually every subject, making quality education accessible to people in remote areas." },
+            { zh: "太阳能和风能等可再生能源在成本上正越来越具竞争力。", en: "Renewable energy sources such as solar and wind power are becoming increasingly cost-competitive with fossil fuels." },
+            { zh: "远程工作从根本上改变了公司的运营方式。它提供了灵活性和成本节约，但在团队协作和维护公司文化方面也带来了挑战。", en: "Remote work has fundamentally changed how companies operate. While it offers flexibility and cost savings, it also presents challenges in team collaboration and maintaining company culture." },
+            { zh: "电子商务平台通过使小企业无需实体店面就能触达全球市场，从而改变了零售业。", en: "E-commerce platforms have transformed the retail industry by enabling small businesses to reach global markets without the need for physical storefronts." },
+            { zh: "网络安全已成为全球组织的首要任务。数据泄露可能导致重大财务损失和公司声誉受损。", en: "Cybersecurity has become a top priority for organizations worldwide. Data breaches can result in significant financial losses and damage to a company's reputation." },
+            { zh: "随着更严格的数据隐私法规的实施，公司必须更加透明地说明如何收集和使用个人信息。", en: "With the implementation of stricter data privacy regulations, companies must be more transparent about how they collect and use personal information." },
+            { zh: "数字营销策略如今高度依赖数据分析来了解消费者行为，并提供个性化广告内容。", en: "Digital marketing strategies now rely heavily on data analytics to understand consumer behavior and deliver personalized advertising content." },
+            { zh: "近年来，全球供应链面临前所未有的中断，促使企业多元化供应商网络并增加库存储备。", en: "The global supply chain has faced unprecedented disruptions in recent years, prompting companies to diversify their supplier networks and increase inventory reserves." },
+            { zh: "初创公司通常依赖风险投资来扩大业务。引人注目的商业模式和强大的团队是吸引投资者的关键。", en: "Startup companies often rely on venture capital funding to scale their operations. A compelling business model and strong team are essential to attract investors." },
+            { zh: "移动支付系统彻底改变了人们进行日常交易的方式，尤其是在传统银行基础设施欠发达的国家。", en: "Mobile payment systems have revolutionized the way people conduct daily transactions, especially in countries where traditional banking infrastructure is less developed." },
+            { zh: "物联网实现了智能城市应用，如智能交通管理、节能建筑和实时环境监测。", en: "The Internet of Things enables smart city applications such as intelligent traffic management, energy-efficient buildings, and real-time environmental monitoring." },
+            { zh: "云计算使企业能够动态扩展IT资源，降低基础设施成本，同时提高运营效率。", en: "Cloud computing allows enterprises to scale their IT resources dynamically, reducing infrastructure costs while improving operational efficiency." },
+            { zh: "CRISPR等基因编辑技术为治疗遗传疾病开辟了新可能，但也引发了关于人类增强的重要伦理问题。", en: "Gene editing technologies such as CRISPR have opened new possibilities for treating genetic diseases, but they also raise important ethical questions about human enhancement." },
+            { zh: "制造业的数字化转型涉及集成传感器、人工智能和机器人技术，创建具有预测性维护能力的智能工厂。", en: "Digital transformation in manufacturing involves integrating sensors, artificial intelligence, and robotics to create smart factories with predictive maintenance capabilities." },
+            { zh: "许多国家宣布了雄心勃勃的碳中和目标，这需要能源生产、交通运输和工业流程的根本性转变。", en: "Many countries have announced ambitious carbon neutrality targets, requiring fundamental shifts in energy production, transportation, and industrial processes." },
+            { zh: "从交互式白板到自适应学习平台，教育技术工具正在重塑课堂动态并个性化学习体验。", en: "Educational technology tools, from interactive whiteboards to adaptive learning platforms, are reshaping classroom dynamics and personalizing the learning experience." },
+            { zh: "城市交通拥堵仍然是特大城市的一个持续性问题。解决方案包括扩建公共交通、实施拥堵收费和推广共享出行。", en: "Urban traffic congestion remains a persistent problem in megacities. Solutions include expanding public transit, implementing congestion pricing, and promoting shared mobility." },
+            { zh: "有效的公共卫生应急响应需要跨多个部门的协调努力，包括医疗、物流、通信和政府机构。", en: "Effective public health emergency response requires coordinated efforts across multiple sectors, including healthcare, logistics, communications, and government agencies." },
+            { zh: "太空旅行的商业化标志着人类探索的新纪元。私营公司正在发射火箭，并计划前往月球和火星的任务。", en: "The commercialization of space travel marks a new era in human exploration. Private companies are now launching rockets and planning missions to the Moon and Mars." },
+            { zh: "通过机器人和人工智能实现的工业自动化正在提高生产力，但也引发了关于劳动力替代和再培训需求的担忧。", en: "Industrial automation through robotics and AI is increasing productivity, but it also raises concerns about workforce displacement and the need for re-skilling programs." },
+            { zh: "区块链技术的应用远超加密货币范畴。其应用包括供应链追溯、数字身份验证和去中心化金融服务。", en: "Blockchain technology extends far beyond cryptocurrency. Its applications include supply chain traceability, digital identity verification, and decentralized finance services." },
+            { zh: "5G网络的推广正在实现新的远程医疗应用，使医生能够进行远程手术并实时监测患者。", en: "The rollout of 5G networks is enabling new telemedicine applications, allowing doctors to perform remote surgeries and monitor patients in real time." },
+            { zh: "绿色建筑设计原则强调能源效率、可持续材料和健康的室内环境，以减少建筑的环境足迹。", en: "Green building design principles emphasize energy efficiency, sustainable materials, and healthy indoor environments to reduce the environmental footprint of construction." },
+            { zh: "培养创新文化要求公司鼓励实验、容忍经过计算的风险，并奖励创造性解决问题的能力。", en: "Fostering a culture of innovation requires companies to encourage experimentation, tolerate calculated risks, and reward creative problem-solving." },
+            { zh: "跨境电商为国际贸易创造了新机遇，但也涉及应对复杂的海关法规和跨文化交流挑战。", en: "Cross-border e-commerce has created new opportunities for international trade, but it also involves navigating complex customs regulations and cross-cultural communication challenges." },
+            { zh: "社交媒体平台通过使公民报道成为可能，从根本上改变了新闻业的格局，同时也助长了错误信息的传播。", en: "Social media platforms have fundamentally altered the landscape of journalism by enabling citizen reporting while also contributing to the spread of misinformation." }
+        ],
+        hard: [
+            { zh: "神经可塑性指大脑通过形成新神经连接进行自我重组的非凡能力。这对康复医学有重大意义。", en: "Neuroplasticity refers to the brain's remarkable ability to reorganize itself by forming new neural connections throughout life. This has significant implications for rehabilitation medicine." },
+            { zh: "数字时代虚假信息的泛滥对民主治理和社会凝聚力构成了前所未有的挑战。", en: "The proliferation of disinformation in the digital age poses unprecedented challenges to democratic governance and social cohesion." },
+            { zh: "量子计算利用叠加和纠缠原理，执行经典计算机实际上无法完成的计算。", en: "Quantum computing exploits the principles of superposition and entanglement to perform calculations that would be practically impossible for classical computers." },
+            { zh: "企业社会责任概念已发生显著演变，当代利益相关者理论认为企业义务超越股东范畴。", en: "The concept of corporate social responsibility has evolved considerably, with contemporary stakeholder theory positing obligations beyond shareholders." },
+            { zh: "地缘政治格局已发生深刻变化，单极世界秩序正让位于日益多极化的格局。", en: "The geopolitical landscape has undergone profound transformations as the unipolar world order gives way to an increasingly multipolar configuration." },
+            { zh: "关于记忆形成的认知心理学研究表明，慢波睡眠期间情景记忆的巩固对于长期保持和知识整合至关重要。", en: "Cognitive psychology research on memory formation suggests that the consolidation of episodic memories during slow-wave sleep is critical for long-term retention and knowledge integration." },
+            { zh: "中央银行通过多种渠道传导货币政策，包括利率渠道、信贷渠道和汇率渠道，每种渠道的传导滞后和有效性各不相同。", en: "Central banks transmit monetary policy through multiple channels, including the interest rate channel, the credit channel, and the exchange rate channel, each operating with varying lags and effectiveness." },
+            { zh: "国际人道法中的区分原则要求战斗人员区分军事目标与民用物体，在攻击规划中施加预防义务。", en: "The principle of distinction in international humanitarian law requires combatants to differentiate between military objectives and civilian objects, imposing obligations of precaution in attack planning." },
+            { zh: "向循环经济转型需要系统性地重新设计和消费模式，超越废弃物管理，从根本上重新思考物质流和产品生命周期。", en: "The transition to a circular economy requires systemic redesign of production and consumption patterns, moving beyond waste management to fundamentally rethinking material flows and product lifecycles." },
+            { zh: "关于意识的哲学探究致力于解决「困难问题」：解释主观定性体验为何以及如何从神经生物学过程中产生。", en: "Philosophical inquiries into consciousness grapple with the hard problem of explaining why and how subjective qualitative experiences arise from neurobiological processes." },
+            { zh: "当语言社区转向使用另一种语言时，语言消亡就会发生，导致世代积累的、编码在语言结构中的独特文化知识的丧失。", en: "Language death occurs when a speech community shifts to another language, resulting in the loss of unique cultural knowledge encoded in linguistic structures accumulated over generations." },
+            { zh: "民主倒退现象涉及制度制衡的逐步侵蚀，通常通过法律认可的措施实现，从而维持宪法合法性的表象。", en: "The phenomenon of democratic backsliding involves the gradual erosion of institutional checks and balances, often through legally sanctioned measures that preserve a facade of constitutional legitimacy." },
+            { zh: "发展经济学中的贫困陷阱机制描述了自我强化的均衡状态，低收入阻碍了对人力资本和物质资产的投资，从而延续了代际劣势。", en: "Poverty trap mechanisms in development economics describe self-reinforcing equilibria whereby low income prevents investment in human capital and physical assets, perpetuating intergenerational disadvantage." },
+            { zh: "大流行防范的全球卫生治理框架强调早期预警监测系统、疫苗公平分配和协调一致的国际响应协议的重要性。", en: "Global health governance frameworks for pandemic preparedness emphasize the importance of early warning surveillance systems, equitable vaccine distribution, and coordinated international response protocols." },
+            { zh: "粒子物理学的标准模型成功描述了四种基本力中的三种，但未能纳入引力，在我们对宇宙的理解中留下了重大的理论空白。", en: "The Standard Model of particle physics successfully describes three of the four fundamental forces, yet it does not incorporate gravity, leaving a significant theoretical gap in our understanding of the universe." },
+            { zh: "比较宪法解释研究不同法律传统如何在界定基本权利时处理司法审查与立法至上之间的平衡。", en: "Comparative constitutional interpretation examines how different legal traditions approach the balance between judicial review and legislative supremacy in defining fundamental rights." },
+            { zh: "民族志研究方法论强调长期田野沉浸和反思性的重要性，要求研究者批判性地审视自身立场及其对数据收集的影响。", en: "Ethnographic research methodology emphasizes prolonged immersion in the field and the importance of reflexivity, requiring researchers to critically examine their own positionality and its influence on data collection." },
+            { zh: "卡尼曼和特沃斯基提出的前景理论证明，个体表现出损失厌恶，并相对于参照点而非绝对值来评估结果。", en: "Prospect theory, developed by Kahneman and Tversky, demonstrates that individuals exhibit loss aversion and evaluate outcomes relative to a reference point rather than in absolute terms." },
+            { zh: "第二轨道外交让非国家行为体参与非正式对话进程以补充官方谈判，通常在正式外交渠道停滞时成功建立信任。", en: "Track II diplomacy engages non-state actors in informal dialogue processes to complement official negotiations, often succeeding in building trust where formal diplomatic channels have stalled." },
+            { zh: "大众传播研究中的议程设置理论认为，媒体不会告诉人们思考什么，但在告诉人们关注什么方面却非常有效。", en: "Agenda-setting theory in mass communication research posits that the media does not tell people what to think, but is remarkably effective in telling them what to think about." },
+            { zh: "为联合国可持续发展目标筹资需要以前所未有的规模调动资源，结合公共财政、私人投资和创新的混合融资机制。", en: "Financing the United Nations Sustainable Development Goals requires mobilizing resources at an unprecedented scale, combining public finance, private investment, and innovative blended finance mechanisms." },
+            { zh: "体细胞基因治疗的监管需要在基因修饰的治疗前景与脱靶效应、生殖系改变和治疗公平获取的担忧之间取得平衡。", en: "The regulation of somatic gene therapy involves balancing the therapeutic promise of genetic modification against concerns regarding off-target effects, germline alterations, and equitable access to treatment." },
+            { zh: "深度学习中的Transformer架构完全依赖自注意力机制而非循环结构，已成为最先进大语言模型的基础。", en: "The transformer architecture in deep learning, which relies entirely on self-attention mechanisms rather than recurrence, has become the foundation for state-of-the-art large language models." },
+            { zh: "纳什均衡描述了没有任何参与者可以通过单方面偏离来提高收益的战略互动，为分析寡头垄断市场行为提供了基础性解决方案概念。", en: "Nash equilibrium characterizes strategic interactions in which no player can unilaterally deviate to improve their payoff, providing a foundational solution concept for analyzing oligopolistic market behavior." },
+            { zh: "爱德华·萨义德对东方主义的批判审视了西方对中东的学术和艺术表征如何历史性地为殖民统治辩护并建构文化他者性。", en: "Edward Said's critique of Orientalism examines how Western scholarly and artistic representations of the Middle East have historically served to justify colonial domination and construct cultural otherness." },
+            { zh: "公交导向型发展规划围绕公共交通节点整合高密度混合用途开发，旨在减少汽车依赖并促进可持续的城市增长模式。", en: "Transit-oriented development planning integrates high-density mixed-use development around public transportation nodes, aiming to reduce automobile dependency and promote sustainable urban growth patterns." },
+            { zh: "监管政策中的成本效益分析需要对环境质量和人类生命等非市场价值进行量化，引发了关于可通约性的深刻方法论和伦理问题。", en: "Cost-benefit analysis in regulatory policy requires quantifying non-market values such as environmental quality and human life, raising profound methodological and ethical questions about commensurability." },
+            { zh: "冲突后社会中的恢复性司法方法优先通过受害者与施害者之间的对话来修复伤害，为纯粹惩罚性的过渡司法模式提供了替代方案。", en: "Restorative justice approaches in post-conflict societies prioritize repairing harm through dialogue between victims and perpetrators, offering an alternative to purely retributive models of transitional justice." },
+            { zh: "托马斯·库恩的范式转换概念描述了科学进步不是通过渐进积累发生的，而是通过主导理论框架被推翻的革命性时期发生的。", en: "Thomas Kuhn's concept of paradigm shifts describes how scientific progress occurs not through gradual accumulation but through revolutionary periods when dominant theoretical frameworks are overturned." }
+        ]
+    };
+
+    // ==================== 标签页切换 ====================
+    function switchTab(name) {
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(name).classList.add('active');
+        document.querySelector(`.tab-btn[data-tab="${name}"]`).classList.add('active');
+        if (name === 'records') loadRecords();
+    }
+
+    // ==================== 翻译方向 ====================
+    function setDirection(dir) {
+        direction = dir;
+        document.querySelectorAll('.dir-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector(`.dir-btn[data-dir="${dir}"]`).classList.add('active');
+        showStatus(null, 'info');
+    }
+
+    // 实战演练翻译方向选择
+    let practiceDirection = 'en2zh';  // en2zh | zh2en
+    function setPracticeDirection(dir) {
+        practiceDirection = dir;
+        document.querySelectorAll('.practice-dir-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector(`.practice-dir-btn[data-direction="${dir}"]`).classList.add('active');
+        // 重置材料显示
+        document.getElementById('englishSource').textContent = '请先选择练习材料';
+        showPracticeStatus('翻译方向已切换，请重新选择材料', 'info');
+    }
+
+    // ==================== 输入模式 ====================
+    function switchInputMode(mode) {
+        inputMode = mode;
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector(`.mode-btn[data-mode="${mode}"]`).classList.add('active');
+        document.querySelectorAll('.input-mode').forEach(m => m.classList.remove('active'));
+        document.getElementById(mode === 'text' ? 'textMode' : 'voiceMode').classList.add('active');
+    }
+
+    // ==================== 翻译机重置 ====================
+    function resetTranslator() {
+        // 停止正在进行的录音
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+        }
+        if (recordTimer) clearInterval(recordTimer);
+
+        // 重置全局状态
+        mediaRecorder = null;
+        audioChunks = [];
+        recordStart = null;
+        recordTimer = null;
+        currentBlob = null;
+        lastTranslation = { text: '', lang: '' };
+
+        // 重置翻译方向为默认值
+        direction = 'en2zh';
+        document.querySelectorAll('.dir-btn').forEach(b => b.classList.remove('active'));
+        const defaultDirBtn = document.querySelector('.dir-btn[data-dir="en2zh"]');
+        if (defaultDirBtn) defaultDirBtn.classList.add('active');
+
+        // 重置输入模式为文本输入
+        inputMode = 'text';
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        const defaultModeBtn = document.querySelector('.mode-btn[data-mode="text"]');
+        if (defaultModeBtn) defaultModeBtn.classList.add('active');
+        document.querySelectorAll('.input-mode').forEach(m => m.classList.remove('active'));
+        document.getElementById('textMode').classList.add('active');
+
+        // 清空文本输入
+        document.getElementById('sourceText').value = '';
+
+        // 清空录音相关 UI
+        document.getElementById('recordTimer').textContent = '00:00';
+        document.getElementById('recordInfo').innerHTML = '';
+        document.getElementById('recordBtn').disabled = false;
+        document.getElementById('stopRecordBtn').disabled = true;
+
+        // 隐藏识别结果和翻译结果
+        document.getElementById('recognitionResult').style.display = 'none';
+        document.getElementById('translationResult').innerHTML = '';
+
+        // 清除状态消息
+        const statusEl = document.getElementById('translatorStatus');
+        statusEl.classList.remove('show');
+        statusEl.textContent = '';
+    }
+
+    // ==================== 状态消息 ====================
+    function showStatus(msg, type) {
+        const el = document.getElementById('translatorStatus');
+        if (!msg) { el.classList.remove('show'); return; }
+        el.textContent = msg;
+        el.className = `status-msg show ${type}`;
+        setTimeout(() => el.classList.remove('show'), 4000);
+    }
+
+    function showPracticeStatus(msg, type) {
+        const el = document.getElementById('translatorStatus');
+        el.textContent = msg;
+        el.className = `status-msg show ${type}`;
+        setTimeout(() => el.classList.remove('show'), 4000);
+    }
+
+    // ==================== 翻译 (MyMemory API) ====================
+    async function translateText() {
+        const text = document.getElementById('sourceText').value.trim();
+        if (!text) { showStatus('请输入要翻译的文本', 'error'); return; }
+        showStatus('翻译中...', 'info');
+
+        const src = direction === 'en2zh' ? 'en' : 'zh-CN';
+        const tgt = direction === 'en2zh' ? 'zh-CN' : 'en';
+        const result = await callMyMemory(text, src, tgt);
+
+        if (result) {
+            displayTranslationResult(text, result);
+            showStatus('翻译成功', 'success');
+        } else {
+            showStatus('翻译失败，请检查网络连接', 'error');
+        }
+    }
+
+    async function callMyMemory(text, from, to) {
+        const langPair = `${from}|${to}`;
+        try {
+            const resp = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${langPair}`);
+            const data = await resp.json();
+            if (data.responseStatus === 200 && data.responseData.translatedText) {
+                return data.responseData.translatedText;
+            }
+        } catch (e) { console.warn('MyMemory failed:', e.message); }
+
+        // 回退：LibreTranslate
+        try {
+            const resp = await fetch('https://libretranslate.de/translate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ q: text, source: from === 'zh-CN' ? 'zh' : from, target: to === 'zh-CN' ? 'zh' : to, format: 'text' })
+            });
+            const data = await resp.json();
+            if (data.translatedText) return data.translatedText;
+        } catch (e) { console.warn('LibreTranslate failed:', e.message); }
+        return null;
+    }
+
+    let lastTranslation = { text: '', lang: '' };
+
+    function displayTranslationResult(original, translated) {
+        const tgtLang = direction === 'en2zh' ? 'zh-CN' : 'en-US';
+        lastTranslation.text = translated;
+        lastTranslation.lang = tgtLang;
+
+        document.getElementById('translationResult').innerHTML = `
+            <div class="result-card success">
+                <div class="output-label">原文</div>
+                <div class="output-text">${escHtml(original)}</div>
+                <div class="output-label" style="margin-top:12px;">翻译结果</div>
+                <div class="output-text">${escHtml(translated)}</div>
+                <div class="btn-group" style="margin-top:10px;">
+                    <button onclick="speakLast()">播放翻译语音</button>
+                    <button onclick="copyLast()" class="btn-secondary">复制</button>
+                </div>
+            </div>`;
+    }
+
+    function speakLast() { speak(lastTranslation.text, lastTranslation.lang); }
+    function copyLast() { navigator.clipboard.writeText(lastTranslation.text).then(() => showStatus('已复制', 'success')).catch(() => {}); }
+
+    function speak(text, lang) {
+        if (!window.speechSynthesis) return;
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = lang;
+        u.rate = 0.9;
+        window.speechSynthesis.speak(u);
+    }
+
+    // ==================== 语音录制 ====================
+    async function startRecording() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
+            mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+            mediaRecorder.onstop = () => {
+                currentBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                stream.getTracks().forEach(t => t.stop());
+                updateRecordInfo();
+            };
+            mediaRecorder.start();
+            document.getElementById('recordBtn').disabled = true;
+            document.getElementById('stopRecordBtn').disabled = false;
+            recordStart = Date.now();
+            recordTimer = setInterval(updateRecordTimer, 100);
+            showStatus('正在录音...', 'info');
+        } catch (e) { showStatus('无法访问麦克风: ' + e.message, 'error'); }
+    }
+
+    function stopRecording() {
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+            document.getElementById('recordBtn').disabled = false;
+            document.getElementById('stopRecordBtn').disabled = true;
+            clearInterval(recordTimer);
+            showStatus('录音完成', 'success');
+        }
+    }
+
+    function updateRecordTimer() {
+        const elapsed = Date.now() - recordStart;
+        document.getElementById('recordTimer').textContent =
+            `${String(Math.floor(elapsed / 60000)).padStart(2, '0')}:${String(Math.floor((elapsed % 60000) / 1000)).padStart(2, '0')}`;
+    }
+
+    function updateRecordInfo() {
+        document.getElementById('recordInfo').innerHTML = currentBlob ?
+            `录音完成 · ${(currentBlob.size / 1024).toFixed(1)} KB` : '';
+    }
+
+    function clearRecording() {
+        currentBlob = null;
+        audioChunks = [];
+        document.getElementById('recordTimer').textContent = '00:00';
+        document.getElementById('recordInfo').innerHTML = '';
+        document.getElementById('recordBtn').disabled = false;
+        document.getElementById('stopRecordBtn').disabled = true;
+        document.getElementById('recognitionResult').style.display = 'none';
+    }
+
+    // ==================== 识别录音 (Web Speech API) ====================
+    async function recognizeRecording() {
+        if (!currentBlob) { showStatus('请先录音', 'error'); return; }
+        fallbackSpeechRecognition(id => {
+            document.getElementById('recognitionText').textContent = id;
+            document.getElementById('recognitionResult').style.display = 'block';
+            showStatus('识别成功', 'success');
+        }, direction === 'en2zh' ? 'en-US' : 'zh-CN');
+    }
+
+    function translateRecognition() {
+        const text = document.getElementById('recognitionText').textContent;
+        if (!text) return;
+        document.getElementById('sourceText').value = text;
+        switchInputMode('text');
+        translateText();
+    }
+
+    // ==================== 实战演练 - 录音+识别 (同步) ====================
+    async function startPracticeRecord() {
+        if (!currentMaterial) { showPracticeStatus('请先选择练习材料', 'error'); return; }
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SR) { showPracticeStatus('浏览器不支持语音识别，请使用 Chrome 或 Edge', 'error'); return; }
+
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+            // 1. 启动录音 (MediaRecorder — 用于保存音频)
+            practiceRecorder = new MediaRecorder(stream);
+            practiceChunks = [];
+            practiceRecorder.ondataavailable = e => practiceChunks.push(e.data);
+            practiceRecorder.onstop = () => {
+                practiceBlob = new Blob(practiceChunks, { type: 'audio/webm' });
+                stream.getTracks().forEach(t => t.stop());
+                updatePracticeInfo();
+            };
+            practiceRecorder.start();
+
+            // 2. 启动实时语音识别 (Web Speech API)
+            practiceRecognition = new SR();
+            // 根据翻译方向设置语言
+            practiceRecognition.lang = practiceDirection === 'en2zh' ? 'zh-CN' : 'en-US';
+            practiceRecognition.continuous = true;
+            practiceRecognition.interimResults = true;
+            practiceFinalTranscript = '';
+
+            practiceRecognition.onresult = (event) => {
+                let interim = '';
+                let final = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const r = event.results[i];
+                    if (r.isFinal) {
+                        final += r[0].transcript;
+                    } else {
+                        interim += r[0].transcript;
+                    }
+                }
+                if (final) practiceFinalTranscript += final;
+                // 显示实时识别
+                const liveDiv = document.getElementById('practiceLiveText');
+                const liveInterim = document.getElementById('practiceLiveInterim');
+                liveDiv.style.display = 'block';
+                liveInterim.textContent = practiceFinalTranscript + (interim ? ' ' + interim : '');
+            };
+
+            practiceRecognition.onerror = (event) => {
+                console.warn('识别中间错误:', event.error);
+                if (event.error === 'no-speech') {
+                    showPracticeStatus('未检测到语音，请继续说话...', 'info');
+                }
+            };
+
+            practiceRecognition.start();
+
+            // UI 状态
+            document.getElementById('practiceRecordBtn').disabled = true;
+            document.getElementById('practiceStopBtn').disabled = false;
+            document.getElementById('practiceRecognition').style.display = 'none';
+            practiceStart = Date.now();
+            practiceTimer = setInterval(updatePracticeTimer, 100);
+            const msg = practiceDirection === 'en2zh'
+                ? '录音中，请对着麦克风说出你的中文翻译...'
+                : '录音中，请对着麦克风说出你的英文翻译...';
+            showPracticeStatus(msg, 'info');
+        } catch (e) {
+            showPracticeStatus('无法访问麦克风: ' + e.message, 'error');
+        }
+    }
+
+    function stopPracticeRecord() {
+        // 停止语音识别
+        if (practiceRecognition) {
+            try { practiceRecognition.stop(); } catch (e) {}
+            practiceRecognition = null;
+        }
+        // 停止录音
+        if (practiceRecorder && practiceRecorder.state === 'recording') {
+            practiceRecorder.stop();
+        }
+        // UI 恢复
+        document.getElementById('practiceRecordBtn').disabled = false;
+        document.getElementById('practiceStopBtn').disabled = true;
+        clearInterval(practiceTimer);
+        document.getElementById('practiceLiveText').style.display = 'none';
+
+        // 延迟显示结果（等待最后的 onresult 回调）
+        setTimeout(() => {
+            const transcript = practiceFinalTranscript.trim();
+            if (transcript) {
+                recognizedUserTranslation = transcript;
+                document.getElementById('practiceRecognitionText').textContent = transcript;
+                document.getElementById('practiceRecognition').style.display = 'block';
+                document.getElementById('userTranslationInput').value = transcript;
+                showPracticeStatus('识别完成！音频已保存，文本已自动填入', 'success');
+            } else {
+                showPracticeStatus('录音完成，但未识别到语音内容。请重试或手动输入', 'error');
+            }
+        }, 300);
+    }
+
+    function updatePracticeTimer() {
+        const elapsed = Date.now() - practiceStart;
+        document.getElementById('practiceTimer').textContent =
+            `${String(Math.floor(elapsed / 60000)).padStart(2, '0')}:${String(Math.floor((elapsed % 60000) / 1000)).padStart(2, '0')}`;
+    }
+
+    function updatePracticeInfo() {
+        document.getElementById('practiceRecordInfo').innerHTML = practiceBlob ?
+            `录音已保存 · ${(practiceBlob.size / 1024).toFixed(1)} KB` : '';
+    }
+
+    function clearPracticeRecord() {
+        if (practiceRecognition) {
+            try { practiceRecognition.stop(); } catch (e) {}
+            practiceRecognition = null;
+        }
+        if (practiceRecorder && practiceRecorder.state === 'recording') {
+            practiceRecorder.stop();
+        }
+        practiceBlob = null;
+        practiceChunks = [];
+        practiceFinalTranscript = '';
+        if (practiceTimer) clearInterval(practiceTimer);
+        document.getElementById('practiceTimer').textContent = '00:00';
+        document.getElementById('practiceRecordInfo').innerHTML = '';
+        document.getElementById('practiceLiveText').style.display = 'none';
+        document.getElementById('practiceLiveInterim').textContent = '';
+        document.getElementById('practiceRecordBtn').disabled = false;
+        document.getElementById('practiceStopBtn').disabled = true;
+        document.getElementById('practiceRecognition').style.display = 'none';
+        document.getElementById('practiceRecognitionText').textContent = '';
+    }
+
+    // ==================== 翻译机 - 实时识别回退 ====================
+    function fallbackSpeechRecognition(callback, lang) {
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SR) {
+            showStatus('浏览器不支持语音识别，请使用 Chrome 或 Edge，或手动输入文本', 'error');
+            return;
+        }
+        const rec = new SR();
+        rec.lang = lang;
+        rec.continuous = false;
+        rec.interimResults = false;
+        showStatus('请对着麦克风说话...', 'info');
+        rec.onresult = e => {
+            const text = Array.from(e.results).map(r => r[0].transcript).join('');
+            callback(text);
+        };
+        rec.onerror = e => {
+            showStatus('识别失败: ' + e.error + '，请重试或手动输入', 'error');
+        };
+        rec.start();
+    }
+
+    // ==================== 实战演练 - 加载材料 ====================
+    function loadMaterial() {
+        const diff = document.getElementById('difficulty').value;
+        if (!diff) return;
+
+        let item;
+        if (practiceDirection === 'en2zh') {
+            const pool = MATERIALS[diff];
+            item = pool[Math.floor(Math.random() * pool.length)];
+            currentMaterial = item.en;
+            currentReference = item.zh;
+            document.getElementById('sourceLabel').textContent = '英文原文';
+            document.getElementById('refLabel').textContent = '参考翻译（提交评分后可查看）';
+            document.getElementById('recordLabel').textContent = '用中文录制你的翻译（录音 + 实时识别同步进行）';
+        } else {  // zh2en
+            const pool = MATERIALS_REVERSE[diff];
+            item = pool[Math.floor(Math.random() * pool.length)];
+            currentMaterial = item.zh;
+            currentReference = item.en;
+            document.getElementById('sourceLabel').textContent = '中文原文';
+            document.getElementById('refLabel').textContent = '参考翻译（提交评分后可查看）';
+            document.getElementById('recordLabel').textContent = '用英文录制你的翻译（录音 + 实时识别同步进行）';
+        }
+
+        document.getElementById('englishSource').textContent = currentMaterial;
+        document.getElementById('refBox').style.display = 'none';
+        document.getElementById('scoringResult').innerHTML = '';
+        document.getElementById('feedbackBox').style.display = 'none';
+        document.getElementById('saveRecordBtn').style.display = 'none';
+        currentScores = null;
+        showPracticeStatus('材料已加载', 'success');
+    }
+
+    // ==================== 实战演练 - 评分 ====================
+    function submitScoring() {
+        const userTranslation = document.getElementById('userTranslationInput').value.trim();
+        if (!userTranslation) { showPracticeStatus('请先输入或识别你的翻译', 'error'); return; }
+        if (!currentMaterial) { showPracticeStatus('请先选择练习材料', 'error'); return; }
+
+        currentScores = localScore(userTranslation, currentReference);
+        displayScoringResult(currentScores);
+        showPracticeStatus('评分完成', 'success');
+        document.getElementById('refBox').style.display = 'block';
+        document.getElementById('referenceText').textContent = currentReference;
+        document.getElementById('saveRecordBtn').style.display = 'inline-block';
+    }
+
+    function localScore(userTr, refTr) {
+        const usr = (userTr || '').replace(/\s/g, '');
+        const ref = (refTr || '').replace(/\s/g, '');
+
+        // --- 发音标准性 (0-3): 基于文本结构 ---
+        let pron = 0;
+        if (usr.length >= 5) pron += 1;
+        if (!/(.)\1{3,}/.test(usr)) pron += 1;   // 无连续重复字符
+        if (/[，。！？、,\.\!\?]/.test(usr)) pron += 1;
+
+        // --- 语言流畅性 (0-3): 基于句子结构 ---
+        let flu = 0;
+        if (/[。！？\.\!\?]/.test(usr)) flu += 1;  // 含结束标点
+        const lenRatio = ref.length > 0 ? Math.min(usr.length, ref.length) / Math.max(usr.length, ref.length) : 0;
+        if (lenRatio >= 0.3) flu += 1;
+        const words = usr.split('');
+        const uniqueRatio = new Set(words).size / Math.max(1, words.length);
+        if (uniqueRatio >= 0.4) flu += 1;
+
+        // --- 翻译准确性 (0-3): 基于字符相似度 ---
+        function jaccardSim(a, b) {
+            const sa = new Set(a.split('')), sb = new Set(b.split(''));
+            let inter = 0;
+            for (const c of sa) { if (sb.has(c)) inter++; }
+            const union = new Set([...sa, ...sb]).size;
+            return union === 0 ? 0 : inter / union;
+        }
+        function bigramSim(a, b) {
+            const bg = s => { const set = new Set(); for (let i = 0; i < s.length - 1; i++) set.add(s[i] + s[i + 1]); return set; };
+            const ba = bg(a), bb = bg(b);
+            let inter = 0;
+            for (const g of ba) { if (bb.has(g)) inter++; }
+            const denom = (ba.size + bb.size) / 2;
+            return denom === 0 ? 0 : inter / denom;
+        }
+        const jSim = jaccardSim(usr, ref);
+        const bSim = bigramSim(usr, ref);
+        const sim = jSim * 0.4 + bSim * 0.6;
+        let acc = 0;
+        if (sim >= 0.8) acc = 3;
+        else if (sim >= 0.6) acc = 2.5;
+        else if (sim >= 0.4) acc = 2;
+        else if (sim >= 0.2) acc = 1;
+        else acc = 0.5;
+
+        const total = (pron + flu + acc) / 3;
+        let feedback = '';
+        if (total >= 2.5) feedback = '表现优秀！翻译质量较高，继续保持。';
+        else if (total >= 2.0) feedback = '表现良好，部分细节有待完善。';
+        else if (total >= 1.5) feedback = '表现尚可，建议多加练习以提高准确度。';
+        else feedback = '需要改进，建议对照参考译文仔细揣摩。';
+
+        const suggestions = [];
+        if (pron < 2) suggestions.push('发音维度：尝试增加翻译内容的长度和完整性。');
+        if (flu < 2) suggestions.push('流畅维度：注意句子结构，适当使用标点符号断句。');
+        if (acc < 2) suggestions.push('准确维度：关注关键词汇的准确对应，多对照参考译文。');
+        if (suggestions.length === 0) suggestions.push('各方面表现均衡，坚持练习会越来越好！');
+
+        return {
+            pronunciation: pron,
+            fluency: flu,
+            accuracy: acc,
+            total: parseFloat(total.toFixed(1)),
+            feedback,
+            suggestions
+        };
+    }
+
+    function displayScoringResult(s) {
+        document.getElementById('scoringResult').innerHTML = `
+            <div class="result-card success">
+                <div class="section-title">评分结果</div>
+                <div class="score-grid">
+                    <div class="score-item">
+                        <div class="score-num">${s.pronunciation}</div>
+                        <div class="score-label">发音标准性 /3</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-num">${s.fluency}</div>
+                        <div class="score-label">语言流畅性 /3</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-num">${s.accuracy}</div>
+                        <div class="score-label">翻译准确性 /3</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-num" style="color:#28a745;">${s.total.toFixed(1)}</div>
+                        <div class="score-label">总分 /3</div>
+                    </div>
+                </div>
+                <p style="margin-top:10px;">${s.feedback}</p>
+            </div>`;
+
+        const fb = document.getElementById('feedbackBox');
+        fb.style.display = 'block';
+        fb.innerHTML = '<div class="output-label">改进建议</div><ul style="margin-left:18px;">' +
+            s.suggestions.map(t => `<li>${t}</li>`).join('') + '</ul>';
+    }
+
+    // ==================== 保存记录 (localStorage) ====================
+    function saveRecord() {
+        if (!currentScores || !currentMaterial) {
+            showPracticeStatus('没有可保存的评分结果', 'error');
+            return;
+        }
+        const userTr = document.getElementById('userTranslationInput').value.trim();
+        const record = {
+            time: new Date().toLocaleString('zh-CN'),
+            original: currentMaterial,
+            userTranslation: userTr,
+            pronunciation: currentScores.pronunciation,
+            fluency: currentScores.fluency,
+            accuracy: currentScores.accuracy,
+            feedback: currentScores.feedback
+        };
+        const records = getRecords();
+        records.push(record);
+        localStorage.setItem(LS_RECORDS, JSON.stringify(records));
+        showPracticeStatus('记录已保存', 'success');
+        // 重置表单
+        setTimeout(() => {
+            document.getElementById('difficulty').value = '';
+            document.getElementById('englishSource').textContent = '请先选择练习材料';
+            document.getElementById('refBox').style.display = 'none';
+            document.getElementById('userTranslationInput').value = '';
+            document.getElementById('scoringResult').innerHTML = '';
+            document.getElementById('feedbackBox').style.display = 'none';
+            document.getElementById('saveRecordBtn').style.display = 'none';
+            clearPracticeRecord();
+            currentMaterial = '';
+            currentReference = '';
+            currentScores = null;
+        }, 800);
+    }
+
+    function getRecords() {
+        try { return JSON.parse(localStorage.getItem(LS_RECORDS) || '[]'); } catch (e) { return []; }
+    }
+
+    // ==================== 学习记录 ====================
+    let cachedRecords = [];
+
+    function loadRecords() {
+        cachedRecords = getRecords();
+        const tbody = document.getElementById('recordsBody');
+
+        if (cachedRecords.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#999;">暂无记录</td></tr>';
+        } else {
+            tbody.innerHTML = cachedRecords.map((r, i) => {
+                const total = ((r.pronunciation + r.fluency + r.accuracy) / 3).toFixed(1);
+                return `<tr>
+                    <td>${escHtml(r.time)}</td>
+                    <td>${escHtml(r.original.substring(0, 28))}...</td>
+                    <td>${r.pronunciation}</td>
+                    <td>${r.fluency}</td>
+                    <td>${r.accuracy}</td>
+                    <td style="font-weight:bold;color:#667eea;">${total}</td>
+                    <td><button onclick="showDetail(${i})" style="padding:5px 10px;font-size:0.85em;">查看</button></td>
+                </tr>`;
+            }).join('');
+        }
+        updateStats();
+    }
+
+    function updateStats() {
+        const total = cachedRecords.length;
+        document.getElementById('totalCount').textContent = total;
+        if (total === 0) {
+            document.getElementById('avgScore').textContent = '0.0';
+            document.getElementById('maxScore').textContent = '0.0';
+            return;
+        }
+        const scores = cachedRecords.map(r => (r.pronunciation + r.fluency + r.accuracy) / 3);
+        document.getElementById('avgScore').textContent = (scores.reduce((a, b) => a + b, 0) / total).toFixed(1);
+        document.getElementById('maxScore').textContent = Math.max(...scores).toFixed(1);
+    }
+
+    function showDetail(i) {
+        const r = cachedRecords[i];
+        if (!r) return;
+        const total = ((r.pronunciation + r.fluency + r.accuracy) / 3).toFixed(1);
+        document.getElementById('detailContent').innerHTML = `
+            <h3 style="color:#667eea; margin-bottom:12px;">练习详情</h3>
+            <p><strong>时间：</strong>${escHtml(r.time)}</p>
+            <p><strong>英文原文：</strong><br>${escHtml(r.original)}</p>
+            <p><strong>你的翻译：</strong><br>${escHtml(r.userTranslation || '(无)')}</p>
+            <p><strong>发音：</strong>${r.pronunciation}/3 &nbsp; <strong>流畅：</strong>${r.fluency}/3 &nbsp; <strong>准确：</strong>${r.accuracy}/3 &nbsp; <strong>总分：</strong><span style="color:#667eea;font-weight:bold;">${total}/3</span></p>
+            ${r.feedback ? `<p style="padding:8px;background:#fff3cd;border-radius:4px;"><strong>评语：</strong>${escHtml(r.feedback)}</p>` : ''}`;
+        document.getElementById('detailModal').classList.add('show');
+    }
+
+    function closeDetail() {
+        document.getElementById('detailModal').classList.remove('show');
+    }
+
+    function clearRecords() {
+        if (!confirm('确定要清除所有学习记录吗？此操作不可撤销！')) return;
+        localStorage.removeItem(LS_RECORDS);
+        cachedRecords = [];
+        loadRecords();
+        showPracticeStatus('所有记录已清除', 'success');
+    }
+
+    function exportCSV() {
+        const records = getRecords();
+        if (records.length === 0) { alert('暂无记录可导出'); return; }
+        let csv = '﻿时间,原文,你的翻译,发音,流畅,准确,评语\n';
+        csv += records.map(r =>
+            `"${r.time}","${r.original}","${r.userTranslation || ''}",${r.pronunciation},${r.fluency},${r.accuracy},"${r.feedback || ''}"`
+        ).join('\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `口译练习记录_${new Date().toISOString().slice(0, 10)}.csv`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+    }
+
+    // ==================== 工具函数 ====================
+    function escHtml(s) {
+        const div = document.createElement('div');
+        div.textContent = s;
+        return div.innerHTML;
+    }
+
+    // ==================== 初始化 ====================
+    window.addEventListener('DOMContentLoaded', () => {
+        console.log('AI 口译训练助手 V2 已加载');
+        loadRecords();
+    });
+
+    // 点击模态框背景关闭
+    document.getElementById('detailModal').addEventListener('click', function(e) {
+        if (e.target === this) closeDetail();
+    });
+    </script>
+</body>
+</html>
