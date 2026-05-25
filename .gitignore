@@ -17,6 +17,7 @@ venv/
 # Config & AI tools
 .claude/
 .kiro/
+
 CLAUDE.md
 
 # IDE
