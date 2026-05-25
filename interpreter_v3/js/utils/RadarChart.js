@@ -15,13 +15,13 @@ export class RadarChart {
       maxScore: 3,
       levels: 3,
       colors: {
-        pronunciation: '#6366f1', // indigo
-        fluency: '#10b981',       // emerald
-        accuracy: '#f59e0b',      // amber
-        fill: 'rgba(102, 126, 234, 0.2)',
-        stroke: 'rgba(102, 126, 234, 0.6)',
-        grid: '#e2e8f0',
-        text: '#64748b'
+        pronunciation: '#818cf8', // indigo-400
+        fluency: '#34d399',       // emerald-400
+        accuracy: '#fbbf24',      // amber-400
+        fill: 'rgba(129, 140, 248, 0.2)',
+        stroke: 'rgba(129, 140, 248, 0.5)',
+        grid: 'rgba(148, 163, 184, 0.25)',
+        text: '#94a3b8'
       },
       labels: {
         pronunciation: '发音',
@@ -150,7 +150,7 @@ export class RadarChart {
       ctx.arc(dp.x, dp.y, 5, 0, 2 * Math.PI);
       ctx.fillStyle = color;
       ctx.fill();
-      ctx.strokeStyle = '#fff';
+      ctx.strokeStyle = '#1e293b';
       ctx.lineWidth = 2;
       ctx.stroke();
 
@@ -160,7 +160,7 @@ export class RadarChart {
       const labelX = dp.x + (dp.x > centerX ? labelOffset : dp.x < centerX ? -labelOffset : 0);
       const labelY = dp.y + (dp.y > centerY ? labelOffset : dp.y < centerY ? -labelOffset : 0);
 
-      ctx.fillStyle = '#1e293b';
+      ctx.fillStyle = '#e2e8f0';
       ctx.font = 'bold 13px system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';

@@ -13,16 +13,13 @@ export class TabManager {
   }
 
   init() {
-    // Restore last active tab
     this.switchTab(this.currentTab);
 
-    // Bind click events to tab buttons
     this.container.querySelectorAll('[data-tab]').forEach(btn => {
       btn.addEventListener('click', () => {
         this.switchTab(btn.dataset.tab);
       });
 
-      // Keyboard accessibility
       btn.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
@@ -33,18 +30,17 @@ export class TabManager {
   }
 
   switchTab(tabName) {
-    // Save state of current tab before switching
     if (this.currentTab) {
       this.saveTabState(this.currentTab);
     }
 
-    // Update tab buttons
+    // Update tab buttons — glassmorphism classes
     this.container.querySelectorAll('[data-tab]').forEach(btn => {
       const isActive = btn.dataset.tab === tabName;
-      btn.classList.toggle('border-indigo-500', isActive);
-      btn.classList.toggle('text-indigo-500', isActive);
+      btn.classList.toggle('border-indigo-400', isActive);
+      btn.classList.toggle('text-indigo-300', isActive);
       btn.classList.toggle('border-transparent', !isActive);
-      btn.classList.toggle('text-gray-500', !isActive);
+      btn.classList.toggle('text-slate-400', !isActive);
       btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
     });
 
@@ -57,13 +53,11 @@ export class TabManager {
     this.currentTab = tabName;
     this.localStorage.saveActiveTab(tabName);
 
-    // Restore state for newly activated tab
     const state = this.localStorage.getTabState(tabName);
     if (Object.keys(state).length > 0) {
       this.restoreTabState(tabName, state);
     }
 
-    // Notify listeners
     this.changeListeners.forEach(cb => cb(tabName));
   }
 
@@ -79,7 +73,6 @@ export class TabManager {
     if (state) {
       this.tabStates[tabName] = state;
     }
-    // Auto-capture: save DOM state for the current tab
     this.tabStates[tabName] = this._captureState(tabName);
     this.localStorage.saveTabState(tabName, this.tabStates[tabName]);
   }
@@ -89,7 +82,6 @@ export class TabManager {
   }
 
   restoreTabState(tabName, state) {
-    // Restore common state elements
     if (state.languageDirection) {
       this.localStorage.saveLanguageDirection(state.languageDirection);
     }
@@ -97,7 +89,6 @@ export class TabManager {
 
   _captureState(tabName) {
     const state = {};
-    // Save language direction
     const dirBtn = document.querySelector(`#tab-${tabName} .dir-btn.active, #tab-${tabName} [data-active="true"]`);
     if (dirBtn) {
       state.languageDirection = dirBtn.dataset.direction;

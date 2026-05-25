@@ -5,358 +5,307 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI 口译训练平台</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: { 50: '#eef2ff', 100: '#e0e7ff', 200: '#c7d2fe', 300: '#a5b4fc', 400: '#818cf8', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca' }
-          }
-        }
-      }
-    }
-  </script>
   <link rel="stylesheet" href="styles/main.css">
 </head>
-<body class="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 min-h-screen p-3 md:p-6">
+<body>
 
-  <div class="max-w-5xl mx-auto bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl overflow-hidden" id="app">
+  <!-- ====== VIBRANT ANIMATED BACKGROUND ====== -->
+  <div class="bg-glow"></div>
 
-    <!-- ====== HEADER ====== -->
-    <header class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-4 md:p-6 text-center">
-      <h1 class="text-2xl md:text-3xl font-bold tracking-tight">AI 口译训练平台</h1>
-      <p class="text-sm md:text-base opacity-85 mt-1">中英文双向翻译 · 语音交互 · 智能评分</p>
+  <!-- Decorative floating orbs that will be visible through the glass -->
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-orb orb-3"></div>
+  <div class="bg-orb orb-4"></div>
+
+  <!-- ====== APP CONTAINER ====== -->
+  <div class="app-shell" id="app">
+
+    <!-- HEADER -->
+    <header class="header-glass">
+      <h1>AI 口译训练平台</h1>
+      <p>中英文双向翻译 · 语音交互 · 智能评分</p>
     </header>
 
-    <!-- ====== TAB NAVIGATION ====== -->
-    <nav id="tabNav" class="flex border-b bg-gray-50/80" role="tablist">
-      <button data-tab="demo" class="tab-btn flex-1 py-3 px-4 font-semibold text-sm md:text-base border-b-2 border-indigo-500 text-indigo-500 transition duration-200 hover:bg-indigo-50" role="tab" aria-selected="true" aria-controls="tab-demo">
-        📡 AI 翻译机
+    <!-- TAB NAVIGATION -->
+    <nav id="tabNav" class="nav-glass" role="tablist">
+      <button data-tab="demo" class="nav-tab border-indigo-400 text-indigo-300" role="tab" aria-selected="true" aria-controls="tab-demo">
+        AI 翻译机
       </button>
-      <button data-tab="practice" class="tab-btn flex-1 py-3 px-4 font-semibold text-sm md:text-base border-b-2 border-transparent text-gray-500 transition duration-200 hover:bg-indigo-50 hover:text-indigo-500" role="tab" aria-selected="false" aria-controls="tab-practice">
-        🎯 实战演练
+      <button data-tab="practice" class="nav-tab border-transparent text-slate-400" role="tab" aria-selected="false" aria-controls="tab-practice">
+        实战演练
       </button>
-      <button data-tab="records" class="tab-btn flex-1 py-3 px-4 font-semibold text-sm md:text-base border-b-2 border-transparent text-gray-500 transition duration-200 hover:bg-indigo-50 hover:text-indigo-500" role="tab" aria-selected="false" aria-controls="tab-records">
-        📊 学习记录
+      <button data-tab="records" class="nav-tab border-transparent text-slate-400" role="tab" aria-selected="false" aria-controls="tab-records">
+        学习记录
       </button>
     </nav>
 
-    <!-- ====== TAB CONTENT ====== -->
-    <main class="p-4 md:p-6">
+    <!-- TAB CONTENT -->
+    <main class="content-area">
 
       <!-- ====== TAB 1: DEMO MODE ====== -->
-      <section id="tab-demo" class="tab-panel block space-y-5">
+      <section id="tab-demo" class="tab-panel block">
+        <div class="tab-inner">
 
-        <div class="flex flex-wrap justify-between items-center gap-3">
-          <h2 class="text-xl font-bold text-gray-800">AI 翻译机</h2>
-          <div class="flex gap-2" id="demoDirection">
-            <button data-direction="en-zh" class="dir-btn px-4 py-2 rounded-lg border-2 border-indigo-500 bg-indigo-500 text-white font-medium text-sm transition" aria-pressed="true">英 → 中</button>
-            <button data-direction="zh-en" class="dir-btn px-4 py-2 rounded-lg border-2 border-gray-300 text-gray-600 hover:border-indigo-300 font-medium text-sm transition" aria-pressed="false">中 → 英</button>
+          <div class="flex flex-wrap justify-between items-center gap-3">
+            <h2>AI 翻译机</h2>
+            <div class="flex gap-2" id="demoDirection">
+              <button data-direction="en-zh" class="pill active" aria-pressed="true">英 → 中</button>
+              <button data-direction="zh-en" class="pill" aria-pressed="false">中 → 英</button>
+            </div>
           </div>
-        </div>
 
-        <p class="text-gray-500 text-sm">输入英文或中文文本，或使用语音输入，获取 AI 翻译结果（文本 + 语音播放）。</p>
+          <p class="section-desc">输入英文或中文文本，或使用语音输入，获取 AI 翻译结果。</p>
 
-        <!-- Input mode toggle -->
-        <div class="flex gap-2" id="inputModeToggle">
-          <button data-mode="text" class="mode-btn px-4 py-1.5 rounded-lg border-2 border-indigo-500 bg-indigo-500 text-white font-medium text-sm transition">📝 文本输入</button>
-          <button data-mode="voice" class="mode-btn px-4 py-1.5 rounded-lg border-2 border-gray-300 text-gray-600 font-medium text-sm transition hover:border-indigo-300">🎤 语音输入</button>
-        </div>
-
-        <!-- Text input panel -->
-        <div id="demoTextPanel" class="space-y-3">
-          <textarea id="demoSourceText" class="w-full p-3 border-2 border-gray-200 rounded-xl min-h-[100px] focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition resize-y" placeholder="请输入要翻译的英文文本..."></textarea>
-          <button id="demoTranslateBtn" class="bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-2.5 rounded-lg font-medium transition disabled:opacity-50 disabled:cursor-not-allowed shadow-sm">
-            翻译
-          </button>
-        </div>
-
-        <!-- Voice input panel -->
-        <div id="demoVoicePanel" class="space-y-3 hidden">
-          <div class="flex flex-wrap gap-2">
-            <button id="demoRecordBtn" class="bg-red-500 hover:bg-red-600 text-white px-5 py-2.5 rounded-lg font-medium transition shadow-sm">
-              🔴 开始录音
-            </button>
-            <button id="demoStopBtn" class="bg-gray-500 hover:bg-gray-600 text-white px-5 py-2.5 rounded-lg font-medium transition shadow-sm hidden">
-              ⏹ 停止录音
-            </button>
-            <button id="demoClearVoiceBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2.5 rounded-lg font-medium transition text-sm">
-              清除
-            </button>
+          <!-- Input mode toggle -->
+          <div class="flex gap-2" id="inputModeToggle">
+            <button data-mode="text" class="pill active">文本输入</button>
+            <button data-mode="voice" class="pill">语音输入</button>
           </div>
-          <div class="flex items-center gap-3">
-            <span id="demoTimer" class="recording-timer font-mono text-lg hidden">00:00</span>
-            <span id="demoRecordStatus" class="text-sm text-gray-500"></span>
-          </div>
-          <button id="demoRecognizeBtn" class="bg-indigo-500 hover:bg-indigo-600 text-white px-5 py-2.5 rounded-lg font-medium transition shadow-sm">
-            🎤 语音识别
-          </button>
-          <div id="demoLiveInterimBox" class="bg-indigo-50 p-3 rounded-lg text-sm hidden">
-            <span class="text-indigo-700 font-medium">实时识别：</span>
-            <span id="demoLiveInterim" class="text-gray-500 italic"></span>
-          </div>
-        </div>
 
-        <!-- Recognition result -->
-        <div id="demoRecognitionBox" class="bg-indigo-50 border-l-4 border-indigo-500 p-4 rounded-r-lg hidden">
-          <p class="text-sm font-semibold text-gray-600 mb-1">识别结果</p>
-          <p id="demoRecognitionText" class="text-gray-800"></p>
-          <button id="demoUseRecognizedBtn" class="mt-2 text-sm text-indigo-600 hover:text-indigo-800 font-medium">↗ 翻译此文本</button>
-        </div>
-
-        <!-- Translation result -->
-        <div id="demoResultBox" class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg hidden result-card">
-          <p class="text-sm font-semibold text-gray-600 mb-1">翻译结果</p>
-          <p id="demoResultText" class="text-gray-800 text-lg"></p>
-          <div class="flex gap-2 mt-3">
-            <button id="demoPlayBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-1.5 rounded-lg text-sm font-medium transition shadow-sm">🔊 播放</button>
-            <button id="demoCopyBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-1.5 rounded-lg text-sm font-medium transition">📋 复制</button>
+          <!-- Text panel -->
+          <div id="demoTextPanel">
+            <textarea id="demoSourceText" class="glass-input" placeholder="请输入要翻译的英文文本..."></textarea>
+            <button id="demoTranslateBtn" class="btn-primary">翻译</button>
           </div>
-        </div>
 
-        <!-- Error/info messages -->
-        <div id="demoStatusMsg" class="status-msg hidden"></div>
+          <!-- Voice panel -->
+          <div id="demoVoicePanel" class="hidden voice-panel">
+            <div class="flex flex-wrap gap-2">
+              <button id="demoRecordBtn" class="btn-danger">开始录音</button>
+              <button id="demoStopBtn" class="btn-ghost hidden">停止录音</button>
+              <button id="demoClearVoiceBtn" class="btn-minor">清除</button>
+            </div>
+            <div class="flex items-center gap-3">
+              <span id="demoTimer" class="timer hidden">00:00</span>
+              <span id="demoRecordStatus" class="status-text"></span>
+            </div>
+            <div id="demoLiveInterimBox" class="live-box hidden">
+              <span class="live-label">实时识别中：</span>
+              <span id="demoLiveInterim" class="live-text"></span>
+            </div>
+          </div>
+
+          <!-- Recognition result -->
+          <div id="demoRecognitionBox" class="result-card card-indigo hidden">
+            <p class="card-label">识别结果</p>
+            <p id="demoRecognitionText" class="card-body"></p>
+            <button id="demoUseRecognizedBtn" class="link-btn">翻译此文本</button>
+          </div>
+
+          <!-- Translation result -->
+          <div id="demoResultBox" class="result-card card-green hidden">
+            <p class="card-label">翻译结果</p>
+            <p id="demoResultText" class="card-body text-lg"></p>
+            <div class="flex gap-2 mt-3">
+              <button id="demoPlayBtn" class="btn-success">播放</button>
+              <button id="demoCopyBtn" class="btn-ghost">复制</button>
+            </div>
+          </div>
+
+          <div id="demoStatusMsg" class="status-msg hidden"></div>
+        </div>
       </section>
 
       <!-- ====== TAB 2: PRACTICE MODE ====== -->
-      <section id="tab-practice" class="tab-panel hidden space-y-5">
+      <section id="tab-practice" class="tab-panel hidden">
+        <div class="tab-inner">
 
-        <div class="flex flex-wrap justify-between items-center gap-3">
-          <h2 class="text-xl font-bold text-gray-800">实战演练</h2>
-          <div class="flex gap-2" id="practiceDirection">
-            <button data-direction="en-zh" class="dir-btn px-4 py-2 rounded-lg border-2 border-indigo-500 bg-indigo-500 text-white font-medium text-sm transition" aria-pressed="true">英 → 中</button>
-            <button data-direction="zh-en" class="dir-btn px-4 py-2 rounded-lg border-2 border-gray-300 text-gray-600 font-medium text-sm transition hover:border-indigo-300" aria-pressed="false">中 → 英</button>
-          </div>
-        </div>
-
-        <p class="text-gray-500 text-sm">获取随机练习素材，录制你的翻译，系统将从发音、流畅性和准确性三个维度进行评分。</p>
-
-        <!-- Difficulty selector + get material -->
-        <div class="flex flex-wrap gap-3 items-end">
-          <div>
-            <label class="block text-sm font-medium text-gray-600 mb-1">难度等级</label>
-            <select id="practiceDifficulty" class="w-full p-2.5 border-2 border-gray-200 rounded-lg bg-white focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition text-sm">
-              <option value="easy">简单 (Easy)</option>
-              <option value="medium" selected>中等 (Medium)</option>
-              <option value="hard">困难 (Hard)</option>
-              <option value="all">全部随机</option>
-            </select>
-          </div>
-          <button id="practiceGetMaterialBtn" class="bg-indigo-500 hover:bg-indigo-600 text-white px-5 py-2.5 rounded-lg font-medium transition shadow-sm">
-            🎲 获取练习素材
-          </button>
-        </div>
-
-        <!-- Source text display -->
-        <div id="practiceSourceBox" class="bg-gray-50 border-l-4 border-indigo-500 p-4 rounded-r-lg hidden">
-          <p class="text-sm font-semibold text-indigo-600 mb-1">原文</p>
-          <p id="practiceSourceText" class="text-gray-800 leading-relaxed"></p>
-        </div>
-
-        <!-- Reference translation (shown after scoring) -->
-        <div id="practiceRefBox" class="bg-indigo-50 border-l-4 border-indigo-400 p-4 rounded-r-lg hidden">
-          <p class="text-sm font-semibold text-indigo-600 mb-1">参考翻译</p>
-          <p id="practiceRefText" class="text-gray-800 leading-relaxed"></p>
-        </div>
-
-        <!-- Recording panel -->
-        <div class="space-y-3">
-          <p class="text-sm font-medium text-gray-600">🎙️ 录制你的翻译</p>
-          <div class="flex flex-wrap gap-2">
-            <button id="practiceRecordBtn" class="bg-red-500 hover:bg-red-600 text-white px-5 py-2.5 rounded-lg font-medium transition shadow-sm">
-              🔴 开始录音
-            </button>
-            <button id="practiceStopBtn" class="bg-gray-500 hover:bg-gray-600 text-white px-5 py-2.5 rounded-lg font-medium transition shadow-sm hidden">
-              ⏹ 停止录音
-            </button>
-            <button id="practiceClearBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2.5 rounded-lg font-medium transition text-sm">
-              清除
-            </button>
-          </div>
-          <div class="flex items-center gap-3">
-            <span id="practiceTimer" class="recording-timer font-mono text-lg hidden">00:00</span>
-            <span id="practiceRecordStatus" class="text-sm text-gray-500"></span>
-          </div>
-
-          <!-- Live recognition interim -->
-          <div id="practiceLiveBox" class="bg-green-50 p-3 rounded-lg text-sm hidden">
-            <span class="text-green-700 font-medium">实时识别中：</span>
-            <span id="practiceLiveInterim" class="text-gray-500 italic"></span>
-          </div>
-        </div>
-
-        <!-- Recognized text + manual edit -->
-        <div id="practiceRecognitionBox" class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg hidden">
-          <p class="text-sm font-semibold text-green-700 mb-1">识别结果（可手动修正）</p>
-          <textarea id="practiceUserTranslation" class="w-full p-3 border-2 border-gray-200 rounded-lg min-h-[80px] focus:ring-2 focus:ring-green-300 focus:border-green-400 transition resize-y text-sm" placeholder="录音识别结果将显示在这里，你也可以手动修改..."></textarea>
-        </div>
-
-        <!-- Submit scoring -->
-        <button id="practiceSubmitBtn" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2.5 rounded-lg font-medium transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
-          📝 提交评分
-        </button>
-
-        <!-- Scoring result -->
-        <div id="practiceScoreBox" class="space-y-4 hidden animate-fadeIn">
-          <h3 class="text-lg font-bold text-gray-800">评分结果</h3>
-
-          <!-- Score cards -->
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div class="score-card bg-white border-2 border-gray-100 rounded-xl p-4 text-center shadow-sm">
-              <p class="text-3xl font-bold text-indigo-500" id="scoreTotal">0.0</p>
-              <p class="text-xs text-gray-500 font-medium mt-1">总分 / 3</p>
-            </div>
-            <div class="score-card bg-white border-2 border-gray-100 rounded-xl p-4 text-center shadow-sm">
-              <p class="text-3xl font-bold text-blue-500" id="scorePron">0</p>
-              <p class="text-xs text-gray-500 font-medium mt-1">发音标准性</p>
-            </div>
-            <div class="score-card bg-white border-2 border-gray-100 rounded-xl p-4 text-center shadow-sm">
-              <p class="text-3xl font-bold text-emerald-500" id="scoreFlu">0</p>
-              <p class="text-xs text-gray-500 font-medium mt-1">语言流畅性</p>
-            </div>
-            <div class="score-card bg-white border-2 border-gray-100 rounded-xl p-4 text-center shadow-sm">
-              <p class="text-3xl font-bold text-amber-500" id="scoreAcc">0</p>
-              <p class="text-xs text-gray-500 font-medium mt-1">翻译准确性</p>
+          <div class="flex flex-wrap justify-between items-center gap-3">
+            <h2>实战演练</h2>
+            <div class="flex gap-2" id="practiceDirection">
+              <button data-direction="en-zh" class="pill active" aria-pressed="true">英 → 中</button>
+              <button data-direction="zh-en" class="pill" aria-pressed="false">中 → 英</button>
             </div>
           </div>
 
-          <!-- Radar chart -->
-          <div id="radarContainer" class="flex justify-center my-4">
-            <canvas id="scoreRadar" width="300" height="300" class="max-w-[300px] w-full"></canvas>
+          <p class="section-desc">获取随机练习素材，录制翻译，系统从发音、流畅性和准确性三个维度评分。</p>
+
+          <div class="flex flex-wrap gap-3 items-end">
+            <div>
+              <label>难度等级</label>
+              <select id="practiceDifficulty" class="glass-input" style="padding: 0.625rem 0.75rem;">
+                <option value="easy">简单 (Easy)</option>
+                <option value="medium" selected>中等 (Medium)</option>
+                <option value="hard">困难 (Hard)</option>
+                <option value="all">全部随机</option>
+              </select>
+            </div>
+            <button id="practiceGetMaterialBtn" class="btn-primary">获取练习素材</button>
           </div>
 
-          <!-- Detailed feedback -->
-          <div id="practiceFeedbackBox" class="space-y-2">
-            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg">
-              <p class="text-sm font-semibold text-yellow-700 mb-2">📋 详细反馈</p>
-              <div class="space-y-2 text-sm text-gray-700">
-                <p id="feedbackPron"></p>
-                <p id="feedbackFlu"></p>
-                <p id="feedbackAcc"></p>
+          <!-- Source text -->
+          <div id="practiceSourceBox" class="result-card card-indigo hidden">
+            <p class="card-label">原文</p>
+            <p id="practiceSourceText" class="card-body"></p>
+          </div>
+
+          <!-- Reference -->
+          <div id="practiceRefBox" class="result-card card-blue hidden">
+            <p class="card-label">参考翻译</p>
+            <p id="practiceRefText" class="card-body"></p>
+          </div>
+
+          <!-- Recording -->
+          <div class="voice-panel">
+            <label>录制你的翻译</label>
+            <div class="flex flex-wrap gap-2">
+              <button id="practiceRecordBtn" class="btn-danger">开始录音</button>
+              <button id="practiceStopBtn" class="btn-ghost hidden">停止录音</button>
+              <button id="practiceClearBtn" class="btn-minor">清除</button>
+            </div>
+            <div class="flex items-center gap-3">
+              <span id="practiceTimer" class="timer hidden">00:00</span>
+              <span id="practiceRecordStatus" class="status-text"></span>
+            </div>
+            <div id="practiceLiveBox" class="live-box hidden">
+              <span class="live-label">实时识别中：</span>
+              <span id="practiceLiveInterim" class="live-text"></span>
+            </div>
+          </div>
+
+          <!-- Recognized text -->
+          <div id="practiceRecognitionBox" class="result-card card-green hidden">
+            <p class="card-label">识别结果（可手动修正）</p>
+            <textarea id="practiceUserTranslation" class="glass-input min-h-[80px] resize-y w-full" placeholder="录音识别结果将显示在这里，你也可以手动修改..."></textarea>
+          </div>
+
+          <button id="practiceSubmitBtn" class="btn-success">提交评分</button>
+
+          <!-- Scores -->
+          <div id="practiceScoreBox" class="hidden animate-fadeIn">
+            <h3>评分结果</h3>
+
+            <div class="score-grid">
+              <div class="score-block">
+                <p id="scoreTotal">0.0</p>
+                <span>总分 / 3</span>
+              </div>
+              <div class="score-block">
+                <p id="scorePron">0</p>
+                <span>发音标准性</span>
+              </div>
+              <div class="score-block">
+                <p id="scoreFlu">0</p>
+                <span>语言流畅性</span>
+              </div>
+              <div class="score-block">
+                <p id="scoreAcc">0</p>
+                <span>翻译准确性</span>
               </div>
             </div>
-            <div id="practiceSuggestions" class="bg-indigo-50 border-l-4 border-indigo-400 p-4 rounded-r-lg hidden">
-              <p class="text-sm font-semibold text-indigo-700 mb-1">💡 改进建议</p>
-              <ul id="suggestionsList" class="text-sm text-gray-700 list-disc list-inside space-y-1"></ul>
-            </div>
-          </div>
 
-          <!-- Save record button -->
-          <button id="practiceSaveBtn" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2.5 rounded-lg font-medium transition shadow-sm hidden">
-            💾 保存学习记录
-          </button>
+            <!-- Radar -->
+            <div id="radarContainer">
+              <canvas id="scoreRadar" width="300" height="300"></canvas>
+            </div>
+
+            <!-- Feedback -->
+            <div id="practiceFeedbackBox" class="space-y-2">
+              <div class="result-card card-amber">
+                <p class="card-label">详细反馈</p>
+                <div class="feedback-lines">
+                  <p id="feedbackPron"></p>
+                  <p id="feedbackFlu"></p>
+                  <p id="feedbackAcc"></p>
+                </div>
+              </div>
+              <div id="practiceSuggestions" class="result-card card-indigo hidden">
+                <p class="card-label">改进建议</p>
+                <ul id="suggestionsList"></ul>
+              </div>
+            </div>
+
+            <button id="practiceSaveBtn" class="btn-ghost hidden">保存学习记录</button>
+          </div>
         </div>
       </section>
 
       <!-- ====== TAB 3: RECORDS ====== -->
-      <section id="tab-records" class="tab-panel hidden space-y-5">
+      <section id="tab-records" class="tab-panel hidden">
+        <div class="tab-inner">
 
-        <h2 class="text-xl font-bold text-gray-800">学习记录</h2>
+          <h2>学习记录</h2>
 
-        <!-- Stats cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div class="bg-gradient-to-r from-indigo-500 to-purple-500 text-white p-4 rounded-xl text-center shadow-sm">
-            <p class="text-2xl font-bold" id="statsTotal">0</p>
-            <p class="text-xs opacity-90 mt-1">总练习次数</p>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="stat-block">
+              <p id="statsTotal">0</p>
+              <span>总练习次数</span>
+            </div>
+            <div class="stat-block">
+              <p id="statsAvg">0.0</p>
+              <span>平均分 / 3</span>
+            </div>
+            <div class="stat-block">
+              <p id="statsBest">0.0</p>
+              <span>最高分</span>
+            </div>
           </div>
-          <div class="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-4 rounded-xl text-center shadow-sm">
-            <p class="text-2xl font-bold" id="statsAvg">0.0</p>
-            <p class="text-xs opacity-90 mt-1">平均分 / 3</p>
-          </div>
-          <div class="bg-gradient-to-r from-pink-500 to-red-500 text-white p-4 rounded-xl text-center shadow-sm">
-            <p class="text-2xl font-bold" id="statsBest">0.0</p>
-            <p class="text-xs opacity-90 mt-1">最高分</p>
-          </div>
-        </div>
 
-        <!-- Action buttons -->
-        <div class="flex flex-wrap gap-2">
-          <button id="recordsRefreshBtn" class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm">
-            🔄 刷新
-          </button>
-          <button id="recordsExportBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm">
-            📥 导出 CSV
-          </button>
-          <button id="recordsClearBtn" class="bg-red-400 hover:bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm">
-            🗑️ 清除全部
-          </button>
-        </div>
+          <div class="flex flex-wrap gap-2">
+            <button id="recordsRefreshBtn" class="btn-primary">刷新</button>
+            <button id="recordsExportBtn" class="btn-success">导出 CSV</button>
+            <button id="recordsClearBtn" class="btn-danger">清除全部</button>
+          </div>
 
-        <!-- Records table -->
-        <div class="overflow-x-auto table-wrap rounded-xl border border-gray-200">
-          <table class="w-full text-sm">
-            <thead class="bg-indigo-500 text-white">
-              <tr>
-                <th class="p-3 text-left font-semibold whitespace-nowrap">时间</th>
-                <th class="p-3 text-left font-semibold whitespace-nowrap">原文（摘要）</th>
-                <th class="p-3 text-left font-semibold whitespace-nowrap">翻译（摘要）</th>
-                <th class="p-3 text-center font-semibold whitespace-nowrap">发音</th>
-                <th class="p-3 text-center font-semibold whitespace-nowrap">流畅</th>
-                <th class="p-3 text-center font-semibold whitespace-nowrap">准确</th>
-                <th class="p-3 text-center font-semibold whitespace-nowrap">总分</th>
-                <th class="p-3 text-center font-semibold whitespace-nowrap">操作</th>
-              </tr>
-            </thead>
-            <tbody id="recordsBody">
-              <tr>
-                <td colspan="8" class="text-center text-gray-400 py-10">
-                  <p class="text-lg">📭</p>
-                  <p class="mt-1">暂无学习记录，开始您的第一次练习吧！</p>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="table-wrap glass-table">
+            <table class="w-full">
+              <thead>
+                <tr>
+                  <th>时间</th><th>原文</th><th>翻译</th>
+                  <th class="text-center">发音</th><th class="text-center">流畅</th><th class="text-center">准确</th>
+                  <th class="text-center">总分</th><th class="text-center">操作</th>
+                </tr>
+              </thead>
+              <tbody id="recordsBody">
+                <tr><td colspan="8" class="empty-row">暂无学习记录，开始您的第一次练习吧！</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 
     </main>
 
-    <!-- ====== DETAIL MODAL ====== -->
-    <div id="detailModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
-      <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-lg w-full max-h-[80vh] overflow-y-auto animate-slideUp">
-        <div class="flex justify-between items-start mb-4">
-          <h3 class="text-lg font-bold text-indigo-500">📋 学习记录详情</h3>
-          <button id="detailModalClose" class="text-gray-400 hover:text-gray-600 text-2xl leading-none transition">&times;</button>
+    <!-- ====== MODALS ====== -->
+    <div id="detailModal" class="modal-overlay hidden">
+      <div class="modal-panel">
+        <div class="modal-header">
+          <h3>学习记录详情</h3>
+          <button id="detailModalClose" class="modal-close">&times;</button>
         </div>
-        <div id="detailContent" class="space-y-3 text-sm"></div>
+        <div id="detailContent" class="modal-body"></div>
       </div>
     </div>
 
-    <!-- ====== API SETTINGS MODAL ====== -->
-    <div id="apiSettingsModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
-      <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-md w-full animate-slideUp">
-        <div class="flex justify-between items-start mb-4">
-          <h3 class="text-lg font-bold text-gray-800">⚙️ API 设置</h3>
-          <button id="apiModalClose" class="text-gray-400 hover:text-gray-600 text-2xl leading-none transition">&times;</button>
+    <div id="apiSettingsModal" class="modal-overlay hidden">
+      <div class="modal-panel" style="max-width: 28rem;">
+        <div class="modal-header">
+          <h3>API 设置</h3>
+          <button id="apiModalClose" class="modal-close">&times;</button>
         </div>
-        <p class="text-xs text-gray-500 mb-4">配置 AI API 密钥以获得更高质量的翻译和语音服务。密钥存储在本地浏览器中，不会上传到任何服务器。</p>
+        <p class="modal-desc">配置 AI API 密钥获得更高质量服务。密钥仅存储在本地浏览器中。</p>
         <div class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-600 mb-1">OpenAI API Key</label>
-            <input type="password" id="apiKeyOpenAI" class="w-full p-2.5 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition text-sm" placeholder="sk-...">
-            <p class="text-xs text-gray-400 mt-1">用于 Whisper 语音识别 + TTS 语音合成</p>
+            <label>OpenAI API Key</label>
+            <input type="password" id="apiKeyOpenAI" class="glass-input w-full" placeholder="sk-...">
+            <span class="hint">Whisper 语音识别 + TTS 语音合成</span>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-600 mb-1">DeepL API Key</label>
-            <input type="password" id="apiKeyDeepL" class="w-full p-2.5 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition text-sm" placeholder="DeepL Auth Key">
-            <p class="text-xs text-gray-400 mt-1">用于高质量中英双向翻译</p>
+            <label>DeepL API Key</label>
+            <input type="password" id="apiKeyDeepL" class="glass-input w-full" placeholder="DeepL Auth Key">
+            <span class="hint">高质量中英双向翻译</span>
           </div>
-          <button id="apiSaveBtn" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white px-5 py-2.5 rounded-lg font-medium transition shadow-sm">
-            保存设置
-          </button>
+          <button id="apiSaveBtn" class="btn-primary w-full">保存设置</button>
         </div>
       </div>
     </div>
 
   </div>
 
-  <!-- API Settings gear icon (floating) -->
-  <button id="apiSettingsToggle" class="fixed bottom-5 right-5 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center text-xl hover:shadow-xl transition z-40 gear-icon" title="API 设置">
-    ⚙️
-  </button>
+  <!-- Floating gear -->
+  <button id="apiSettingsToggle" class="float-btn" title="API 设置">&#9881;</button>
 
-  <!-- Main app script (ES module) -->
   <script type="module" src="js/main.js"></script>
-
 </body>
 </html>

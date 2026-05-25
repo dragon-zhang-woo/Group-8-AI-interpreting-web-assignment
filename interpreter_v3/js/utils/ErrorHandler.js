@@ -42,10 +42,10 @@ export class ErrorHandler {
       };
       const color = colors[e.type] || colors.api;
       const icon = icons[e.type] || icons.api;
-      return `<div class="${color} text-white px-4 py-3 rounded-lg shadow-lg flex items-start gap-2 animate-fadeIn" data-error-id="${e.id}">
+      return `<div style="background:linear-gradient(180deg,rgba(30,41,59,0.8) 0%,rgba(30,41,59,0.65) 100%);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(148,163,184,0.35);color:#e2e8f0;padding:0.75rem 1rem;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.05);display:flex;align-items:flex-start;gap:0.5rem;font-size:0.875rem;" data-error-id="${e.id}">
         <span>${icon}</span>
-        <span class="flex-1 text-sm">${ErrorHandler.escapeHtml(e.message)}</span>
-        <button class="text-white/80 hover:text-white ml-2 text-lg leading-none" onclick="this.parentElement.remove()">&times;</button>
+        <span style="flex:1;">${ErrorHandler.escapeHtml(e.message)}</span>
+        <button style="background:none;border:none;color:#64748b;font-size:1.25rem;cursor:pointer;line-height:1;padding:0;" onclick="this.parentElement.remove()">&times;</button>
       </div>`;
     }).join('');
   }

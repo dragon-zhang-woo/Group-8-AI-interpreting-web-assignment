@@ -61,6 +61,11 @@ class App {
       this.tabs = new TabManager(document.getElementById('app'));
       this.tabs.init();
 
+      // Auto-refresh records when switching to records tab
+      this.tabs.onTabChange((tabName) => {
+        if (tabName === 'records') this._loadRecords();
+      });
+
       this.radarChart = new RadarChart('scoreRadar');
 
       // 4. Wire up UI
@@ -127,12 +132,56 @@ class App {
       }
     });
 
-    // Voice recording
+    // Voice recording — starts BOTH MediaRecorder and live STT concurrently
     document.getElementById('demoRecordBtn').addEventListener('click', async () => {
       try {
         self._showDemoStatus('');
         await self.audioRecorder.startRecording();
         self._updateDemoRecordingUI(true);
+
+        // Start live STT concurrently
+        self._stopDemoRecognition();
+        const srcLang = self.languageDirection === 'en-zh' ? 'en' : 'zh';
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SR) {
+          const recognition = new SR();
+          recognition.lang = srcLang === 'zh' ? 'zh-CN' : 'en-US';
+          recognition.continuous = false;
+          recognition.interimResults = true;
+
+          recognition.onresult = (event) => {
+            let finalText = '';
+            let interimText = '';
+            for (let i = 0; i < event.results.length; i++) {
+              const transcript = event.results[i][0].transcript;
+              if (event.results[i].isFinal) { finalText += transcript; }
+              else { interimText += transcript; }
+            }
+            if (finalText) {
+              document.getElementById('demoRecognitionBox').classList.remove('hidden');
+              document.getElementById('demoRecognitionText').textContent = finalText;
+              document.getElementById('demoLiveInterimBox').classList.add('hidden');
+              self._showDemoStatus('识别完成', 'success');
+            } else if (interimText) {
+              document.getElementById('demoLiveInterimBox').classList.remove('hidden');
+              document.getElementById('demoLiveInterim').textContent = interimText;
+            }
+          };
+
+          recognition.onerror = (e) => {
+            if (e.error === 'no-speech') { self._showDemoStatus('未检测到语音'); }
+            else if (e.error === 'not-allowed') { ErrorHandler.showError('需要麦克风权限', 'permission'); }
+            else if (e.error !== 'aborted') { console.warn('Demo STT error:', e.error); }
+          };
+
+          recognition.onend = () => {
+            self.demoRecognition = null;
+            document.getElementById('demoLiveInterimBox').classList.add('hidden');
+          };
+
+          self.demoRecognition = recognition;
+          recognition.start();
+        }
       } catch (e) {
         ErrorHandler.showError(e.message, 'permission');
       }
@@ -144,7 +193,9 @@ class App {
         self._stopDemoRecognition();
         await self.audioRecorder.stopRecording();
         self._updateDemoRecordingUI(false);
-        self._showDemoStatus('录音完成！可点击"语音识别"按钮将录音转为文字', 'success');
+        if (!document.getElementById('demoRecognitionText').textContent) {
+          self._showDemoStatus('录音完成，但未识别到有效语音');
+        }
       } catch (e) {
         ErrorHandler.handleAPIError(e, '录音');
         self._updateDemoRecordingUI(false);
@@ -156,73 +207,10 @@ class App {
       self._updateDemoRecordingUI(false);
       document.getElementById('demoRecognitionBox').classList.add('hidden');
       document.getElementById('demoRecognitionText').textContent = '';
+      document.getElementById('demoResultBox').classList.add('hidden');
+      document.getElementById('demoResultText').textContent = '';
       self._showDemoStatus('');
       self._stopDemoRecognition();
-      document.getElementById('demoLiveInterimBox').classList.add('hidden');
-    });
-
-    // Demo voice recognition (live STT)
-    document.getElementById('demoRecognizeBtn').addEventListener('click', async () => {
-      self._stopDemoRecognition();
-      document.getElementById('demoLiveInterimBox').classList.remove('hidden');
-      document.getElementById('demoLiveInterim').textContent = '';
-      self._showDemoStatus('正在听取语音...');
-
-      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SR) {
-        ErrorHandler.showError('您的浏览器不支持语音识别，请使用 Chrome 或 Edge', 'permission');
-        document.getElementById('demoLiveInterimBox').classList.add('hidden');
-        return;
-      }
-
-      const recognition = new SR();
-      const srcLang = self.languageDirection === 'en-zh' ? 'en' : 'zh';
-      recognition.lang = srcLang === 'zh' ? 'zh-CN' : 'en-US';
-      recognition.continuous = false;
-      recognition.interimResults = true;
-
-      recognition.onresult = (event) => {
-        let finalText = '';
-        let interimText = '';
-        for (let i = 0; i < event.results.length; i++) {
-          if (event.results[i].isFinal) {
-            finalText += event.results[i][0].transcript;
-          } else {
-            interimText += event.results[i][0].transcript;
-          }
-        }
-        if (finalText) {
-          document.getElementById('demoRecognitionBox').classList.remove('hidden');
-          document.getElementById('demoRecognitionText').textContent = finalText;
-          document.getElementById('demoLiveInterim').textContent = '';
-          document.getElementById('demoLiveInterimBox').classList.add('hidden');
-          self._showDemoStatus('识别完成 ✓', 'success');
-        } else {
-          document.getElementById('demoLiveInterim').textContent = interimText;
-        }
-      };
-
-      recognition.onerror = (e) => {
-        document.getElementById('demoLiveInterimBox').classList.add('hidden');
-        if (e.error === 'no-speech') {
-          self._showDemoStatus('未检测到语音，请重试');
-        } else if (e.error === 'not-allowed') {
-          ErrorHandler.showError('需要麦克风权限', 'permission');
-        } else {
-          self._showDemoStatus(`语音识别错误: ${e.error}`);
-        }
-      };
-
-      recognition.onend = () => {
-        self.demoRecognition = null;
-        if (!document.getElementById('demoRecognitionText').textContent) {
-          document.getElementById('demoLiveInterimBox').classList.add('hidden');
-          self._showDemoStatus('');
-        }
-      };
-
-      self.demoRecognition = recognition;
-      recognition.start();
     });
 
     // Use recognized text for translation
@@ -287,12 +275,7 @@ class App {
 
   _switchInputMode(mode) {
     document.querySelectorAll('#inputModeToggle .mode-btn').forEach(b => {
-      b.classList.toggle('border-indigo-500', b.dataset.mode === mode);
-      b.classList.toggle('bg-indigo-500', b.dataset.mode === mode);
-      b.classList.toggle('text-white', b.dataset.mode === mode);
-      b.classList.toggle('border-gray-300', b.dataset.mode !== mode);
-      b.classList.toggle('text-gray-600', b.dataset.mode !== mode);
-      b.classList.toggle('bg-transparent', b.dataset.mode !== mode);
+      b.classList.toggle('active', b.dataset.mode === mode);
     });
     document.getElementById('demoTextPanel').classList.toggle('hidden', mode !== 'text');
     document.getElementById('demoVoicePanel').classList.toggle('hidden', mode !== 'voice');
@@ -368,11 +351,7 @@ class App {
       btn.addEventListener('click', () => {
         document.querySelectorAll('#practiceDirection .dir-btn').forEach(b => {
           const isActive = b.dataset.direction === btn.dataset.direction;
-          b.classList.toggle('border-indigo-500', isActive);
-          b.classList.toggle('bg-indigo-500', isActive);
-          b.classList.toggle('text-white', isActive);
-          b.classList.toggle('border-gray-300', !isActive);
-          b.classList.toggle('text-gray-600', !isActive);
+          b.classList.toggle('active', isActive);
           b.setAttribute('aria-pressed', isActive ? 'true' : 'false');
         });
         self.languageDirection = btn.dataset.direction;
@@ -708,9 +687,7 @@ class App {
       // Update table
       const tbody = document.getElementById('recordsBody');
       if (records.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center text-gray-400 py-10">
-          <p class="text-lg">📭</p><p class="mt-1">暂无学习记录，开始您的第一次练习吧！</p>
-        </td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="empty-row">暂无学习记录，开始您的第一次练习吧！</td></tr>`;
         return;
       }
 
@@ -719,17 +696,17 @@ class App {
         const srcPreview = (r.sourceText || '').slice(0, 25) + ((r.sourceText || '').length > 25 ? '...' : '');
         const trPreview = (r.userTranslation || '').slice(0, 25) + ((r.userTranslation || '').length > 25 ? '...' : '');
 
-        return `<tr class="table-row-hover border-b border-gray-100">
-          <td class="p-3 whitespace-nowrap text-gray-600 text-xs">${time}</td>
-          <td class="p-3 text-gray-700">${Validator.sanitizeInput(srcPreview)}</td>
-          <td class="p-3 text-gray-700">${Validator.sanitizeInput(trPreview)}</td>
-          <td class="p-3 text-center"><span class="font-semibold text-blue-600">${r.pronunciationScore}</span></td>
-          <td class="p-3 text-center"><span class="font-semibold text-emerald-600">${r.fluencyScore}</span></td>
-          <td class="p-3 text-center"><span class="font-semibold text-amber-600">${r.accuracyScore}</span></td>
-          <td class="p-3 text-center"><span class="font-bold text-indigo-600">${(r.totalScore || 0).toFixed(1)}</span></td>
-          <td class="p-3 text-center">
-            <button class="detail-btn text-indigo-500 hover:text-indigo-700 text-xs font-medium px-2 py-1 rounded transition" data-id="${r.id}">查看</button>
-            <button class="delete-btn text-red-400 hover:text-red-600 text-xs font-medium px-2 py-1 rounded transition" data-id="${r.id}">删除</button>
+        return `<tr>
+          <td class="whitespace-nowrap" style="font-size:0.75rem;color:#94a3b8;">${time}</td>
+          <td>${Validator.sanitizeInput(srcPreview)}</td>
+          <td>${Validator.sanitizeInput(trPreview)}</td>
+          <td class="text-center"><span style="color:#60a5fa;font-weight:600;">${r.pronunciationScore}</span></td>
+          <td class="text-center"><span style="color:#34d399;font-weight:600;">${r.fluencyScore}</span></td>
+          <td class="text-center"><span style="color:#fbbf24;font-weight:600;">${r.accuracyScore}</span></td>
+          <td class="text-center"><span style="color:#a5b4fc;font-weight:700;">${(r.totalScore || 0).toFixed(1)}</span></td>
+          <td class="text-center">
+            <button class="detail-btn" data-id="${r.id}" style="color:#818cf8;background:none;border:none;cursor:pointer;font-size:0.75rem;font-weight:500;">查看</button>
+            <button class="delete-btn" data-id="${r.id}" style="color:#f87171;background:none;border:none;cursor:pointer;font-size:0.75rem;font-weight:500;">删除</button>
           </td>
         </tr>`;
       }).join('');
@@ -761,26 +738,27 @@ class App {
       }
 
       const time = new Date(record.timestamp).toLocaleString('zh-CN');
+      const s = (t) => Validator.sanitizeInput(t || '');
       document.getElementById('detailContent').innerHTML = `
-        <div><strong class="text-gray-600">时间：</strong>${time}</div>
-        <div><strong class="text-gray-600">语言方向：</strong>${record.languageDirection === 'en-zh' ? '英→中' : '中→英'}</div>
-        <div><strong class="text-gray-600">原文：</strong><p class="mt-1 text-gray-800 bg-gray-50 p-2 rounded">${Validator.sanitizeInput(record.sourceText || '')}</p></div>
-        <div><strong class="text-gray-600">你的翻译：</strong><p class="mt-1 text-gray-800 bg-gray-50 p-2 rounded">${Validator.sanitizeInput(record.userTranslation || '')}</p></div>
-        <div class="grid grid-cols-3 gap-2">
-          <div class="text-center bg-blue-50 rounded p-2"><p class="font-bold text-blue-600">${record.pronunciationScore}/3</p><p class="text-xs text-gray-500">发音</p></div>
-          <div class="text-center bg-emerald-50 rounded p-2"><p class="font-bold text-emerald-600">${record.fluencyScore}/3</p><p class="text-xs text-gray-500">流畅</p></div>
-          <div class="text-center bg-amber-50 rounded p-2"><p class="font-bold text-amber-600">${record.accuracyScore}/3</p><p class="text-xs text-gray-500">准确</p></div>
+        <div><strong>时间：</strong>${time}</div>
+        <div><strong>语言方向：</strong>${record.languageDirection === 'en-zh' ? '英→中' : '中→英'}</div>
+        <div><strong>原文：</strong><p style="margin-top:0.25rem;padding:0.5rem;border-radius:8px;background:rgba(148,163,184,0.1);color:#e2e8f0;">${s(record.sourceText)}</p></div>
+        <div><strong>你的翻译：</strong><p style="margin-top:0.25rem;padding:0.5rem;border-radius:8px;background:rgba(148,163,184,0.1);color:#e2e8f0;">${s(record.userTranslation)}</p></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;">
+          <div style="text-align:center;padding:0.5rem;border-radius:8px;background:rgba(59,130,246,0.12);"><p style="font-weight:700;color:#60a5fa;">${record.pronunciationScore}/3</p><p style="font-size:0.7rem;color:#94a3b8;">发音</p></div>
+          <div style="text-align:center;padding:0.5rem;border-radius:8px;background:rgba(16,185,129,0.12);"><p style="font-weight:700;color:#34d399;">${record.fluencyScore}/3</p><p style="font-size:0.7rem;color:#94a3b8;">流畅</p></div>
+          <div style="text-align:center;padding:0.5rem;border-radius:8px;background:rgba(245,158,11,0.12);"><p style="font-weight:700;color:#fbbf24;">${record.accuracyScore}/3</p><p style="font-size:0.7rem;color:#94a3b8;">准确</p></div>
         </div>
-        <div><strong class="text-gray-600">总分：</strong><span class="font-bold text-indigo-600">${(record.totalScore || 0).toFixed(1)} / 3</span></div>
-        <div class="space-y-1 mt-2">
-          <p class="text-sm"><strong>发音反馈：</strong>${record.pronunciationFeedback || '无'}</p>
-          <p class="text-sm"><strong>流畅性反馈：</strong>${record.fluencyFeedback || '无'}</p>
-          <p class="text-sm"><strong>准确性反馈：</strong>${record.accuracyFeedback || '无'}</p>
+        <div><strong>总分：</strong><span style="font-weight:700;color:#a5b4fc;">${(record.totalScore || 0).toFixed(1)} / 3</span></div>
+        <div style="display:flex;flex-direction:column;gap:0.25rem;margin-top:0.5rem;">
+          <p style="font-size:0.875rem;"><strong>发音反馈：</strong>${record.pronunciationFeedback || '无'}</p>
+          <p style="font-size:0.875rem;"><strong>流畅性反馈：</strong>${record.fluencyFeedback || '无'}</p>
+          <p style="font-size:0.875rem;"><strong>准确性反馈：</strong>${record.accuracyFeedback || '无'}</p>
         </div>
         ${record.suggestions && record.suggestions.length > 0 ? `
-        <div class="mt-2">
-          <strong class="text-gray-600">改进建议：</strong>
-          <ul class="list-disc list-inside text-sm text-gray-700 mt-1">
+        <div style="margin-top:0.5rem;">
+          <strong>改进建议：</strong>
+          <ul style="list-style:disc;padding-left:1.25rem;font-size:0.875rem;color:#cbd5e1;margin-top:0.25rem;">
             ${record.suggestions.map(s => `<li>${s}</li>`).join('')}
           </ul>
         </div>` : ''}
@@ -846,11 +824,7 @@ class App {
       if (!parent) return;
       parent.querySelectorAll('.dir-btn').forEach(btn => {
         const isActive = btn.dataset.direction === direction;
-        btn.classList.toggle('border-indigo-500', isActive);
-        btn.classList.toggle('bg-indigo-500', isActive);
-        btn.classList.toggle('text-white', isActive);
-        btn.classList.toggle('border-gray-300', !isActive);
-        btn.classList.toggle('text-gray-600', !isActive);
+        btn.classList.toggle('active', isActive);
         btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
       });
     });
@@ -890,11 +864,11 @@ document.addEventListener('DOMContentLoaded', () => {
   app.init().catch(e => {
     console.error('Fatal initialization error:', e);
     document.body.innerHTML = `<div class="flex items-center justify-center min-h-screen">
-      <div class="bg-white rounded-xl shadow-xl p-8 text-center max-w-md">
-        <p class="text-3xl mb-4">⚠️</p>
-        <h2 class="text-xl font-bold text-red-600 mb-2">初始化失败</h2>
-        <p class="text-gray-600">请确保通过 HTTP 服务器访问此页面（不能使用 file:// 协议）</p>
-        <p class="text-sm text-gray-500 mt-2">使用命令: python -m http.server 8000</p>
+      <div style="background:linear-gradient(180deg,rgba(30,41,59,0.85) 0%,rgba(30,41,59,0.7) 100%);backdrop-filter:blur(24px);border:1px solid rgba(148,163,184,0.35);border-radius:16px;padding:2rem;text-align:center;max-width:28rem;color:#e2e8f0;box-shadow:0 16px 48px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.05);">
+        <p style="font-size:3rem;margin-bottom:1rem;">⚠️</p>
+        <h2 style="font-size:1.25rem;font-weight:700;color:#f87171;margin-bottom:0.5rem;">初始化失败</h2>
+        <p style="color:#cbd5e1;">请确保通过 HTTP 服务器访问此页面（不能使用 file:// 协议）</p>
+        <p style="font-size:0.875rem;color:#94a3b8;margin-top:0.5rem;">使用命令: python -m http.server 8000</p>
       </div>
     </div>`;
   });
