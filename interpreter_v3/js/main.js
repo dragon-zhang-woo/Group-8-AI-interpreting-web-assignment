@@ -97,14 +97,14 @@ class App {
     const self = this;
 
     // Language direction buttons
-    document.querySelectorAll('#demoDirection .dir-btn').forEach(btn => {
+    document.querySelectorAll('#demoDirection .pill').forEach(btn => {
       btn.addEventListener('click', () => {
         self._setDemoDirection(btn.dataset.direction);
       });
     });
 
     // Input mode toggle
-    document.querySelectorAll('#inputModeToggle .mode-btn').forEach(btn => {
+    document.querySelectorAll('#inputModeToggle .pill').forEach(btn => {
       btn.addEventListener('click', () => {
         self._switchInputMode(btn.dataset.mode);
       });
@@ -274,7 +274,7 @@ class App {
   }
 
   _switchInputMode(mode) {
-    document.querySelectorAll('#inputModeToggle .mode-btn').forEach(b => {
+    document.querySelectorAll('#inputModeToggle .pill').forEach(b => {
       b.classList.toggle('active', b.dataset.mode === mode);
     });
     document.getElementById('demoTextPanel').classList.toggle('hidden', mode !== 'text');
@@ -347,9 +347,9 @@ class App {
     const self = this;
 
     // Direction toggle
-    document.querySelectorAll('#practiceDirection .dir-btn').forEach(btn => {
+    document.querySelectorAll('#practiceDirection .pill').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('#practiceDirection .dir-btn').forEach(b => {
+        document.querySelectorAll('#practiceDirection .pill').forEach(b => {
           const isActive = b.dataset.direction === btn.dataset.direction;
           b.classList.toggle('active', isActive);
           b.setAttribute('aria-pressed', isActive ? 'true' : 'false');
@@ -822,7 +822,7 @@ class App {
     ['demoDirection', 'practiceDirection'].forEach(parentId => {
       const parent = document.getElementById(parentId);
       if (!parent) return;
-      parent.querySelectorAll('.dir-btn').forEach(btn => {
+      parent.querySelectorAll('.pill').forEach(btn => {
         const isActive = btn.dataset.direction === direction;
         btn.classList.toggle('active', isActive);
         btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
