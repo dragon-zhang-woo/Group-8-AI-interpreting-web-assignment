@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI 口译训练平台</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+
+  <!-- ====== VIBRANT ANIMATED BACKGROUND ====== -->
+  <div class="bg-glow"></div>
+
+  <!-- Decorative floating orbs that will be visible through the glass -->
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-orb orb-3"></div>
+  <div class="bg-orb orb-4"></div>
+
+  <!-- ====== APP CONTAINER ====== -->
+  <div class="app-shell" id="app">
+
+    <!-- HEADER -->
+    <header class="header-glass">
+      <h1>AI 口译训练平台</h1>
+      <p>中英文双向翻译 · 语音交互 · 智能评分</p>
+    </header>
+
+    <!-- TAB NAVIGATION -->
+    <nav id="tabNav" class="nav-glass" role="tablist">
+      <button data-tab="demo" class="nav-tab border-indigo-400 text-indigo-300" role="tab" aria-selected="true" aria-controls="tab-demo">
+        AI 翻译机
+      </button>
+      <button data-tab="practice" class="nav-tab border-transparent text-slate-400" role="tab" aria-selected="false" aria-controls="tab-practice">
+        实战演练
+      </button>
+      <button data-tab="records" class="nav-tab border-transparent text-slate-400" role="tab" aria-selected="false" aria-controls="tab-records">
+        学习记录
+      </button>
+    </nav>
+
+    <!-- TAB CONTENT -->
+    <main class="content-area">
+
+      <!-- ====== TAB 1: DEMO MODE ====== -->
+      <section id="tab-demo" class="tab-panel block">
+        <div class="tab-inner">
+
+          <div class="flex flex-wrap justify-between items-center gap-3">
+            <h2>AI 翻译机</h2>
+            <div class="flex gap-2" id="demoDirection">
+              <button data-direction="en-zh" class="pill active" aria-pressed="true">英 → 中</button>
+              <button data-direction="zh-en" class="pill" aria-pressed="false">中 → 英</button>
+            </div>
+          </div>
+
+          <p class="section-desc">输入英文或中文文本，或使用语音输入，获取 AI 翻译结果。</p>
+
+          <!-- Input mode toggle -->
+          <div class="flex gap-2" id="inputModeToggle">
+            <button data-mode="text" class="pill active">文本输入</button>
+            <button data-mode="voice" class="pill">语音输入</button>
+          </div>
+
+          <!-- Text panel -->
+          <div id="demoTextPanel">
+            <textarea id="demoSourceText" class="glass-input" placeholder="请输入要翻译的英文文本..."></textarea>
+            <button id="demoTranslateBtn" class="btn-primary">翻译</button>
+          </div>
+
+          <!-- Voice panel -->
+          <div id="demoVoicePanel" class="hidden voice-panel">
+            <div class="flex flex-wrap gap-2">
+              <button id="demoRecordBtn" class="btn-danger">开始录音</button>
+              <button id="demoStopBtn" class="btn-ghost hidden">停止录音</button>
+              <button id="demoClearVoiceBtn" class="btn-minor">清除</button>
+            </div>
+            <div class="flex items-center gap-3">
+              <span id="demoTimer" class="timer hidden">00:00</span>
+              <span id="demoRecordStatus" class="status-text"></span>
+            </div>
+            <div id="demoLiveInterimBox" class="live-box hidden">
+              <span class="live-label">实时识别中：</span>
+              <span id="demoLiveInterim" class="live-text"></span>
+            </div>
+          </div>
+
+          <!-- Recognition result -->
+          <div id="demoRecognitionBox" class="result-card card-indigo hidden">
+            <p class="card-label">识别结果</p>
+            <p id="demoRecognitionText" class="card-body"></p>
+            <button id="demoUseRecognizedBtn" class="link-btn">翻译此文本</button>
+          </div>
+
+          <!-- Translation result -->
+          <div id="demoResultBox" class="result-card card-green hidden">
+            <p class="card-label">翻译结果</p>
+            <p id="demoResultText" class="card-body text-lg"></p>
+            <div class="flex gap-2 mt-3">
+              <button id="demoPlayBtn" class="btn-success">播放</button>
+              <button id="demoCopyBtn" class="btn-ghost">复制</button>
+            </div>
+          </div>
+
+          <div id="demoStatusMsg" class="status-msg hidden"></div>
+        </div>
+      </section>
+
+      <!-- ====== TAB 2: PRACTICE MODE ====== -->
+      <section id="tab-practice" class="tab-panel hidden">
+        <div class="tab-inner">
+
+          <div class="flex flex-wrap justify-between items-center gap-3">
+            <h2>实战演练</h2>
+            <div class="flex gap-2" id="practiceDirection">
+              <button data-direction="en-zh" class="pill active" aria-pressed="true">英 → 中</button>
+              <button data-direction="zh-en" class="pill" aria-pressed="false">中 → 英</button>
+            </div>
+          </div>
+
+          <p class="section-desc">获取随机练习素材，录制翻译，系统从发音、流畅性和准确性三个维度评分。</p>
+
+          <div class="flex flex-wrap gap-3 items-end">
+            <div>
+              <label>难度等级</label>
+              <select id="practiceDifficulty" class="glass-input" style="padding: 0.625rem 0.75rem;">
+                <option value="easy">简单 (Easy)</option>
+                <option value="medium" selected>中等 (Medium)</option>
+                <option value="hard">困难 (Hard)</option>
+                <option value="all">全部随机</option>
+              </select>
+            </div>
+            <button id="practiceGetMaterialBtn" class="btn-primary">获取练习素材</button>
+          </div>
+
+          <!-- Source text -->
+          <div id="practiceSourceBox" class="result-card card-indigo hidden">
+            <p class="card-label">原文</p>
+            <p id="practiceSourceText" class="card-body"></p>
+          </div>
+
+          <!-- Reference -->
+          <div id="practiceRefBox" class="result-card card-blue hidden">
+            <p class="card-label">参考翻译</p>
+            <p id="practiceRefText" class="card-body"></p>
+          </div>
+
+          <!-- Recording -->
+          <div class="voice-panel">
+            <label>录制你的翻译</label>
+            <div class="flex flex-wrap gap-2">
+              <button id="practiceRecordBtn" class="btn-danger">开始录音</button>
+              <button id="practiceStopBtn" class="btn-ghost hidden">停止录音</button>
+              <button id="practiceClearBtn" class="btn-minor">清除</button>
+            </div>
+            <div class="flex items-center gap-3">
+              <span id="practiceTimer" class="timer hidden">00:00</span>
+              <span id="practiceRecordStatus" class="status-text"></span>
+            </div>
+            <div id="practiceLiveBox" class="live-box hidden">
+              <span class="live-label">实时识别中：</span>
+              <span id="practiceLiveInterim" class="live-text"></span>
+            </div>
+          </div>
+
+          <!-- Recognized text -->
+          <div id="practiceRecognitionBox" class="result-card card-green hidden">
+            <p class="card-label">识别结果（可手动修正）</p>
+            <textarea id="practiceUserTranslation" class="glass-input min-h-[80px] resize-y w-full" placeholder="录音识别结果将显示在这里，你也可以手动修改..."></textarea>
+          </div>
+
+          <button id="practiceSubmitBtn" class="btn-success">提交评分</button>
+
+          <!-- Scores -->
+          <div id="practiceScoreBox" class="hidden animate-fadeIn">
+            <h3>评分结果</h3>
+
+            <div class="score-grid">
+              <div class="score-block">
+                <p id="scoreTotal">0.0</p>
+                <span>总分 / 3</span>
+              </div>
+              <div class="score-block">
+                <p id="scorePron">0</p>
+                <span>发音标准性</span>
+              </div>
+              <div class="score-block">
+                <p id="scoreFlu">0</p>
+                <span>语言流畅性</span>
+              </div>
+              <div class="score-block">
+                <p id="scoreAcc">0</p>
+                <span>翻译准确性</span>
+              </div>
+            </div>
+
+            <!-- Radar -->
+            <div id="radarContainer">
+              <canvas id="scoreRadar" width="300" height="300"></canvas>
+            </div>
+
+            <!-- Feedback -->
+            <div id="practiceFeedbackBox" class="space-y-2">
+              <div class="result-card card-amber">
+                <p class="card-label">详细反馈</p>
+                <div class="feedback-lines">
+                  <p id="feedbackPron"></p>
+                  <p id="feedbackFlu"></p>
+                  <p id="feedbackAcc"></p>
+                </div>
+              </div>
+              <div id="practiceSuggestions" class="result-card card-indigo hidden">
+                <p class="card-label">改进建议</p>
+                <ul id="suggestionsList"></ul>
+              </div>
+            </div>
+
+            <button id="practiceSaveBtn" class="btn-ghost hidden">保存学习记录</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== TAB 3: RECORDS ====== -->
+      <section id="tab-records" class="tab-panel hidden">
+        <div class="tab-inner">
+
+          <h2>学习记录</h2>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="stat-block">
+              <p id="statsTotal">0</p>
+              <span>总练习次数</span>
+            </div>
+            <div class="stat-block">
+              <p id="statsAvg">0.0</p>
+              <span>平均分 / 3</span>
+            </div>
+            <div class="stat-block">
+              <p id="statsBest">0.0</p>
+              <span>最高分</span>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <button id="recordsRefreshBtn" class="btn-primary">刷新</button>
+            <button id="recordsExportBtn" class="btn-success">导出 CSV</button>
+            <button id="recordsClearBtn" class="btn-danger">清除全部</button>
+          </div>
+
+          <div class="table-wrap glass-table">
+            <table class="w-full">
+              <thead>
+                <tr>
+                  <th>时间</th><th>原文</th><th>翻译</th>
+                  <th class="text-center">发音</th><th class="text-center">流畅</th><th class="text-center">准确</th>
+                  <th class="text-center">总分</th><th class="text-center">操作</th>
+                </tr>
+              </thead>
+              <tbody id="recordsBody">
+                <tr><td colspan="8" class="empty-row">暂无学习记录，开始您的第一次练习吧！</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ====== MODALS ====== -->
+    <div id="detailModal" class="modal-overlay hidden">
+      <div class="modal-panel">
+        <div class="modal-header">
+          <h3>学习记录详情</h3>
+          <button id="detailModalClose" class="modal-close">&times;</button>
+        </div>
+        <div id="detailContent" class="modal-body"></div>
+      </div>
+    </div>
+
+    <div id="apiSettingsModal" class="modal-overlay hidden">
+      <div class="modal-panel" style="max-width: 28rem;">
+        <div class="modal-header">
+          <h3>API 设置</h3>
+          <button id="apiModalClose" class="modal-close">&times;</button>
+        </div>
+        <p class="modal-desc">配置 AI API 密钥获得更高质量服务。密钥仅存储在本地浏览器中。</p>
+        <div class="space-y-4">
+          <div>
+            <label>OpenAI API Key</label>
+            <input type="password" id="apiKeyOpenAI" class="glass-input w-full" placeholder="sk-...">
+            <span class="hint">Whisper 语音识别 + TTS 语音合成</span>
+          </div>
+          <div>
+            <label>DeepL API Key</label>
+            <input type="password" id="apiKeyDeepL" class="glass-input w-full" placeholder="DeepL Auth Key">
+            <span class="hint">高质量中英双向翻译</span>
+          </div>
+          <button id="apiSaveBtn" class="btn-primary w-full">保存设置</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Floating gear -->
+  <button id="apiSettingsToggle" class="float-btn" title="API 设置">&#9881;</button>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
