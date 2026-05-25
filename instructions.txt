@@ -1,5 +1,0 @@
-激活venv环境：.\venv\Scripts\activate
-
-安装核心依赖：pip install gradio python-dotenv requests
-
-测试audio_engine.py:python audio_engine.py
