@@ -168,6 +168,17 @@
           <div id="practiceRecognitionBox" class="result-card card-green hidden">
             <p class="card-label">识别结果（可手动修正）</p>
             <textarea id="practiceUserTranslation" class="glass-input min-h-[80px] resize-y w-full" placeholder="录音识别结果将显示在这里，你也可以手动修改..."></textarea>
+            <div class="flex gap-2 mt-3">
+              <button id="practiceTranslateBtn" class="btn-primary">翻译识别结果</button>
+              <button id="practicePlayTranslationBtn" class="btn-ghost hidden">播放翻译</button>
+            </div>
+          </div>
+
+          <!-- Translation result -->
+          <div id="practiceTranslationBox" class="result-card card-amber hidden">
+            <p class="card-label">翻译内容</p>
+            <p id="practiceTranslationText" class="card-body"></p>
+            <button id="practiceCopyTranslationBtn" class="link-btn">复制</button>
           </div>
 
           <button id="practiceSubmitBtn" class="btn-success">提交评分</button>

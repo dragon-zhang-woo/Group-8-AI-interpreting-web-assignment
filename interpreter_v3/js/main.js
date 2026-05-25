@@ -136,54 +136,12 @@ class App {
     document.getElementById('demoRecordBtn').addEventListener('click', async () => {
       try {
         self._showDemoStatus('');
+        self._setupDemoVoiceRecognition();
         await self.audioRecorder.startRecording();
         self._updateDemoRecordingUI(true);
-
-        // Start live STT concurrently
-        self._stopDemoRecognition();
-        const srcLang = self.languageDirection === 'en-zh' ? 'en' : 'zh';
-        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (SR) {
-          const recognition = new SR();
-          recognition.lang = srcLang === 'zh' ? 'zh-CN' : 'en-US';
-          recognition.continuous = false;
-          recognition.interimResults = true;
-
-          recognition.onresult = (event) => {
-            let finalText = '';
-            let interimText = '';
-            for (let i = 0; i < event.results.length; i++) {
-              const transcript = event.results[i][0].transcript;
-              if (event.results[i].isFinal) { finalText += transcript; }
-              else { interimText += transcript; }
-            }
-            if (finalText) {
-              document.getElementById('demoRecognitionBox').classList.remove('hidden');
-              document.getElementById('demoRecognitionText').textContent = finalText;
-              document.getElementById('demoLiveInterimBox').classList.add('hidden');
-              self._showDemoStatus('识别完成', 'success');
-            } else if (interimText) {
-              document.getElementById('demoLiveInterimBox').classList.remove('hidden');
-              document.getElementById('demoLiveInterim').textContent = interimText;
-            }
-          };
-
-          recognition.onerror = (e) => {
-            if (e.error === 'no-speech') { self._showDemoStatus('未检测到语音'); }
-            else if (e.error === 'not-allowed') { ErrorHandler.showError('需要麦克风权限', 'permission'); }
-            else if (e.error !== 'aborted') { console.warn('Demo STT error:', e.error); }
-          };
-
-          recognition.onend = () => {
-            self.demoRecognition = null;
-            document.getElementById('demoLiveInterimBox').classList.add('hidden');
-          };
-
-          self.demoRecognition = recognition;
-          recognition.start();
-        }
       } catch (e) {
         ErrorHandler.showError(e.message, 'permission');
+        self._updateDemoRecordingUI(false);
       }
     });
 
@@ -320,11 +278,116 @@ class App {
 
   _stopDemoRecognition() {
     if (this.demoRecognition) {
-      try { this.demoRecognition.stop(); } catch (e) {}
+      try { this.demoRecognition.abort(); } catch (e) {}
       this.demoRecognition = null;
     }
     document.getElementById('demoLiveInterimBox').classList.add('hidden');
     document.getElementById('demoLiveInterim').textContent = '';
+  }
+
+  _setupDemoVoiceRecognition() {
+    const self = this;
+    const srcLang = self.languageDirection === 'en-zh' ? 'en' : 'zh';
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    
+    if (!SR) {
+      ErrorHandler.showError('您的浏览器不支持语音识别，请使用 Chrome 或 Edge', 'permission');
+      return;
+    }
+
+    // Stop previous recognition if any
+    self._stopDemoRecognition();
+
+    const recognition = new SR();
+    recognition.lang = srcLang === 'zh' ? 'zh-CN' : 'en-US';
+    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognition.maxAlternatives = 1;
+    recognition.abortOnSilence = false;
+
+    let recognitionTimeout = null;
+    let hasReceivedSpeech = false;
+
+    recognition.onstart = () => {
+      console.log('Speech recognition started');
+      document.getElementById('demoLiveInterimBox').classList.remove('hidden');
+      document.getElementById('demoLiveInterim').textContent = '监听中...';
+      self._showDemoStatus('正在监听语音...');
+      
+      // Set timeout to warn if no speech is detected
+      recognitionTimeout = setTimeout(() => {
+        if (!hasReceivedSpeech) {
+          self._showDemoStatus('未检测到语音，请确保麦克风已启用并靠近');
+        }
+      }, 3000);
+    };
+
+    recognition.onresult = (event) => {
+      hasReceivedSpeech = true;
+      let finalText = '';
+      let interimText = '';
+      
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalText += transcript + ' ';
+        } else {
+          interimText += transcript;
+        }
+      }
+      
+      finalText = finalText.trim();
+      
+      if (finalText) {
+        document.getElementById('demoRecognitionBox').classList.remove('hidden');
+        document.getElementById('demoRecognitionText').textContent = finalText;
+        document.getElementById('demoLiveInterimBox').classList.add('hidden');
+        self._showDemoStatus('✓ 识别完成', 'success');
+      } else if (interimText) {
+        document.getElementById('demoLiveInterim').textContent = interimText;
+        self._showDemoStatus('识别中...');
+      }
+    };
+
+    recognition.onerror = (event) => {
+      if (recognitionTimeout) clearTimeout(recognitionTimeout);
+      
+      const errorMap = {
+        'no-speech': '未检测到语音，请检查：① 麦克风是否连接 ② 是否允许浏览器使用麦克风 ③ 说话是否足够响亮 → 点击"清除"重试',
+        'not-allowed': '需要麦克风权限。请在浏览器设置中允许访问麦克风，然后重试',
+        'network': '网络连接不稳定，请检查网络后重试',
+        'aborted': '识别已中止',
+        'bad-grammar': '无法识别，请用更标准的语言重试'
+      };
+      
+      const errorMsg = errorMap[event.error] || `语音识别错误: ${event.error}。请重试`;
+      
+      if (event.error === 'no-speech' || event.error === 'not-allowed') {
+        ErrorHandler.showError(errorMsg, 'permission');
+      } else if (event.error !== 'aborted') {
+        self._showDemoStatus(`❌ ${errorMsg.split('→')[0]}`);
+        console.warn('Demo STT error:', event.error);
+      }
+      
+      document.getElementById('demoLiveInterimBox').classList.add('hidden');
+    };
+
+    recognition.onend = () => {
+      if (recognitionTimeout) clearTimeout(recognitionTimeout);
+      self.demoRecognition = null;
+      document.getElementById('demoLiveInterimBox').classList.add('hidden');
+      
+      if (!hasReceivedSpeech && !document.getElementById('demoRecognitionText').textContent) {
+        self._showDemoStatus('');
+      }
+    };
+
+    self.demoRecognition = recognition;
+    try {
+      recognition.start();
+    } catch (e) {
+      ErrorHandler.showError('无法启动语音识别: ' + e.message, 'permission');
+    }
   }
 
   _showDemoStatus(msg, type = '') {
@@ -392,6 +455,8 @@ class App {
       document.getElementById('practiceUserTranslation').value = '';
       document.getElementById('practiceLiveBox').classList.add('hidden');
       document.getElementById('practiceLiveInterim').textContent = '';
+      document.getElementById('practiceTranslationBox').classList.add('hidden');
+      document.getElementById('practiceTranslationText').textContent = '';
 
       self._showPracticeStatus(`已加载「${material.topicCategory}」素材 (${material.difficultyLevel})`);
     });
@@ -488,7 +553,60 @@ class App {
       document.getElementById('practiceUserTranslation').value = '';
       document.getElementById('practiceLiveBox').classList.add('hidden');
       document.getElementById('practiceLiveInterim').textContent = '';
+      document.getElementById('practiceTranslationBox').classList.add('hidden');
+      document.getElementById('practiceTranslationText').textContent = '';
       self._showPracticeStatus('');
+    });
+
+    // Translate recognized text
+    document.getElementById('practiceTranslateBtn').addEventListener('click', async () => {
+      const userTranslation = document.getElementById('practiceUserTranslation').value.trim();
+      if (!userTranslation) {
+        ErrorHandler.showError('请先进行语音识别', 'validation');
+        return;
+      }
+
+      const btn = document.getElementById('practiceTranslateBtn');
+      LoadingIndicator.showForElement(btn);
+      try {
+        // Translate the recognized text to English (if source is Chinese) or Chinese (if source is English)
+        const srcLang = self.languageDirection === 'en-zh' ? 'zh' : 'en';
+        const tgtLang = self.languageDirection === 'en-zh' ? 'en' : 'zh';
+        const result = await self.translationEngine.translate(userTranslation, srcLang, tgtLang);
+        
+        document.getElementById('practiceTranslationBox').classList.remove('hidden');
+        document.getElementById('practiceTranslationText').textContent = result.translatedText;
+        document.getElementById('practicePlayTranslationBtn').classList.remove('hidden');
+        
+        self._showPracticeStatus('翻译完成！', 'success');
+      } catch (e) {
+        ErrorHandler.handleAPIError(e, '翻译');
+      } finally {
+        LoadingIndicator.hideForElement(btn);
+      }
+    });
+
+    // Play translation
+    document.getElementById('practicePlayTranslationBtn').addEventListener('click', () => {
+      const text = document.getElementById('practiceTranslationText').textContent;
+      if (text) {
+        const tgtLang = self.languageDirection === 'en-zh' ? 'en' : 'zh';
+        self.translationEngine.synthesizeSpeech(text, tgtLang).catch(e => {
+          ErrorHandler.handleAPIError(e, '语音合成');
+        });
+      }
+    });
+
+    // Copy translation
+    document.getElementById('practiceCopyTranslationBtn').addEventListener('click', () => {
+      const text = document.getElementById('practiceTranslationText').textContent;
+      if (text) {
+        navigator.clipboard.writeText(text).then(() => {
+          self._showPracticeStatus('已复制到剪贴板 ✓', 'success');
+        }).catch(() => {
+          ErrorHandler.showError('复制失败', 'api');
+        });
+      }
     });
 
     // Submit scoring
