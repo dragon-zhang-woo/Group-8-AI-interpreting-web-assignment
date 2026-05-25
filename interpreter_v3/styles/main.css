@@ -1,0 +1,114 @@
+/* Custom animations and styles for AI Interpreting Training Platform */
+
+/* Recording pulse animation */
+@keyframes pulse-record {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.recording-active {
+  animation: pulse-record 1s ease-in-out infinite;
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Slide up animation for modals */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-slideUp {
+  animation: slideUp 0.3s ease-out;
+}
+
+/* Score card hover effect */
+.score-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.score-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+}
+
+/* Radar chart container */
+#radarContainer {
+  aspect-ratio: 1 / 1;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+/* Status message transition */
+.status-msg {
+  transition: opacity 0.4s ease, transform 0.3s ease;
+}
+
+/* Table row hover */
+.table-row-hover:hover {
+  background-color: rgba(102, 126, 234, 0.05);
+}
+
+/* Custom scrollbar for tables */
+.table-wrap::-webkit-scrollbar {
+  height: 6px;
+}
+.table-wrap::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+.table-wrap::-webkit-scrollbar-thumb {
+  background: #c7d2fe;
+  border-radius: 3px;
+}
+.table-wrap::-webkit-scrollbar-thumb:hover {
+  background: #818cf8;
+}
+
+/* Recording timer blinking */
+.recording-timer {
+  color: #ef4444;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Smooth tab transitions */
+.tab-content {
+  transition: opacity 0.2s ease;
+}
+
+/* API settings gear icon spin */
+.gear-icon:hover {
+  animation: spin 2s linear infinite;
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Result cards */
+.result-card {
+  transition: all 0.3s ease;
+}
+
+/* Button disabled state */
+.btn-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Material difficulty badges */
+.badge-easy { background-color: #d1fae5; color: #065f46; }
+.badge-medium { background-color: #fef3c7; color: #92400e; }
+.badge-hard { background-color: #fee2e2; color: #991b1b; }
+
+/* Responsive table */
+@media (max-width: 768px) {
+  .table-responsive td, .table-responsive th {
+    white-space: nowrap;
+  }
+}

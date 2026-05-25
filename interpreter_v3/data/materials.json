@@ -1,0 +1,1568 @@
+[
+  {
+    "id": "mat_0001",
+    "sourceText": "Good morning. Today is a beautiful day. The weather is sunny and warm. I hope you have a great day.",
+    "referenceTranslation": "早上好。今天是美好的一天。天气晴朗温暖。希望你今天过得愉快。",
+    "difficultyLevel": "easy",
+    "topicCategory": "daily",
+    "direction": "en-zh",
+    "wordCount": 20
+  },
+  {
+    "id": "mat_0002",
+    "sourceText": "Please turn off the lights when you leave the room. It helps save energy.",
+    "referenceTranslation": "离开房间时请关灯。这有助于节约能源。",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "en-zh",
+    "wordCount": 14
+  },
+  {
+    "id": "mat_0003",
+    "sourceText": "I would like to order a cup of coffee and a sandwich, please.",
+    "referenceTranslation": "我想点一杯咖啡和一个三明治，谢谢。",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "en-zh",
+    "wordCount": 13
+  },
+  {
+    "id": "mat_0004",
+    "sourceText": "The meeting will start at nine o'clock tomorrow morning. Please be on time.",
+    "referenceTranslation": "会议将于明早九点开始。请准时出席。",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "en-zh",
+    "wordCount": 13
+  },
+  {
+    "id": "mat_0005",
+    "sourceText": "She studies English every day because she wants to improve her language skills.",
+    "referenceTranslation": "她每天学习英语，因为她想提高语言能力。",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "en-zh",
+    "wordCount": 13
+  },
+  {
+    "id": "mat_0006",
+    "sourceText": "Hello, my name is Li Ming. I am from Beijing. Nice to meet you.",
+    "referenceTranslation": "你好，我叫李明。我来自北京。很高兴认识你。",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "en-zh",
+    "wordCount": 14
+  },
+  {
+    "id": "mat_0007",
+    "sourceText": "Excuse me, could you tell me how to get to the train station?",
+    "referenceTranslation": "打扰一下，你能告诉我去火车站怎么走吗？",
+    "difficultyLevel": "easy",
+    "topicCategory": "technology",
+    "direction": "en-zh",
+    "wordCount": 13
+  },
+  {
+    "id": "mat_0008",
+    "sourceText": "I need to buy some milk, bread, and eggs at the supermarket.",
+    "referenceTranslation": "我需要在超市买些牛奶、面包和鸡蛋。",
+    "difficultyLevel": "easy",
+    "topicCategory": "business",
+    "direction": "en-zh",
+    "wordCount": 12
+  },
+  {
+    "id": "mat_0009",
+    "sourceText": "I'd like to make a reservation for two people at seven o'clock this evening.",
+    "referenceTranslation": "我想预订今晚七点两个人的位置。",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "en-zh",
+    "wordCount": 14
+  },
+  {
+    "id": "mat_0010",
+    "sourceText": "My favorite food is dumplings. My grandmother makes the best dumplings in the world.",
+    "referenceTranslation": "我最喜欢的食物是饺子。我奶奶做的饺子是世界上最好吃的。",
+    "difficultyLevel": "easy",
+    "topicCategory": "daily",
+    "direction": "en-zh",
+    "wordCount": 14
+  },
+  {
+    "id": "mat_0011",
+    "sourceText": "I grew up in a small town near the sea. It is very peaceful and beautiful.",
+    "referenceTranslation": "我在一个海边小镇长大。那里非常宁静美丽。",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "en-zh",
+    "wordCount": 16
+  },
+  {
+    "id": "mat_0012",
+    "sourceText": "This weekend I plan to go hiking with my friends. We will leave early in the morning.",
+    "referenceTranslation": "这个周末我打算和朋友去徒步。我们会一大早出发。",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "en-zh",
+    "wordCount": 17
+  },
+  {
+    "id": "mat_0013",
+    "sourceText": "I'd like to buy a one-way ticket to Shanghai, please.",
+    "referenceTranslation": "我想买一张去上海的单程票，谢谢。",
+    "difficultyLevel": "easy",
+    "topicCategory": "technology",
+    "direction": "en-zh",
+    "wordCount": 10
+  },
+  {
+    "id": "mat_0014",
+    "sourceText": "I want to send this package to the United States. How long will it take?",
+    "referenceTranslation": "我想把这个包裹寄到美国。需要多长时间？",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "en-zh",
+    "wordCount": 15
+  },
+  {
+    "id": "mat_0015",
+    "sourceText": "I have a small dog named Doudou. He is very cute and loves to play fetch.",
+    "referenceTranslation": "我有一只叫豆豆的小狗。它很可爱，喜欢玩接球游戏。",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "en-zh",
+    "wordCount": 16
+  },
+  {
+    "id": "mat_0016",
+    "sourceText": "What should I get for my sister's birthday? She likes reading books and listening to music.",
+    "referenceTranslation": "我该给妹妹买什么生日礼物？她喜欢读书和听音乐。",
+    "difficultyLevel": "easy",
+    "topicCategory": "daily",
+    "direction": "en-zh",
+    "wordCount": 16
+  },
+  {
+    "id": "mat_0017",
+    "sourceText": "The weather forecast says it will rain tomorrow. Don't forget to bring an umbrella.",
+    "referenceTranslation": "天气预报说明天会下雨。别忘了带伞。",
+    "difficultyLevel": "easy",
+    "topicCategory": "technology",
+    "direction": "en-zh",
+    "wordCount": 14
+  },
+  {
+    "id": "mat_0018",
+    "sourceText": "I need to see a doctor. I have a headache and a sore throat.",
+    "referenceTranslation": "我需要看医生。我头疼而且喉咙痛。",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "en-zh",
+    "wordCount": 14
+  },
+  {
+    "id": "mat_0019",
+    "sourceText": "Hello, I'd like to order a large pepperoni pizza and two bottles of cola.",
+    "referenceTranslation": "你好，我想点一个大份意大利辣肠披萨和两瓶可乐。",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "en-zh",
+    "wordCount": 14
+  },
+  {
+    "id": "mat_0020",
+    "sourceText": "In my free time, I enjoy painting and playing the guitar. It helps me relax.",
+    "referenceTranslation": "在空闲时间，我喜欢画画和弹吉他。这能帮我放松。",
+    "difficultyLevel": "easy",
+    "topicCategory": "technology",
+    "direction": "en-zh",
+    "wordCount": 15
+  },
+  {
+    "id": "mat_0021",
+    "sourceText": "My father is a teacher and my mother works in a hospital. I have one younger brother.",
+    "referenceTranslation": "我父亲是老师，母亲在医院工作。我有一个弟弟。",
+    "difficultyLevel": "easy",
+    "topicCategory": "health",
+    "direction": "en-zh",
+    "wordCount": 17
+  },
+  {
+    "id": "mat_0022",
+    "sourceText": "I have English class on Monday and Wednesday, and math class on Tuesday and Thursday.",
+    "referenceTranslation": "我周一和周三有英语课，周二和周四有数学课。",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "en-zh",
+    "wordCount": 15
+  },
+  {
+    "id": "mat_0023",
+    "sourceText": "Let's go watch the new animated movie this Friday. I heard it's really good.",
+    "referenceTranslation": "我们这周五去看那部新动画电影吧。我听说很好看。",
+    "difficultyLevel": "easy",
+    "topicCategory": "daily",
+    "direction": "en-zh",
+    "wordCount": 14
+  },
+  {
+    "id": "mat_0024",
+    "sourceText": "Does this bus go to the city center? What time does the last bus leave?",
+    "referenceTranslation": "这辆公交车去市中心吗？末班车几点发车？",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "en-zh",
+    "wordCount": 15
+  },
+  {
+    "id": "mat_0025",
+    "sourceText": "To make scrambled eggs, you need two eggs, a little salt, and some cooking oil.",
+    "referenceTranslation": "做炒鸡蛋需要两个鸡蛋、一点盐和一些食用油。",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "en-zh",
+    "wordCount": 15
+  },
+  {
+    "id": "mat_0026",
+    "sourceText": "I go jogging every morning for about thirty minutes. It keeps me healthy and energetic.",
+    "referenceTranslation": "我每天早上慢跑大约三十分钟。这让我保持健康和精力充沛。",
+    "difficultyLevel": "easy",
+    "topicCategory": "health",
+    "direction": "en-zh",
+    "wordCount": 15
+  },
+  {
+    "id": "mat_0027",
+    "sourceText": "I enjoy reading novels, especially mystery and science fiction. What kind of books do you like?",
+    "referenceTranslation": "我喜欢读小说，尤其是悬疑和科幻类。你喜欢什么类型的书？",
+    "difficultyLevel": "easy",
+    "topicCategory": "daily",
+    "direction": "en-zh",
+    "wordCount": 16
+  },
+  {
+    "id": "mat_0028",
+    "sourceText": "Last summer I visited Japan. The food was delicious and the temples were stunning.",
+    "referenceTranslation": "去年夏天我去了日本。食物很美味，寺庙令人惊叹。",
+    "difficultyLevel": "easy",
+    "topicCategory": "daily",
+    "direction": "en-zh",
+    "wordCount": 14
+  },
+  {
+    "id": "mat_0029",
+    "sourceText": "Every morning I wake up at seven, brush my teeth, eat breakfast, and then go to work.",
+    "referenceTranslation": "每天早上我七点起床，刷牙，吃早餐，然后去上班。",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "en-zh",
+    "wordCount": 17
+  },
+  {
+    "id": "mat_0030",
+    "sourceText": "早上好。今天是美好的一天。天气晴朗温暖。希望你今天过得愉快。",
+    "referenceTranslation": "Good morning. Today is a beautiful day. The weather is sunny and warm. I hope you have a great day.",
+    "difficultyLevel": "easy",
+    "topicCategory": "daily",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0031",
+    "sourceText": "离开房间时请关灯。这有助于节约能源。",
+    "referenceTranslation": "Please turn off the lights when you leave the room. It helps save energy.",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0032",
+    "sourceText": "我想点一杯咖啡和一个三明治，谢谢。",
+    "referenceTranslation": "I would like to order a cup of coffee and a sandwich, please.",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0033",
+    "sourceText": "会议将于明早九点开始。请准时出席。",
+    "referenceTranslation": "The meeting will start at nine o'clock tomorrow morning. Please be on time.",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0034",
+    "sourceText": "她每天学习英语，因为她想提高语言能力。",
+    "referenceTranslation": "She studies English every day because she wants to improve her language skills.",
+    "difficultyLevel": "easy",
+    "topicCategory": "education",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0035",
+    "sourceText": "你好，我叫李明。我来自北京。很高兴认识你。",
+    "referenceTranslation": "Hello, my name is Li Ming. I am from Beijing. Nice to meet you.",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0036",
+    "sourceText": "打扰一下，你能告诉我去火车站怎么走吗？",
+    "referenceTranslation": "Excuse me, could you tell me how to get to the train station?",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0037",
+    "sourceText": "我需要在超市买些牛奶、面包和鸡蛋。",
+    "referenceTranslation": "I need to buy some milk, bread, and eggs at the supermarket.",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0038",
+    "sourceText": "我想预订今晚七点两个人的位置。",
+    "referenceTranslation": "I'd like to make a reservation for two people at seven o'clock this evening.",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0039",
+    "sourceText": "我最喜欢的食物是饺子。我奶奶做的饺子是世界上最好吃的。",
+    "referenceTranslation": "My favorite food is dumplings. My grandmother makes the best dumplings in the world.",
+    "difficultyLevel": "easy",
+    "topicCategory": "daily",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0040",
+    "sourceText": "我在一个海边小镇长大。那里非常宁静美丽。",
+    "referenceTranslation": "I grew up in a small town near the sea. It is very peaceful and beautiful.",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0041",
+    "sourceText": "这个周末我打算和朋友去徒步。我们会一大早出发。",
+    "referenceTranslation": "This weekend I plan to go hiking with my friends. We will leave early in the morning.",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0042",
+    "sourceText": "我想买一张去上海的单程票，谢谢。",
+    "referenceTranslation": "I'd like to buy a one-way ticket to Shanghai, please.",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0043",
+    "sourceText": "我想把这个包裹寄到美国。需要多长时间？",
+    "referenceTranslation": "I want to send this package to the United States. How long will it take?",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0044",
+    "sourceText": "我有一只叫豆豆的小狗。它很可爱，喜欢玩接球游戏。",
+    "referenceTranslation": "I have a small dog named Doudou. He is very cute and loves to play fetch.",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0045",
+    "sourceText": "我该给妹妹买什么生日礼物？她喜欢读书和听音乐。",
+    "referenceTranslation": "What should I get for my sister's birthday? She likes reading books and listening to music.",
+    "difficultyLevel": "easy",
+    "topicCategory": "daily",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0046",
+    "sourceText": "天气预报说明天会下雨。别忘了带伞。",
+    "referenceTranslation": "The weather forecast says it will rain tomorrow. Don't forget to bring an umbrella.",
+    "difficultyLevel": "easy",
+    "topicCategory": "daily",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0047",
+    "sourceText": "我需要看医生。我头疼而且喉咙痛。",
+    "referenceTranslation": "I need to see a doctor. I have a headache and a sore throat.",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0048",
+    "sourceText": "你好，我想点一个大份意大利辣肠披萨和两瓶可乐。",
+    "referenceTranslation": "Hello, I'd like to order a large pepperoni pizza and two bottles of cola.",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0049",
+    "sourceText": "在空闲时间，我喜欢画画和弹吉他。这能帮我放松。",
+    "referenceTranslation": "In my free time, I enjoy painting and playing the guitar. It helps me relax.",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0050",
+    "sourceText": "我父亲是老师，母亲在医院工作。我有一个弟弟。",
+    "referenceTranslation": "My father is a teacher and my mother works in a hospital. I have one younger brother.",
+    "difficultyLevel": "easy",
+    "topicCategory": "health",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0051",
+    "sourceText": "我周一和周三有英语课，周二和周四有数学课。",
+    "referenceTranslation": "I have English class on Monday and Wednesday, and math class on Tuesday and Thursday.",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0052",
+    "sourceText": "我们这周五去看那部新动画电影吧。我听说很好看。",
+    "referenceTranslation": "Let's go watch the new animated movie this Friday. I heard it's really good.",
+    "difficultyLevel": "easy",
+    "topicCategory": "daily",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0053",
+    "sourceText": "这辆公交车去市中心吗？末班车几点发车？",
+    "referenceTranslation": "Does this bus go to the city center? What time does the last bus leave?",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0054",
+    "sourceText": "做炒鸡蛋需要两个鸡蛋、一点盐和一些食用油。",
+    "referenceTranslation": "To make scrambled eggs, you need two eggs, a little salt, and some cooking oil.",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0055",
+    "sourceText": "我每天早上慢跑大约三十分钟。这让我保持健康和精力充沛。",
+    "referenceTranslation": "I go jogging every morning for about thirty minutes. It keeps me healthy and energetic.",
+    "difficultyLevel": "easy",
+    "topicCategory": "health",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0056",
+    "sourceText": "我喜欢读小说，尤其是悬疑和科幻类。你喜欢什么类型的书？",
+    "referenceTranslation": "I enjoy reading novels, especially mystery and science fiction. What kind of books do you like?",
+    "difficultyLevel": "easy",
+    "topicCategory": "daily",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0057",
+    "sourceText": "去年夏天我去了日本。食物很美味，寺庙令人惊叹。",
+    "referenceTranslation": "Last summer I visited Japan. The food was delicious and the temples were stunning.",
+    "difficultyLevel": "easy",
+    "topicCategory": "daily",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0058",
+    "sourceText": "每天早上我七点起床，刷牙，吃早餐，然后去上班。",
+    "referenceTranslation": "Every morning I wake up at seven, brush my teeth, eat breakfast, and then go to work.",
+    "difficultyLevel": "easy",
+    "topicCategory": "daily",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0059",
+    "sourceText": "Climate change is one of the most pressing issues facing humanity today. Scientists warn that global temperatures could rise significantly without immediate action.",
+    "referenceTranslation": "气候变化是当今人类面临的最紧迫问题之一。科学家警告，若不立即采取行动，全球气温可能大幅上升。",
+    "difficultyLevel": "medium",
+    "topicCategory": "environment",
+    "direction": "en-zh",
+    "wordCount": 23
+  },
+  {
+    "id": "mat_0060",
+    "sourceText": "Artificial intelligence is transforming industries across the globe. From healthcare to finance, companies are using machine learning to improve efficiency.",
+    "referenceTranslation": "人工智能正在改变全球各行各业。从医疗到金融，企业正利用机器学习提高效率。",
+    "difficultyLevel": "medium",
+    "topicCategory": "technology",
+    "direction": "en-zh",
+    "wordCount": 20
+  },
+  {
+    "id": "mat_0061",
+    "sourceText": "The global economy has shown signs of recovery following the pandemic. Consumer spending has increased and employment rates are gradually returning to normal.",
+    "referenceTranslation": "疫情后全球经济已显现复苏迹象。消费者支出增加，就业率逐步恢复正常。",
+    "difficultyLevel": "medium",
+    "topicCategory": "business",
+    "direction": "en-zh",
+    "wordCount": 23
+  },
+  {
+    "id": "mat_0062",
+    "sourceText": "Online education platforms now offer courses in virtually every subject, making quality education accessible to people in remote areas.",
+    "referenceTranslation": "在线教育平台如今几乎提供所有学科的课程，使偏远地区的人们也能获得优质教育。",
+    "difficultyLevel": "medium",
+    "topicCategory": "education",
+    "direction": "en-zh",
+    "wordCount": 19
+  },
+  {
+    "id": "mat_0063",
+    "sourceText": "Renewable energy sources such as solar and wind power are becoming increasingly cost-competitive with fossil fuels.",
+    "referenceTranslation": "太阳能和风能等可再生能源在成本上正越来越具竞争力。",
+    "difficultyLevel": "medium",
+    "topicCategory": "environment",
+    "direction": "en-zh",
+    "wordCount": 16
+  },
+  {
+    "id": "mat_0064",
+    "sourceText": "Remote work has fundamentally changed how companies operate. While it offers flexibility and cost savings, it also presents challenges in team collaboration and maintaining company culture.",
+    "referenceTranslation": "远程工作从根本上改变了公司的运营方式。它提供了灵活性和成本节约，但在团队协作和维护公司文化方面也带来了挑战。",
+    "difficultyLevel": "medium",
+    "topicCategory": "technology",
+    "direction": "en-zh",
+    "wordCount": 26
+  },
+  {
+    "id": "mat_0065",
+    "sourceText": "E-commerce platforms have transformed the retail industry by enabling small businesses to reach global markets without the need for physical storefronts.",
+    "referenceTranslation": "电子商务平台通过使小企业无需实体店面就能触达全球市场，从而改变了零售业。",
+    "difficultyLevel": "medium",
+    "topicCategory": "technology",
+    "direction": "en-zh",
+    "wordCount": 21
+  },
+  {
+    "id": "mat_0066",
+    "sourceText": "Cybersecurity has become a top priority for organizations worldwide. Data breaches can result in significant financial losses and damage to a company's reputation.",
+    "referenceTranslation": "网络安全已成为全球组织的首要任务。数据泄露可能导致重大财务损失和公司声誉受损。",
+    "difficultyLevel": "medium",
+    "topicCategory": "business",
+    "direction": "en-zh",
+    "wordCount": 23
+  },
+  {
+    "id": "mat_0067",
+    "sourceText": "With the implementation of stricter data privacy regulations, companies must be more transparent about how they collect and use personal information.",
+    "referenceTranslation": "随着更严格的数据隐私法规的实施，公司必须更加透明地说明如何收集和使用个人信息。",
+    "difficultyLevel": "medium",
+    "topicCategory": "general",
+    "direction": "en-zh",
+    "wordCount": 21
+  },
+  {
+    "id": "mat_0068",
+    "sourceText": "Digital marketing strategies now rely heavily on data analytics to understand consumer behavior and deliver personalized advertising content.",
+    "referenceTranslation": "数字营销策略如今高度依赖数据分析来了解消费者行为，并提供个性化广告内容。",
+    "difficultyLevel": "medium",
+    "topicCategory": "technology",
+    "direction": "en-zh",
+    "wordCount": 18
+  },
+  {
+    "id": "mat_0069",
+    "sourceText": "The global supply chain has faced unprecedented disruptions in recent years, prompting companies to diversify their supplier networks and increase inventory reserves.",
+    "referenceTranslation": "近年来，全球供应链面临前所未有的中断，促使企业多元化供应商网络并增加库存储备。",
+    "difficultyLevel": "medium",
+    "topicCategory": "technology",
+    "direction": "en-zh",
+    "wordCount": 22
+  },
+  {
+    "id": "mat_0070",
+    "sourceText": "Startup companies often rely on venture capital funding to scale their operations. A compelling business model and strong team are essential to attract investors.",
+    "referenceTranslation": "初创公司通常依赖风险投资来扩大业务。引人注目的商业模式和强大的团队是吸引投资者的关键。",
+    "difficultyLevel": "medium",
+    "topicCategory": "business",
+    "direction": "en-zh",
+    "wordCount": 24
+  },
+  {
+    "id": "mat_0071",
+    "sourceText": "Mobile payment systems have revolutionized the way people conduct daily transactions, especially in countries where traditional banking infrastructure is less developed.",
+    "referenceTranslation": "移动支付系统彻底改变了人们进行日常交易的方式，尤其是在传统银行基础设施欠发达的国家。",
+    "difficultyLevel": "medium",
+    "topicCategory": "technology",
+    "direction": "en-zh",
+    "wordCount": 21
+  },
+  {
+    "id": "mat_0072",
+    "sourceText": "The Internet of Things enables smart city applications such as intelligent traffic management, energy-efficient buildings, and real-time environmental monitoring.",
+    "referenceTranslation": "物联网实现了智能城市应用，如智能交通管理、节能建筑和实时环境监测。",
+    "difficultyLevel": "medium",
+    "topicCategory": "technology",
+    "direction": "en-zh",
+    "wordCount": 19
+  },
+  {
+    "id": "mat_0073",
+    "sourceText": "Cloud computing allows enterprises to scale their IT resources dynamically, reducing infrastructure costs while improving operational efficiency.",
+    "referenceTranslation": "云计算使企业能够动态扩展IT资源，降低基础设施成本，同时提高运营效率。",
+    "difficultyLevel": "medium",
+    "topicCategory": "technology",
+    "direction": "en-zh",
+    "wordCount": 17
+  },
+  {
+    "id": "mat_0074",
+    "sourceText": "Gene editing technologies such as CRISPR have opened new possibilities for treating genetic diseases, but they also raise important ethical questions about human enhancement.",
+    "referenceTranslation": "CRISPR等基因编辑技术为治疗遗传疾病开辟了新可能，但也引发了关于人类增强的重要伦理问题。",
+    "difficultyLevel": "medium",
+    "topicCategory": "technology",
+    "direction": "en-zh",
+    "wordCount": 24
+  },
+  {
+    "id": "mat_0075",
+    "sourceText": "Digital transformation in manufacturing involves integrating sensors, artificial intelligence, and robotics to create smart factories with predictive maintenance capabilities.",
+    "referenceTranslation": "制造业的数字化转型涉及集成传感器、人工智能和机器人技术，创建具有预测性维护能力的智能工厂。",
+    "difficultyLevel": "medium",
+    "topicCategory": "technology",
+    "direction": "en-zh",
+    "wordCount": 19
+  },
+  {
+    "id": "mat_0076",
+    "sourceText": "Many countries have announced ambitious carbon neutrality targets, requiring fundamental shifts in energy production, transportation, and industrial processes.",
+    "referenceTranslation": "许多国家宣布了雄心勃勃的碳中和目标，这需要能源生产、交通运输和工业流程的根本性转变。",
+    "difficultyLevel": "medium",
+    "topicCategory": "environment",
+    "direction": "en-zh",
+    "wordCount": 18
+  },
+  {
+    "id": "mat_0077",
+    "sourceText": "Educational technology tools, from interactive whiteboards to adaptive learning platforms, are reshaping classroom dynamics and personalizing the learning experience.",
+    "referenceTranslation": "从交互式白板到自适应学习平台，教育技术工具正在重塑课堂动态并个性化学习体验。",
+    "difficultyLevel": "medium",
+    "topicCategory": "technology",
+    "direction": "en-zh",
+    "wordCount": 19
+  },
+  {
+    "id": "mat_0078",
+    "sourceText": "Urban traffic congestion remains a persistent problem in megacities. Solutions include expanding public transit, implementing congestion pricing, and promoting shared mobility.",
+    "referenceTranslation": "城市交通拥堵仍然是特大城市的一个持续性问题。解决方案包括扩建公共交通、实施拥堵收费和推广共享出行。",
+    "difficultyLevel": "medium",
+    "topicCategory": "technology",
+    "direction": "en-zh",
+    "wordCount": 21
+  },
+  {
+    "id": "mat_0079",
+    "sourceText": "Effective public health emergency response requires coordinated efforts across multiple sectors, including healthcare, logistics, communications, and government agencies.",
+    "referenceTranslation": "有效的公共卫生应急响应需要跨多个部门的协调努力，包括医疗、物流、通信和政府机构。",
+    "difficultyLevel": "medium",
+    "topicCategory": "health",
+    "direction": "en-zh",
+    "wordCount": 18
+  },
+  {
+    "id": "mat_0080",
+    "sourceText": "The commercialization of space travel marks a new era in human exploration. Private companies are now launching rockets and planning missions to the Moon and Mars.",
+    "referenceTranslation": "太空旅行的商业化标志着人类探索的新纪元。私营公司正在发射火箭，并计划前往月球和火星的任务。",
+    "difficultyLevel": "medium",
+    "topicCategory": "daily",
+    "direction": "en-zh",
+    "wordCount": 26
+  },
+  {
+    "id": "mat_0081",
+    "sourceText": "Industrial automation through robotics and AI is increasing productivity, but it also raises concerns about workforce displacement and the need for re-skilling programs.",
+    "referenceTranslation": "通过机器人和人工智能实现的工业自动化正在提高生产力，但也引发了关于劳动力替代和再培训需求的担忧。",
+    "difficultyLevel": "medium",
+    "topicCategory": "technology",
+    "direction": "en-zh",
+    "wordCount": 23
+  },
+  {
+    "id": "mat_0082",
+    "sourceText": "Blockchain technology extends far beyond cryptocurrency. Its applications include supply chain traceability, digital identity verification, and decentralized finance services.",
+    "referenceTranslation": "区块链技术的应用远超加密货币范畴。其应用包括供应链追溯、数字身份验证和去中心化金融服务。",
+    "difficultyLevel": "medium",
+    "topicCategory": "technology",
+    "direction": "en-zh",
+    "wordCount": 19
+  },
+  {
+    "id": "mat_0083",
+    "sourceText": "The rollout of 5G networks is enabling new telemedicine applications, allowing doctors to perform remote surgeries and monitor patients in real time.",
+    "referenceTranslation": "5G网络的推广正在实现新的远程医疗应用，使医生能够进行远程手术并实时监测患者。",
+    "difficultyLevel": "medium",
+    "topicCategory": "technology",
+    "direction": "en-zh",
+    "wordCount": 22
+  },
+  {
+    "id": "mat_0084",
+    "sourceText": "Green building design principles emphasize energy efficiency, sustainable materials, and healthy indoor environments to reduce the environmental footprint of construction.",
+    "referenceTranslation": "绿色建筑设计原则强调能源效率、可持续材料和健康的室内环境，以减少建筑的环境足迹。",
+    "difficultyLevel": "medium",
+    "topicCategory": "technology",
+    "direction": "en-zh",
+    "wordCount": 20
+  },
+  {
+    "id": "mat_0085",
+    "sourceText": "Fostering a culture of innovation requires companies to encourage experimentation, tolerate calculated risks, and reward creative problem-solving.",
+    "referenceTranslation": "培养创新文化要求公司鼓励实验、容忍经过计算的风险，并奖励创造性解决问题的能力。",
+    "difficultyLevel": "medium",
+    "topicCategory": "humanities",
+    "direction": "en-zh",
+    "wordCount": 17
+  },
+  {
+    "id": "mat_0086",
+    "sourceText": "Cross-border e-commerce has created new opportunities for international trade, but it also involves navigating complex customs regulations and cross-cultural communication challenges.",
+    "referenceTranslation": "跨境电商为国际贸易创造了新机遇，但也涉及应对复杂的海关法规和跨文化交流挑战。",
+    "difficultyLevel": "medium",
+    "topicCategory": "business",
+    "direction": "en-zh",
+    "wordCount": 21
+  },
+  {
+    "id": "mat_0087",
+    "sourceText": "Social media platforms have fundamentally altered the landscape of journalism by enabling citizen reporting while also contributing to the spread of misinformation.",
+    "referenceTranslation": "社交媒体平台通过使公民报道成为可能，从根本上改变了新闻业的格局，同时也助长了错误信息的传播。",
+    "difficultyLevel": "medium",
+    "topicCategory": "general",
+    "direction": "en-zh",
+    "wordCount": 22
+  },
+  {
+    "id": "mat_0088",
+    "sourceText": "气候变化是当今人类面临的最紧迫问题之一。科学家警告，若不立即采取行动，全球气温可能大幅上升。",
+    "referenceTranslation": "Climate change is one of the most pressing issues facing humanity today. Scientists warn that global temperatures could rise significantly without immediate action.",
+    "difficultyLevel": "medium",
+    "topicCategory": "environment",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0089",
+    "sourceText": "人工智能正在改变全球各行各业。从医疗到金融，企业正利用机器学习提高效率。",
+    "referenceTranslation": "Artificial intelligence is transforming industries across the globe. From healthcare to finance, companies are using machine learning to improve efficiency.",
+    "difficultyLevel": "medium",
+    "topicCategory": "technology",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0090",
+    "sourceText": "疫情后全球经济已显现复苏迹象。消费者支出增加，就业率逐步恢复正常。",
+    "referenceTranslation": "The global economy has shown signs of recovery following the pandemic. Consumer spending has increased and employment rates are gradually returning to normal.",
+    "difficultyLevel": "medium",
+    "topicCategory": "business",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0091",
+    "sourceText": "在线教育平台如今几乎提供所有学科的课程，使偏远地区的人们也能获得优质教育。",
+    "referenceTranslation": "Online education platforms now offer courses in virtually every subject, making quality education accessible to people in remote areas.",
+    "difficultyLevel": "medium",
+    "topicCategory": "education",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0092",
+    "sourceText": "太阳能和风能等可再生能源在成本上正越来越具竞争力。",
+    "referenceTranslation": "Renewable energy sources such as solar and wind power are becoming increasingly cost-competitive with fossil fuels.",
+    "difficultyLevel": "medium",
+    "topicCategory": "general",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0093",
+    "sourceText": "远程工作从根本上改变了公司的运营方式。它提供了灵活性和成本节约，但在团队协作和维护公司文化方面也带来了挑战。",
+    "referenceTranslation": "Remote work has fundamentally changed how companies operate. While it offers flexibility and cost savings, it also presents challenges in team collaboration and maintaining company culture.",
+    "difficultyLevel": "medium",
+    "topicCategory": "humanities",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0094",
+    "sourceText": "电子商务平台通过使小企业无需实体店面就能触达全球市场，从而改变了零售业。",
+    "referenceTranslation": "E-commerce platforms have transformed the retail industry by enabling small businesses to reach global markets without the need for physical storefronts.",
+    "difficultyLevel": "medium",
+    "topicCategory": "business",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0095",
+    "sourceText": "网络安全已成为全球组织的首要任务。数据泄露可能导致重大财务损失和公司声誉受损。",
+    "referenceTranslation": "Cybersecurity has become a top priority for organizations worldwide. Data breaches can result in significant financial losses and damage to a company's reputation.",
+    "difficultyLevel": "medium",
+    "topicCategory": "technology",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0096",
+    "sourceText": "随着更严格的数据隐私法规的实施，公司必须更加透明地说明如何收集和使用个人信息。",
+    "referenceTranslation": "With the implementation of stricter data privacy regulations, companies must be more transparent about how they collect and use personal information.",
+    "difficultyLevel": "medium",
+    "topicCategory": "general",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0097",
+    "sourceText": "数字营销策略如今高度依赖数据分析来了解消费者行为，并提供个性化广告内容。",
+    "referenceTranslation": "Digital marketing strategies now rely heavily on data analytics to understand consumer behavior and deliver personalized advertising content.",
+    "difficultyLevel": "medium",
+    "topicCategory": "technology",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0098",
+    "sourceText": "近年来，全球供应链面临前所未有的中断，促使企业多元化供应商网络并增加库存储备。",
+    "referenceTranslation": "The global supply chain has faced unprecedented disruptions in recent years, prompting companies to diversify their supplier networks and increase inventory reserves.",
+    "difficultyLevel": "medium",
+    "topicCategory": "technology",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0099",
+    "sourceText": "初创公司通常依赖风险投资来扩大业务。引人注目的商业模式和强大的团队是吸引投资者的关键。",
+    "referenceTranslation": "Startup companies often rely on venture capital funding to scale their operations. A compelling business model and strong team are essential to attract investors.",
+    "difficultyLevel": "medium",
+    "topicCategory": "business",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0100",
+    "sourceText": "移动支付系统彻底改变了人们进行日常交易的方式，尤其是在传统银行基础设施欠发达的国家。",
+    "referenceTranslation": "Mobile payment systems have revolutionized the way people conduct daily transactions, especially in countries where traditional banking infrastructure is less developed.",
+    "difficultyLevel": "medium",
+    "topicCategory": "daily",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0101",
+    "sourceText": "物联网实现了智能城市应用，如智能交通管理、节能建筑和实时环境监测。",
+    "referenceTranslation": "The Internet of Things enables smart city applications such as intelligent traffic management, energy-efficient buildings, and real-time environmental monitoring.",
+    "difficultyLevel": "medium",
+    "topicCategory": "environment",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0102",
+    "sourceText": "云计算使企业能够动态扩展IT资源，降低基础设施成本，同时提高运营效率。",
+    "referenceTranslation": "Cloud computing allows enterprises to scale their IT resources dynamically, reducing infrastructure costs while improving operational efficiency.",
+    "difficultyLevel": "medium",
+    "topicCategory": "technology",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0103",
+    "sourceText": "CRISPR等基因编辑技术为治疗遗传疾病开辟了新可能，但也引发了关于人类增强的重要伦理问题。",
+    "referenceTranslation": "Gene editing technologies such as CRISPR have opened new possibilities for treating genetic diseases, but they also raise important ethical questions about human enhancement.",
+    "difficultyLevel": "medium",
+    "topicCategory": "technology",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0104",
+    "sourceText": "制造业的数字化转型涉及集成传感器、人工智能和机器人技术，创建具有预测性维护能力的智能工厂。",
+    "referenceTranslation": "Digital transformation in manufacturing involves integrating sensors, artificial intelligence, and robotics to create smart factories with predictive maintenance capabilities.",
+    "difficultyLevel": "medium",
+    "topicCategory": "technology",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0105",
+    "sourceText": "许多国家宣布了雄心勃勃的碳中和目标，这需要能源生产、交通运输和工业流程的根本性转变。",
+    "referenceTranslation": "Many countries have announced ambitious carbon neutrality targets, requiring fundamental shifts in energy production, transportation, and industrial processes.",
+    "difficultyLevel": "medium",
+    "topicCategory": "environment",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0106",
+    "sourceText": "从交互式白板到自适应学习平台，教育技术工具正在重塑课堂动态并个性化学习体验。",
+    "referenceTranslation": "Educational technology tools, from interactive whiteboards to adaptive learning platforms, are reshaping classroom dynamics and personalizing the learning experience.",
+    "difficultyLevel": "medium",
+    "topicCategory": "technology",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0107",
+    "sourceText": "城市交通拥堵仍然是特大城市的一个持续性问题。解决方案包括扩建公共交通、实施拥堵收费和推广共享出行。",
+    "referenceTranslation": "Urban traffic congestion remains a persistent problem in megacities. Solutions include expanding public transit, implementing congestion pricing, and promoting shared mobility.",
+    "difficultyLevel": "medium",
+    "topicCategory": "general",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0108",
+    "sourceText": "有效的公共卫生应急响应需要跨多个部门的协调努力，包括医疗、物流、通信和政府机构。",
+    "referenceTranslation": "Effective public health emergency response requires coordinated efforts across multiple sectors, including healthcare, logistics, communications, and government agencies.",
+    "difficultyLevel": "medium",
+    "topicCategory": "health",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0109",
+    "sourceText": "太空旅行的商业化标志着人类探索的新纪元。私营公司正在发射火箭，并计划前往月球和火星的任务。",
+    "referenceTranslation": "The commercialization of space travel marks a new era in human exploration. Private companies are now launching rockets and planning missions to the Moon and Mars.",
+    "difficultyLevel": "medium",
+    "topicCategory": "daily",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0110",
+    "sourceText": "通过机器人和人工智能实现的工业自动化正在提高生产力，但也引发了关于劳动力替代和再培训需求的担忧。",
+    "referenceTranslation": "Industrial automation through robotics and AI is increasing productivity, but it also raises concerns about workforce displacement and the need for re-skilling programs.",
+    "difficultyLevel": "medium",
+    "topicCategory": "technology",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0111",
+    "sourceText": "区块链技术的应用远超加密货币范畴。其应用包括供应链追溯、数字身份验证和去中心化金融服务。",
+    "referenceTranslation": "Blockchain technology extends far beyond cryptocurrency. Its applications include supply chain traceability, digital identity verification, and decentralized finance services.",
+    "difficultyLevel": "medium",
+    "topicCategory": "technology",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0112",
+    "sourceText": "5G网络的推广正在实现新的远程医疗应用，使医生能够进行远程手术并实时监测患者。",
+    "referenceTranslation": "The rollout of 5G networks is enabling new telemedicine applications, allowing doctors to perform remote surgeries and monitor patients in real time.",
+    "difficultyLevel": "medium",
+    "topicCategory": "technology",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0113",
+    "sourceText": "绿色建筑设计原则强调能源效率、可持续材料和健康的室内环境，以减少建筑的环境足迹。",
+    "referenceTranslation": "Green building design principles emphasize energy efficiency, sustainable materials, and healthy indoor environments to reduce the environmental footprint of construction.",
+    "difficultyLevel": "medium",
+    "topicCategory": "environment",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0114",
+    "sourceText": "培养创新文化要求公司鼓励实验、容忍经过计算的风险，并奖励创造性解决问题的能力。",
+    "referenceTranslation": "Fostering a culture of innovation requires companies to encourage experimentation, tolerate calculated risks, and reward creative problem-solving.",
+    "difficultyLevel": "medium",
+    "topicCategory": "technology",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0115",
+    "sourceText": "跨境电商为国际贸易创造了新机遇，但也涉及应对复杂的海关法规和跨文化交流挑战。",
+    "referenceTranslation": "Cross-border e-commerce has created new opportunities for international trade, but it also involves navigating complex customs regulations and cross-cultural communication challenges.",
+    "difficultyLevel": "medium",
+    "topicCategory": "business",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0116",
+    "sourceText": "社交媒体平台通过使公民报道成为可能，从根本上改变了新闻业的格局，同时也助长了错误信息的传播。",
+    "referenceTranslation": "Social media platforms have fundamentally altered the landscape of journalism by enabling citizen reporting while also contributing to the spread of misinformation.",
+    "difficultyLevel": "medium",
+    "topicCategory": "general",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0117",
+    "sourceText": "Neuroplasticity refers to the brain's remarkable ability to reorganize itself by forming new neural connections throughout life. This has significant implications for rehabilitation medicine.",
+    "referenceTranslation": "神经可塑性指大脑通过形成新神经连接进行自我重组的非凡能力。这对康复医学有重大意义。",
+    "difficultyLevel": "hard",
+    "topicCategory": "technology",
+    "direction": "en-zh",
+    "wordCount": 24
+  },
+  {
+    "id": "mat_0118",
+    "sourceText": "The proliferation of disinformation in the digital age poses unprecedented challenges to democratic governance and social cohesion.",
+    "referenceTranslation": "数字时代虚假信息的泛滥对民主治理和社会凝聚力构成了前所未有的挑战。",
+    "difficultyLevel": "hard",
+    "topicCategory": "technology",
+    "direction": "en-zh",
+    "wordCount": 17
+  },
+  {
+    "id": "mat_0119",
+    "sourceText": "Quantum computing exploits the principles of superposition and entanglement to perform calculations that would be practically impossible for classical computers.",
+    "referenceTranslation": "量子计算利用叠加和纠缠原理，执行经典计算机实际上无法完成的计算。",
+    "difficultyLevel": "hard",
+    "topicCategory": "technology",
+    "direction": "en-zh",
+    "wordCount": 20
+  },
+  {
+    "id": "mat_0120",
+    "sourceText": "The concept of corporate social responsibility has evolved considerably, with contemporary stakeholder theory positing obligations beyond shareholders.",
+    "referenceTranslation": "企业社会责任概念已发生显著演变，当代利益相关者理论认为企业义务超越股东范畴。",
+    "difficultyLevel": "hard",
+    "topicCategory": "general",
+    "direction": "en-zh",
+    "wordCount": 17
+  },
+  {
+    "id": "mat_0121",
+    "sourceText": "The geopolitical landscape has undergone profound transformations as the unipolar world order gives way to an increasingly multipolar configuration.",
+    "referenceTranslation": "地缘政治格局已发生深刻变化，单极世界秩序正让位于日益多极化的格局。",
+    "difficultyLevel": "hard",
+    "topicCategory": "politics",
+    "direction": "en-zh",
+    "wordCount": 19
+  },
+  {
+    "id": "mat_0122",
+    "sourceText": "Cognitive psychology research on memory formation suggests that the consolidation of episodic memories during slow-wave sleep is critical for long-term retention and knowledge integration.",
+    "referenceTranslation": "关于记忆形成的认知心理学研究表明，慢波睡眠期间情景记忆的巩固对于长期保持和知识整合至关重要。",
+    "difficultyLevel": "hard",
+    "topicCategory": "humanities",
+    "direction": "en-zh",
+    "wordCount": 24
+  },
+  {
+    "id": "mat_0123",
+    "sourceText": "Central banks transmit monetary policy through multiple channels, including the interest rate channel, the credit channel, and the exchange rate channel, each operating with varying lags and effectiveness.",
+    "referenceTranslation": "中央银行通过多种渠道传导货币政策，包括利率渠道、信贷渠道和汇率渠道，每种渠道的传导滞后和有效性各不相同。",
+    "difficultyLevel": "hard",
+    "topicCategory": "politics",
+    "direction": "en-zh",
+    "wordCount": 28
+  },
+  {
+    "id": "mat_0124",
+    "sourceText": "The principle of distinction in international humanitarian law requires combatants to differentiate between military objectives and civilian objects, imposing obligations of precaution in attack planning.",
+    "referenceTranslation": "国际人道法中的区分原则要求战斗人员区分军事目标与民用物体，在攻击规划中施加预防义务。",
+    "difficultyLevel": "hard",
+    "topicCategory": "politics",
+    "direction": "en-zh",
+    "wordCount": 25
+  },
+  {
+    "id": "mat_0125",
+    "sourceText": "The transition to a circular economy requires systemic redesign of production and consumption patterns, moving beyond waste management to fundamentally rethinking material flows and product lifecycles.",
+    "referenceTranslation": "向循环经济转型需要系统性地重新设计生产和消费模式，超越废弃物管理，从根本上重新思考物质流和产品生命周期。",
+    "difficultyLevel": "hard",
+    "topicCategory": "business",
+    "direction": "en-zh",
+    "wordCount": 26
+  },
+  {
+    "id": "mat_0126",
+    "sourceText": "Philosophical inquiries into consciousness grapple with the hard problem of explaining why and how subjective qualitative experiences arise from neurobiological processes.",
+    "referenceTranslation": "关于意识的哲学探究致力于解决「困难问题」：解释主观定性体验为何以及如何从神经生物学过程中产生。",
+    "difficultyLevel": "hard",
+    "topicCategory": "technology",
+    "direction": "en-zh",
+    "wordCount": 21
+  },
+  {
+    "id": "mat_0127",
+    "sourceText": "Language death occurs when a speech community shifts to another language, resulting in the loss of unique cultural knowledge encoded in linguistic structures accumulated over generations.",
+    "referenceTranslation": "当语言社区转向使用另一种语言时，语言消亡就会发生，导致世代积累的、编码在语言结构中的独特文化知识的丧失。",
+    "difficultyLevel": "hard",
+    "topicCategory": "health",
+    "direction": "en-zh",
+    "wordCount": 26
+  },
+  {
+    "id": "mat_0128",
+    "sourceText": "The phenomenon of democratic backsliding involves the gradual erosion of institutional checks and balances, often through legally sanctioned measures that preserve a facade of constitutional legitimacy.",
+    "referenceTranslation": "民主倒退现象涉及制度制衡的逐步侵蚀，通常通过法律认可的措施实现，从而维持宪法合法性的表象。",
+    "difficultyLevel": "hard",
+    "topicCategory": "politics",
+    "direction": "en-zh",
+    "wordCount": 26
+  },
+  {
+    "id": "mat_0129",
+    "sourceText": "Poverty trap mechanisms in development economics describe self-reinforcing equilibria whereby low income prevents investment in human capital and physical assets, perpetuating intergenerational disadvantage.",
+    "referenceTranslation": "发展经济学中的贫困陷阱机制描述了自我强化的均衡状态，低收入阻碍了对人力资本和物质资产的投资，从而延续了代际劣势。",
+    "difficultyLevel": "hard",
+    "topicCategory": "business",
+    "direction": "en-zh",
+    "wordCount": 23
+  },
+  {
+    "id": "mat_0130",
+    "sourceText": "Global health governance frameworks for pandemic preparedness emphasize the importance of early warning surveillance systems, equitable vaccine distribution, and coordinated international response protocols.",
+    "referenceTranslation": "大流行防范的全球卫生治理框架强调早期预警监测系统、疫苗公平分配和协调一致的国际响应协议的重要性。",
+    "difficultyLevel": "hard",
+    "topicCategory": "health",
+    "direction": "en-zh",
+    "wordCount": 23
+  },
+  {
+    "id": "mat_0131",
+    "sourceText": "The Standard Model of particle physics successfully describes three of the four fundamental forces, yet it does not incorporate gravity, leaving a significant theoretical gap in our understanding of the universe.",
+    "referenceTranslation": "粒子物理学的标准模型成功描述了四种基本力中的三种，但未能纳入引力，在我们对宇宙的理解中留下了重大的理论空白。",
+    "difficultyLevel": "hard",
+    "topicCategory": "general",
+    "direction": "en-zh",
+    "wordCount": 31
+  },
+  {
+    "id": "mat_0132",
+    "sourceText": "Comparative constitutional interpretation examines how different legal traditions approach the balance between judicial review and legislative supremacy in defining fundamental rights.",
+    "referenceTranslation": "比较宪法解释研究不同法律传统如何在界定基本权利时处理司法审查与立法至上之间的平衡。",
+    "difficultyLevel": "hard",
+    "topicCategory": "politics",
+    "direction": "en-zh",
+    "wordCount": 21
+  },
+  {
+    "id": "mat_0133",
+    "sourceText": "Ethnographic research methodology emphasizes prolonged immersion in the field and the importance of reflexivity, requiring researchers to critically examine their own positionality and its influence on data collection.",
+    "referenceTranslation": "民族志研究方法论强调长期田野沉浸和反思性的重要性，要求研究者批判性地审视自身立场及其对数据收集的影响。",
+    "difficultyLevel": "hard",
+    "topicCategory": "general",
+    "direction": "en-zh",
+    "wordCount": 28
+  },
+  {
+    "id": "mat_0134",
+    "sourceText": "Prospect theory, developed by Kahneman and Tversky, demonstrates that individuals exhibit loss aversion and evaluate outcomes relative to a reference point rather than in absolute terms.",
+    "referenceTranslation": "卡尼曼和特沃斯基提出的前景理论证明，个体表现出损失厌恶，并相对于参照点而非绝对值来评估结果。",
+    "difficultyLevel": "hard",
+    "topicCategory": "general",
+    "direction": "en-zh",
+    "wordCount": 26
+  },
+  {
+    "id": "mat_0135",
+    "sourceText": "Track II diplomacy engages non-state actors in informal dialogue processes to complement official negotiations, often succeeding in building trust where formal diplomatic channels have stalled.",
+    "referenceTranslation": "第二轨道外交让非国家行为体参与非正式对话进程以补充官方谈判，通常在正式外交渠道停滞时成功建立信任。",
+    "difficultyLevel": "hard",
+    "topicCategory": "general",
+    "direction": "en-zh",
+    "wordCount": 25
+  },
+  {
+    "id": "mat_0136",
+    "sourceText": "Agenda-setting theory in mass communication research posits that the media does not tell people what to think, but is remarkably effective in telling them what to think about.",
+    "referenceTranslation": "大众传播研究中的议程设置理论认为，媒体不会告诉人们思考什么，但在告诉人们关注什么方面却非常有效。",
+    "difficultyLevel": "hard",
+    "topicCategory": "general",
+    "direction": "en-zh",
+    "wordCount": 28
+  },
+  {
+    "id": "mat_0137",
+    "sourceText": "Financing the United Nations Sustainable Development Goals requires mobilizing resources at an unprecedented scale, combining public finance, private investment, and innovative blended finance mechanisms.",
+    "referenceTranslation": "为联合国可持续发展目标筹资需要以前所未有的规模调动资源，结合公共财政、私人投资和创新的混合融资机制。",
+    "difficultyLevel": "hard",
+    "topicCategory": "technology",
+    "direction": "en-zh",
+    "wordCount": 24
+  },
+  {
+    "id": "mat_0138",
+    "sourceText": "The regulation of somatic gene therapy involves balancing the therapeutic promise of genetic modification against concerns regarding off-target effects, germline alterations, and equitable access to treatment.",
+    "referenceTranslation": "体细胞基因治疗的监管需要在基因修饰的治疗前景与脱靶效应、生殖系改变和治疗公平获取的担忧之间取得平衡。",
+    "difficultyLevel": "hard",
+    "topicCategory": "technology",
+    "direction": "en-zh",
+    "wordCount": 26
+  },
+  {
+    "id": "mat_0139",
+    "sourceText": "The transformer architecture in deep learning, which relies entirely on self-attention mechanisms rather than recurrence, has become the foundation for state-of-the-art large language models.",
+    "referenceTranslation": "深度学习中的Transformer架构完全依赖自注意力机制而非循环结构，已成为最先进大语言模型的基础。",
+    "difficultyLevel": "hard",
+    "topicCategory": "education",
+    "direction": "en-zh",
+    "wordCount": 24
+  },
+  {
+    "id": "mat_0140",
+    "sourceText": "Nash equilibrium characterizes strategic interactions in which no player can unilaterally deviate to improve their payoff, providing a foundational solution concept for analyzing oligopolistic market behavior.",
+    "referenceTranslation": "纳什均衡描述了没有任何参与者可以通过单方面偏离来提高收益的战略互动，为分析寡头垄断市场行为提供了基础性解决方案概念。",
+    "difficultyLevel": "hard",
+    "topicCategory": "business",
+    "direction": "en-zh",
+    "wordCount": 26
+  },
+  {
+    "id": "mat_0141",
+    "sourceText": "Edward Said's critique of Orientalism examines how Western scholarly and artistic representations of the Middle East have historically served to justify colonial domination and construct cultural otherness.",
+    "referenceTranslation": "爱德华·萨义德对东方主义的批判审视了西方对中东的学术和艺术表征如何历史性地为殖民统治辩护并建构文化他者性。",
+    "difficultyLevel": "hard",
+    "topicCategory": "technology",
+    "direction": "en-zh",
+    "wordCount": 27
+  },
+  {
+    "id": "mat_0142",
+    "sourceText": "Transit-oriented development planning integrates high-density mixed-use development around public transportation nodes, aiming to reduce automobile dependency and promote sustainable urban growth patterns.",
+    "referenceTranslation": "公交导向型发展规划围绕公共交通节点整合高密度混合用途开发，旨在减少汽车依赖并促进可持续的城市增长模式。",
+    "difficultyLevel": "hard",
+    "topicCategory": "technology",
+    "direction": "en-zh",
+    "wordCount": 22
+  },
+  {
+    "id": "mat_0143",
+    "sourceText": "Cost-benefit analysis in regulatory policy requires quantifying non-market values such as environmental quality and human life, raising profound methodological and ethical questions about commensurability.",
+    "referenceTranslation": "监管政策中的成本效益分析需要对环境质量和人类生命等非市场价值进行量化，引发了关于可通约性的深刻方法论和伦理问题。",
+    "difficultyLevel": "hard",
+    "topicCategory": "technology",
+    "direction": "en-zh",
+    "wordCount": 24
+  },
+  {
+    "id": "mat_0144",
+    "sourceText": "Restorative justice approaches in post-conflict societies prioritize repairing harm through dialogue between victims and perpetrators, offering an alternative to purely retributive models of transitional justice.",
+    "referenceTranslation": "冲突后社会中的恢复性司法方法优先通过受害者与施害者之间的对话来修复伤害，为纯粹惩罚性的过渡司法模式提供了替代方案。",
+    "difficultyLevel": "hard",
+    "topicCategory": "technology",
+    "direction": "en-zh",
+    "wordCount": 25
+  },
+  {
+    "id": "mat_0145",
+    "sourceText": "Thomas Kuhn's concept of paradigm shifts describes how scientific progress occurs not through gradual accumulation but through revolutionary periods when dominant theoretical frameworks are overturned.",
+    "referenceTranslation": "托马斯·库恩的范式转换概念描述了科学进步不是通过渐进积累发生的，而是通过主导理论框架被推翻的革命性时期发生的。",
+    "difficultyLevel": "hard",
+    "topicCategory": "general",
+    "direction": "en-zh",
+    "wordCount": 25
+  },
+  {
+    "id": "mat_0146",
+    "sourceText": "神经可塑性指大脑通过形成新神经连接进行自我重组的非凡能力。这对康复医学有重大意义。",
+    "referenceTranslation": "Neuroplasticity refers to the brain's remarkable ability to reorganize itself by forming new neural connections throughout life. This has significant implications for rehabilitation medicine.",
+    "difficultyLevel": "hard",
+    "topicCategory": "general",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0147",
+    "sourceText": "数字时代虚假信息的泛滥对民主治理和社会凝聚力构成了前所未有的挑战。",
+    "referenceTranslation": "The proliferation of disinformation in the digital age poses unprecedented challenges to democratic governance and social cohesion.",
+    "difficultyLevel": "hard",
+    "topicCategory": "technology",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0148",
+    "sourceText": "量子计算利用叠加和纠缠原理，执行经典计算机实际上无法完成的计算。",
+    "referenceTranslation": "Quantum computing exploits the principles of superposition and entanglement to perform calculations that would be practically impossible for classical computers.",
+    "difficultyLevel": "hard",
+    "topicCategory": "technology",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0149",
+    "sourceText": "企业社会责任概念已发生显著演变，当代利益相关者理论认为企业义务超越股东范畴。",
+    "referenceTranslation": "The concept of corporate social responsibility has evolved considerably, with contemporary stakeholder theory positing obligations beyond shareholders.",
+    "difficultyLevel": "hard",
+    "topicCategory": "humanities",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0150",
+    "sourceText": "地缘政治格局已发生深刻变化，单极世界秩序正让位于日益多极化的格局。",
+    "referenceTranslation": "The geopolitical landscape has undergone profound transformations as the unipolar world order gives way to an increasingly multipolar configuration.",
+    "difficultyLevel": "hard",
+    "topicCategory": "politics",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0151",
+    "sourceText": "关于记忆形成的认知心理学研究表明，慢波睡眠期间情景记忆的巩固对于长期保持和知识整合至关重要。",
+    "referenceTranslation": "Cognitive psychology research on memory formation suggests that the consolidation of episodic memories during slow-wave sleep is critical for long-term retention and knowledge integration.",
+    "difficultyLevel": "hard",
+    "topicCategory": "humanities",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0152",
+    "sourceText": "中央银行通过多种渠道传导货币政策，包括利率渠道、信贷渠道和汇率渠道，每种渠道的传导滞后和有效性各不相同。",
+    "referenceTranslation": "Central banks transmit monetary policy through multiple channels, including the interest rate channel, the credit channel, and the exchange rate channel, each operating with varying lags and effectiveness.",
+    "difficultyLevel": "hard",
+    "topicCategory": "politics",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0153",
+    "sourceText": "国际人道法中的区分原则要求战斗人员区分军事目标与民用物体，在攻击规划中施加预防义务。",
+    "referenceTranslation": "The principle of distinction in international humanitarian law requires combatants to differentiate between military objectives and civilian objects, imposing obligations of precaution in attack planning.",
+    "difficultyLevel": "hard",
+    "topicCategory": "general",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0154",
+    "sourceText": "向循环经济转型需要系统性地重新设计和消费模式，超越废弃物管理，从根本上重新思考物质流和产品生命周期。",
+    "referenceTranslation": "The transition to a circular economy requires systemic redesign of production and consumption patterns, moving beyond waste management to fundamentally rethinking material flows and product lifecycles.",
+    "difficultyLevel": "hard",
+    "topicCategory": "business",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0155",
+    "sourceText": "关于意识的哲学探究致力于解决「困难问题」：解释主观定性体验为何以及如何从神经生物学过程中产生。",
+    "referenceTranslation": "Philosophical inquiries into consciousness grapple with the hard problem of explaining why and how subjective qualitative experiences arise from neurobiological processes.",
+    "difficultyLevel": "hard",
+    "topicCategory": "humanities",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0156",
+    "sourceText": "当语言社区转向使用另一种语言时，语言消亡就会发生，导致世代积累的、编码在语言结构中的独特文化知识的丧失。",
+    "referenceTranslation": "Language death occurs when a speech community shifts to another language, resulting in the loss of unique cultural knowledge encoded in linguistic structures accumulated over generations.",
+    "difficultyLevel": "hard",
+    "topicCategory": "humanities",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0157",
+    "sourceText": "民主倒退现象涉及制度制衡的逐步侵蚀，通常通过法律认可的措施实现，从而维持宪法合法性的表象。",
+    "referenceTranslation": "The phenomenon of democratic backsliding involves the gradual erosion of institutional checks and balances, often through legally sanctioned measures that preserve a facade of constitutional legitimacy.",
+    "difficultyLevel": "hard",
+    "topicCategory": "politics",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0158",
+    "sourceText": "发展经济学中的贫困陷阱机制描述了自我强化的均衡状态，低收入阻碍了对人力资本和物质资产的投资，从而延续了代际劣势。",
+    "referenceTranslation": "Poverty trap mechanisms in development economics describe self-reinforcing equilibria whereby low income prevents investment in human capital and physical assets, perpetuating intergenerational disadvantage.",
+    "difficultyLevel": "hard",
+    "topicCategory": "business",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0159",
+    "sourceText": "大流行防范的全球卫生治理框架强调早期预警监测系统、疫苗公平分配和协调一致的国际响应协议的重要性。",
+    "referenceTranslation": "Global health governance frameworks for pandemic preparedness emphasize the importance of early warning surveillance systems, equitable vaccine distribution, and coordinated international response protocols.",
+    "difficultyLevel": "hard",
+    "topicCategory": "health",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0160",
+    "sourceText": "粒子物理学的标准模型成功描述了四种基本力中的三种，但未能纳入引力，在我们对宇宙的理解中留下了重大的理论空白。",
+    "referenceTranslation": "The Standard Model of particle physics successfully describes three of the four fundamental forces, yet it does not incorporate gravity, leaving a significant theoretical gap in our understanding of the universe.",
+    "difficultyLevel": "hard",
+    "topicCategory": "general",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0161",
+    "sourceText": "比较宪法解释研究不同法律传统如何在界定基本权利时处理司法审查与立法至上之间的平衡。",
+    "referenceTranslation": "Comparative constitutional interpretation examines how different legal traditions approach the balance between judicial review and legislative supremacy in defining fundamental rights.",
+    "difficultyLevel": "hard",
+    "topicCategory": "politics",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0162",
+    "sourceText": "民族志研究方法论强调长期田野沉浸和反思性的重要性，要求研究者批判性地审视自身立场及其对数据收集的影响。",
+    "referenceTranslation": "Ethnographic research methodology emphasizes prolonged immersion in the field and the importance of reflexivity, requiring researchers to critically examine their own positionality and its influence on data collection.",
+    "difficultyLevel": "hard",
+    "topicCategory": "general",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0163",
+    "sourceText": "卡尼曼和特沃斯基提出的前景理论证明，个体表现出损失厌恶，并相对于参照点而非绝对值来评估结果。",
+    "referenceTranslation": "Prospect theory, developed by Kahneman and Tversky, demonstrates that individuals exhibit loss aversion and evaluate outcomes relative to a reference point rather than in absolute terms.",
+    "difficultyLevel": "hard",
+    "topicCategory": "general",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0164",
+    "sourceText": "第二轨道外交让非国家行为体参与非正式对话进程以补充官方谈判，通常在正式外交渠道停滞时成功建立信任。",
+    "referenceTranslation": "Track II diplomacy engages non-state actors in informal dialogue processes to complement official negotiations, often succeeding in building trust where formal diplomatic channels have stalled.",
+    "difficultyLevel": "hard",
+    "topicCategory": "general",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0165",
+    "sourceText": "大众传播研究中的议程设置理论认为，媒体不会告诉人们思考什么，但在告诉人们关注什么方面却非常有效。",
+    "referenceTranslation": "Agenda-setting theory in mass communication research posits that the media does not tell people what to think, but is remarkably effective in telling them what to think about.",
+    "difficultyLevel": "hard",
+    "topicCategory": "general",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0166",
+    "sourceText": "为联合国可持续发展目标筹资需要以前所未有的规模调动资源，结合公共财政、私人投资和创新的混合融资机制。",
+    "referenceTranslation": "Financing the United Nations Sustainable Development Goals requires mobilizing resources at an unprecedented scale, combining public finance, private investment, and innovative blended finance mechanisms.",
+    "difficultyLevel": "hard",
+    "topicCategory": "business",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0167",
+    "sourceText": "体细胞基因治疗的监管需要在基因修饰的治疗前景与脱靶效应、生殖系改变和治疗公平获取的担忧之间取得平衡。",
+    "referenceTranslation": "The regulation of somatic gene therapy involves balancing the therapeutic promise of genetic modification against concerns regarding off-target effects, germline alterations, and equitable access to treatment.",
+    "difficultyLevel": "hard",
+    "topicCategory": "health",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0168",
+    "sourceText": "深度学习中的Transformer架构完全依赖自注意力机制而非循环结构，已成为最先进大语言模型的基础。",
+    "referenceTranslation": "The transformer architecture in deep learning, which relies entirely on self-attention mechanisms rather than recurrence, has become the foundation for state-of-the-art large language models.",
+    "difficultyLevel": "hard",
+    "topicCategory": "education",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0169",
+    "sourceText": "纳什均衡描述了没有任何参与者可以通过单方面偏离来提高收益的战略互动，为分析寡头垄断市场行为提供了基础性解决方案概念。",
+    "referenceTranslation": "Nash equilibrium characterizes strategic interactions in which no player can unilaterally deviate to improve their payoff, providing a foundational solution concept for analyzing oligopolistic market behavior.",
+    "difficultyLevel": "hard",
+    "topicCategory": "business",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0170",
+    "sourceText": "爱德华·萨义德对东方主义的批判审视了西方对中东的学术和艺术表征如何历史性地为殖民统治辩护并建构文化他者性。",
+    "referenceTranslation": "Edward Said's critique of Orientalism examines how Western scholarly and artistic representations of the Middle East have historically served to justify colonial domination and construct cultural otherness.",
+    "difficultyLevel": "hard",
+    "topicCategory": "humanities",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0171",
+    "sourceText": "公交导向型发展规划围绕公共交通节点整合高密度混合用途开发，旨在减少汽车依赖并促进可持续的城市增长模式。",
+    "referenceTranslation": "Transit-oriented development planning integrates high-density mixed-use development around public transportation nodes, aiming to reduce automobile dependency and promote sustainable urban growth patterns.",
+    "difficultyLevel": "hard",
+    "topicCategory": "environment",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0172",
+    "sourceText": "监管政策中的成本效益分析需要对环境质量和人类生命等非市场价值进行量化，引发了关于可通约性的深刻方法论和伦理问题。",
+    "referenceTranslation": "Cost-benefit analysis in regulatory policy requires quantifying non-market values such as environmental quality and human life, raising profound methodological and ethical questions about commensurability.",
+    "difficultyLevel": "hard",
+    "topicCategory": "business",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0173",
+    "sourceText": "冲突后社会中的恢复性司法方法优先通过受害者与施害者之间的对话来修复伤害，为纯粹惩罚性的过渡司法模式提供了替代方案。",
+    "referenceTranslation": "Restorative justice approaches in post-conflict societies prioritize repairing harm through dialogue between victims and perpetrators, offering an alternative to purely retributive models of transitional justice.",
+    "difficultyLevel": "hard",
+    "topicCategory": "humanities",
+    "direction": "zh-en",
+    "wordCount": 1
+  },
+  {
+    "id": "mat_0174",
+    "sourceText": "托马斯·库恩的范式转换概念描述了科学进步不是通过渐进积累发生的，而是通过主导理论框架被推翻的革命性时期发生的。",
+    "referenceTranslation": "Thomas Kuhn's concept of paradigm shifts describes how scientific progress occurs not through gradual accumulation but through revolutionary periods when dominant theoretical frameworks are overturned.",
+    "difficultyLevel": "hard",
+    "topicCategory": "general",
+    "direction": "zh-en",
+    "wordCount": 1
+  }
+]
