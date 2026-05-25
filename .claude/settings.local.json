@@ -1,0 +1,39 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(netstat -ano)",
+      "Bash(./venv/Scripts/python.exe app.py)",
+      "Bash(echo \"PID: $!\")",
+      "Bash(git add *)",
+      "Bash(git commit -m 'fix: 修复实战演练模块离线时所有API调用失败问题 *)",
+      "Bash(git push *)",
+      "Bash(git config *)",
+      "Bash(pip list *)",
+      "Bash(curl *)",
+      "Bash(wc -l integrated_ui.html)",
+      "Bash(awk 'END {print NR}' integrated_ui.html)",
+      "Bash(start \"\" \"integrated_ui.html\")",
+      "Bash(python run_tests.py)",
+      "Bash(python quick_test.py)",
+      "Bash(PYTHONIOENCODING=utf-8 python quick_test.py)",
+      "Bash(git commit -m ' *)",
+      "Bash(taskkill /PID 78676 /F)",
+      "Bash(PYTHONIOENCODING=utf-8 python app.py)",
+      "Bash(taskkill /PID 98332 /F)",
+      "Bash(powershell *)",
+      "Bash(cmd *)",
+      "Bash(python -c \"import subprocess; [subprocess.run\\(['taskkill','/F','/PID',str\\(p\\)], capture_output=True\\) for p in [78676, 98332]]; import time; time.sleep\\(2\\)\")",
+      "Bash(start \"\" \"interpreter_v2.html\")",
+      "Bash(node -e \"const fs = require\\('fs'\\); const html = fs.readFileSync\\('interpreter_v2.html', 'utf8'\\); const match = html.match\\(/const MATERIALS = \\({[\\\\s\\\\S]*?}\\\\s*\\);/\\); if \\(match\\) { const m = eval\\('\\(' + match[1] + '\\)'\\); console.log\\('MATERIALS easy:', m.easy.length\\); console.log\\('MATERIALS medium:', m.medium.length\\); console.log\\('MATERIALS hard:', m.hard.length\\); } else { console.log\\('MATERIALS not found'\\); } const match2 = html.match\\(/const MATERIALS_REVERSE = \\({[\\\\s\\\\S]*?}\\\\s*\\);/\\); if \\(match2\\) { const mr = eval\\('\\(' + match2[1] + '\\)'\\); console.log\\('MATERIALS_REVERSE easy:', mr.easy.length\\); console.log\\('MATERIALS_REVERSE medium:', mr.medium.length\\); console.log\\('MATERIALS_REVERSE hard:', mr.hard.length\\); } else { console.log\\('MATERIALS_REVERSE not found'\\); }\")",
+      "Bash(node -e \"const fs = require\\('fs'\\); const lines = fs.readFileSync\\('interpreter_v2.html', 'utf8'\\).split\\('\\\\n'\\); const l = lines[640]; for\\(let i = 0; i < l.length; i++\\) { const c = l.charCodeAt\\(i\\); if\\(c > 127\\) console.log\\('pos', i, 'char:', l[i], 'code:', c.toString\\(16\\)\\); }\")",
+      "Bash(node -e \"const fs = require\\('fs'\\); const lines = fs.readFileSync\\('interpreter_v2.html', 'utf8'\\).split\\('\\\\n'\\); const l = lines[640]; console.log\\('pos 33 code:', l.charCodeAt\\(33\\).toString\\(16\\), 'char:', JSON.stringify\\(l[33]\\)\\); console.log\\('pos 38 code:', l.charCodeAt\\(38\\).toString\\(16\\), 'char:', JSON.stringify\\(l[38]\\)\\);\")",
+      "Bash(node -e \"const fs = require\\('fs'\\); const html = fs.readFileSync\\('interpreter_v2.html', 'utf8'\\); const match = html.match\\(/const MATERIALS = \\({[\\\\s\\\\S]*?}\\\\s*\\);/\\); if \\(match\\) { const m = eval\\('\\(' + match[1] + '\\)'\\); console.log\\('MATERIALS easy:', m.easy.length\\); console.log\\('MATERIALS medium:', m.medium.length\\); console.log\\('MATERIALS hard:', m.hard.length\\); } const match2 = html.match\\(/const MATERIALS_REVERSE = \\({[\\\\s\\\\S]*?}\\\\s*\\);/\\); if \\(match2\\) { const mr = eval\\('\\(' + match2[1] + '\\)'\\); console.log\\('REVERSE easy:', mr.easy.length\\); console.log\\('REVERSE medium:', mr.medium.length\\); console.log\\('REVERSE hard:', mr.hard.length\\); }\")",
+      "Bash(awk '{print $5}')",
+      "Bash(node -e \"const fs = require\\('fs'\\); const html = fs.readFileSync\\('interpreter_v2.html', 'utf8'\\); const jsStart = html.indexOf\\('<script>'\\); const jsEnd = html.indexOf\\('</script>'\\); const js = html.slice\\(jsStart + 8, jsEnd\\); try { new Function\\(js\\); console.log\\('JS syntax OK'\\); } catch\\(e\\) { console.log\\('Syntax error:', e.message\\); }\")",
+      "Bash(where node *)",
+      "Read(//c//**)",
+      "Bash(\"C:/Program Files/nodejs/node.exe\" -e \"console.log\\('OK'\\)\")",
+      "Bash(\"C:/Program Files \\(x86\\)/nodejs/node.exe\" -e \"console.log\\('OK'\\)\")"
+    ]
+  }
+}
