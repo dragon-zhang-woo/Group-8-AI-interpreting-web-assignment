@@ -18,6 +18,8 @@ venv/
 .claude/
 .kiro/
 
+CLAUDE.md
+
 # IDE
 .vscode/
 .idea/
