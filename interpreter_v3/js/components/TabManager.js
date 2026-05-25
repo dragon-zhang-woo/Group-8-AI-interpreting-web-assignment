@@ -89,7 +89,7 @@ export class TabManager {
 
   _captureState(tabName) {
     const state = {};
-    const dirBtn = document.querySelector(`#tab-${tabName} .dir-btn.active, #tab-${tabName} [data-active="true"]`);
+    const dirBtn = document.querySelector(`#tab-${tabName} .pill.active, #tab-${tabName} [data-active="true"]`);
     if (dirBtn) {
       state.languageDirection = dirBtn.dataset.direction;
     }
