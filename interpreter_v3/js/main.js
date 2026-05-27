@@ -151,7 +151,10 @@ class App {
         self._stopDemoRecognition();
         await self.audioRecorder.stopRecording();
         self._updateDemoRecordingUI(false);
-        if (!document.getElementById('demoRecognitionText').textContent) {
+        
+        // Only show "no valid speech" message if no text was recognized
+        const recognizedText = document.getElementById('demoRecognitionText').textContent;
+        if (!recognizedText) {
           self._showDemoStatus('录音完成，但未识别到有效语音');
         }
       } catch (e) {
@@ -300,30 +303,49 @@ class App {
 
     const recognition = new SR();
     recognition.lang = srcLang === 'zh' ? 'zh-CN' : 'en-US';
-    recognition.continuous = false;
+    recognition.continuous = true;  // Changed to true for continuous recognition
     recognition.interimResults = true;
     recognition.maxAlternatives = 1;
     recognition.abortOnSilence = false;
 
     let recognitionTimeout = null;
+    let silenceTimeout = null;  // Track silence timeout
     let hasReceivedSpeech = false;
+    let recognitionAutoStopped = false;  // Track if recognition auto-stopped
+    let recognitionStartTime = null;  // Track recognition start time
+    const MAX_RECOGNITION_DURATION = 60000;  // 60 seconds max
+    const SILENCE_DURATION = 3000;  // 3 seconds of silence before stopping
 
     recognition.onstart = () => {
       console.log('Speech recognition started');
+      recognitionAutoStopped = false;  // Reset flag on start
+      recognitionStartTime = Date.now();  // Record start time
       document.getElementById('demoLiveInterimBox').classList.remove('hidden');
       document.getElementById('demoLiveInterim').textContent = '监听中...';
       self._showDemoStatus('正在监听语音...');
       
-      // Set timeout to warn if no speech is detected
+      // Set timeout to warn if no speech is detected within 3 seconds
       recognitionTimeout = setTimeout(() => {
         if (!hasReceivedSpeech) {
           self._showDemoStatus('未检测到语音，请确保麦克风已启用并靠近');
         }
       }, 3000);
+
+      // Set max recognition duration to 60 seconds
+      setTimeout(() => {
+        if (self.demoRecognition && recognitionAutoStopped === false) {
+          console.log('Max recognition duration reached, stopping...');
+          self.demoRecognition.stop();
+        }
+      }, MAX_RECOGNITION_DURATION);
     };
 
     recognition.onresult = (event) => {
       hasReceivedSpeech = true;
+      
+      // Clear previous silence timeout and reset
+      if (silenceTimeout) clearTimeout(silenceTimeout);
+      
       let finalText = '';
       let interimText = '';
       
@@ -347,10 +369,19 @@ class App {
         document.getElementById('demoLiveInterim').textContent = interimText;
         self._showDemoStatus('识别中...');
       }
+      
+      // Set silence timeout: stop recognition after 3 seconds of silence
+      silenceTimeout = setTimeout(() => {
+        if (self.demoRecognition && !recognitionAutoStopped) {
+          console.log('Silence detected, stopping recognition...');
+          self.demoRecognition.stop();
+        }
+      }, SILENCE_DURATION);
     };
 
     recognition.onerror = (event) => {
       if (recognitionTimeout) clearTimeout(recognitionTimeout);
+      if (silenceTimeout) clearTimeout(silenceTimeout);
       
       const errorMap = {
         'no-speech': '未检测到语音，请检查：① 麦克风是否连接 ② 是否允许浏览器使用麦克风 ③ 说话是否足够响亮 → 点击"清除"重试',
@@ -374,15 +405,28 @@ class App {
 
     recognition.onend = () => {
       if (recognitionTimeout) clearTimeout(recognitionTimeout);
+      if (silenceTimeout) clearTimeout(silenceTimeout);
       self.demoRecognition = null;
+      recognitionAutoStopped = true;  // Mark that recognition stopped
       document.getElementById('demoLiveInterimBox').classList.add('hidden');
       
-      if (!hasReceivedSpeech && !document.getElementById('demoRecognitionText').textContent) {
+      // If recognition successfully completed (has recognized text), auto-stop AudioRecorder
+      const recognizedText = document.getElementById('demoRecognitionText').textContent;
+      if (recognizedText && self.audioRecorder.isRecording()) {
+        // Auto-stop the audio recorder when speech recognition completes
+        self.audioRecorder.stopRecording().catch(e => {
+          console.error('Error stopping audio recorder after recognition:', e);
+        });
+        self._updateDemoRecordingUI(false);
+      }
+      
+      if (!hasReceivedSpeech && !recognizedText) {
         self._showDemoStatus('');
       }
     };
 
     self.demoRecognition = recognition;
+    self._demoRecognitionAutoStopped = false;  // Reset state on new recognition
     try {
       recognition.start();
     } catch (e) {
