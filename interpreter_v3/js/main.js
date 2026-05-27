@@ -151,7 +151,10 @@ class App {
         self._stopDemoRecognition();
         await self.audioRecorder.stopRecording();
         self._updateDemoRecordingUI(false);
-        if (!document.getElementById('demoRecognitionText').textContent) {
+        
+        // Only show "no valid speech" message if no text was recognized
+        const recognizedText = document.getElementById('demoRecognitionText').textContent;
+        if (!recognizedText) {
           self._showDemoStatus('录音完成，但未识别到有效语音');
         }
       } catch (e) {
@@ -307,9 +310,11 @@ class App {
 
     let recognitionTimeout = null;
     let hasReceivedSpeech = false;
+    let recognitionAutoStopped = false;  // Track if recognition auto-stopped
 
     recognition.onstart = () => {
       console.log('Speech recognition started');
+      recognitionAutoStopped = false;  // Reset flag on start
       document.getElementById('demoLiveInterimBox').classList.remove('hidden');
       document.getElementById('demoLiveInterim').textContent = '监听中...';
       self._showDemoStatus('正在监听语音...');
@@ -375,14 +380,26 @@ class App {
     recognition.onend = () => {
       if (recognitionTimeout) clearTimeout(recognitionTimeout);
       self.demoRecognition = null;
+      recognitionAutoStopped = true;  // Mark that recognition stopped
       document.getElementById('demoLiveInterimBox').classList.add('hidden');
       
-      if (!hasReceivedSpeech && !document.getElementById('demoRecognitionText').textContent) {
+      // If recognition successfully completed (has recognized text), auto-stop AudioRecorder
+      const recognizedText = document.getElementById('demoRecognitionText').textContent;
+      if (recognizedText && self.audioRecorder.isRecording()) {
+        // Auto-stop the audio recorder when speech recognition completes
+        self.audioRecorder.stopRecording().catch(e => {
+          console.error('Error stopping audio recorder after recognition:', e);
+        });
+        self._updateDemoRecordingUI(false);
+      }
+      
+      if (!hasReceivedSpeech && !recognizedText) {
         self._showDemoStatus('');
       }
     };
 
     self.demoRecognition = recognition;
+    self._demoRecognitionAutoStopped = false;  // Reset state on new recognition
     try {
       recognition.start();
     } catch (e) {
