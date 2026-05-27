@@ -30,6 +30,7 @@ class App {
     this.currentAudioBlobId = null;
     this.practiceRecognition = null; // live STT instance during practice recording
     this.demoRecognition = null;      // live STT instance during demo voice input
+    this._demoStopRequested = false;
   }
 
   async init() {
@@ -132,30 +133,39 @@ class App {
       }
     });
 
+    // Clear text input + results
+    document.getElementById('demoClearTextBtn').addEventListener('click', () => {
+      self._resetDemoTextPanel();
+    });
+
     // Voice recording — starts BOTH MediaRecorder and live STT concurrently
     document.getElementById('demoRecordBtn').addEventListener('click', async () => {
       try {
-        self._showDemoStatus('');
-        self._setupDemoVoiceRecognition();
+        self._resetDemoVoiceSession();
+        self._demoStopRequested = false;
+        // Same order as practice: start mic first, then live STT
         await self.audioRecorder.startRecording();
         self._updateDemoRecordingUI(true);
+        self._startDemoLiveRecognition();
       } catch (e) {
         ErrorHandler.showError(e.message, 'permission');
         self._updateDemoRecordingUI(false);
+        self._haltDemoLiveRecognition('abort');
       }
     });
 
     document.getElementById('demoStopBtn').addEventListener('click', async () => {
       try {
         self._updateDemoRecordingUI('processing');
-        self._stopDemoRecognition();
+        await self._haltDemoLiveRecognition('stop');
         await self.audioRecorder.stopRecording();
         self._updateDemoRecordingUI(false);
-        
-        // Only show "no valid speech" message if no text was recognized
-        const recognizedText = document.getElementById('demoRecognitionText').textContent;
+
+        const recognizedText = document.getElementById('demoRecognitionText').textContent.trim();
         if (!recognizedText) {
           self._showDemoStatus('录音完成，但未识别到有效语音');
+        } else {
+          self._showDemoStatus('录音完成！可继续编辑识别结果或点击「翻译此文本」', 'success');
         }
       } catch (e) {
         ErrorHandler.handleAPIError(e, '录音');
@@ -164,14 +174,10 @@ class App {
     });
 
     document.getElementById('demoClearVoiceBtn').addEventListener('click', () => {
+      self._haltDemoLiveRecognition('abort');
       self.audioRecorder.reset();
       self._updateDemoRecordingUI(false);
-      document.getElementById('demoRecognitionBox').classList.add('hidden');
-      document.getElementById('demoRecognitionText').textContent = '';
-      document.getElementById('demoResultBox').classList.add('hidden');
-      document.getElementById('demoResultText').textContent = '';
-      self._showDemoStatus('');
-      self._stopDemoRecognition();
+      self._resetDemoVoicePanel();
     });
 
     // Use recognized text for translation
@@ -216,7 +222,9 @@ class App {
 
     // AudioRecorder state changes
     this.audioRecorder.onRecordingStateChange((isRecording) => {
-      if (!isRecording && document.getElementById('demoStopBtn').style.display !== 'none') {
+      // When AudioRecorder auto-stops (max duration), ensure UI + stop logic runs.
+      // `hidden` uses CSS classes, so `style.display` is unreliable here.
+      if (!isRecording && !document.getElementById('demoStopBtn').classList.contains('hidden')) {
         // Auto-stopped (max duration reached)
         document.getElementById('demoStopBtn').click();
       }
@@ -279,159 +287,145 @@ class App {
     document.getElementById('demoResultText').textContent = result.translatedText;
   }
 
-  _stopDemoRecognition() {
+  _resetDemoTextPanel() {
+    const textEl = document.getElementById('demoSourceText');
+    textEl.value = '';
+    textEl.focus();
+    document.getElementById('demoResultBox').classList.add('hidden');
+    document.getElementById('demoResultText').textContent = '';
+    document.getElementById('demoRecognitionBox').classList.add('hidden');
+    document.getElementById('demoRecognitionText').textContent = '';
+    this.translationEngine.cache.clear();
+    this._showDemoStatus('已清除', 'success');
+  }
+
+  _resetDemoVoicePanel() {
+    document.getElementById('demoRecognitionBox').classList.add('hidden');
+    document.getElementById('demoRecognitionText').textContent = '';
+    document.getElementById('demoResultBox').classList.add('hidden');
+    document.getElementById('demoResultText').textContent = '';
+    document.getElementById('demoLiveInterimBox').classList.add('hidden');
+    document.getElementById('demoLiveInterim').textContent = '';
+    this._showDemoStatus('已清除', 'success');
+  }
+
+  _resetDemoVoiceSession() {
     if (this.demoRecognition) {
       try { this.demoRecognition.abort(); } catch (e) {}
       this.demoRecognition = null;
     }
+    this._showDemoStatus('');
+    document.getElementById('demoRecognitionBox').classList.add('hidden');
+    document.getElementById('demoRecognitionText').textContent = '';
+    document.getElementById('demoResultBox').classList.add('hidden');
+    document.getElementById('demoResultText').textContent = '';
     document.getElementById('demoLiveInterimBox').classList.add('hidden');
     document.getElementById('demoLiveInterim').textContent = '';
   }
 
-  _setupDemoVoiceRecognition() {
-    const self = this;
-    const srcLang = self.languageDirection === 'en-zh' ? 'en' : 'zh';
+  _startDemoLiveRecognition() {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    
     if (!SR) {
       ErrorHandler.showError('您的浏览器不支持语音识别，请使用 Chrome 或 Edge', 'permission');
       return;
     }
 
-    // Stop previous recognition if any
-    self._stopDemoRecognition();
+    if (this.demoRecognition) {
+      try { this.demoRecognition.abort(); } catch (e) {}
+      this.demoRecognition = null;
+    }
 
+    const srcLang = this.languageDirection === 'en-zh' ? 'en' : 'zh';
     const recognition = new SR();
     recognition.lang = srcLang === 'zh' ? 'zh-CN' : 'en-US';
-    recognition.continuous = true;  // Changed to true for continuous recognition
+    recognition.continuous = true;
     recognition.interimResults = true;
-    recognition.maxAlternatives = 1;
-    recognition.abortOnSilence = false;
-
-    let recognitionTimeout = null;
-    let silenceTimeout = null;  // Track silence timeout
-    let hasReceivedSpeech = false;
-    let recognitionAutoStopped = false;  // Track if recognition auto-stopped
-    let recognitionStartTime = null;  // Track recognition start time
-    const MAX_RECOGNITION_DURATION = 60000;  // 60 seconds max
-    const SILENCE_DURATION = 3000;  // 3 seconds of silence before stopping
 
     recognition.onstart = () => {
-      console.log('Speech recognition started');
-      recognitionAutoStopped = false;  // Reset flag on start
-      recognitionStartTime = Date.now();  // Record start time
       document.getElementById('demoLiveInterimBox').classList.remove('hidden');
       document.getElementById('demoLiveInterim').textContent = '监听中...';
-      self._showDemoStatus('正在监听语音...');
-      
-      // Set timeout to warn if no speech is detected within 3 seconds
-      recognitionTimeout = setTimeout(() => {
-        if (!hasReceivedSpeech) {
-          self._showDemoStatus('未检测到语音，请确保麦克风已启用并靠近');
-        }
-      }, 3000);
-
-      // Set max recognition duration to 60 seconds
-      setTimeout(() => {
-        if (self.demoRecognition && recognitionAutoStopped === false) {
-          console.log('Max recognition duration reached, stopping...');
-          self.demoRecognition.stop();
-        }
-      }, MAX_RECOGNITION_DURATION);
+      this._showDemoStatus('正在监听语音...');
     };
 
     recognition.onresult = (event) => {
-      hasReceivedSpeech = true;
-      
-      // Clear previous silence timeout and reset
-      if (silenceTimeout) clearTimeout(silenceTimeout);
-      
+      let interim = '';
       let finalText = '';
-      let interimText = '';
-      
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const transcript = event.results[i][0].transcript;
         if (event.results[i].isFinal) {
-          finalText += transcript + ' ';
+          finalText += transcript;
         } else {
-          interimText += transcript;
+          interim += transcript;
         }
       }
-      
-      finalText = finalText.trim();
-      
+
       if (finalText) {
         document.getElementById('demoRecognitionBox').classList.remove('hidden');
-        document.getElementById('demoRecognitionText').textContent = finalText;
-        document.getElementById('demoLiveInterimBox').classList.add('hidden');
-        self._showDemoStatus('✓ 识别完成', 'success');
-      } else if (interimText) {
-        document.getElementById('demoLiveInterim').textContent = interimText;
-        self._showDemoStatus('识别中...');
+        const el = document.getElementById('demoRecognitionText');
+        const existing = el.textContent.trim();
+        el.textContent = (existing ? `${existing} ${finalText}` : finalText).trim();
       }
-      
-      // Set silence timeout: stop recognition after 3 seconds of silence
-      silenceTimeout = setTimeout(() => {
-        if (self.demoRecognition && !recognitionAutoStopped) {
-          console.log('Silence detected, stopping recognition...');
-          self.demoRecognition.stop();
-        }
-      }, SILENCE_DURATION);
+
+      document.getElementById('demoLiveInterim').textContent = interim || '监听中...';
+      if (interim) {
+        this._showDemoStatus('识别中...');
+      }
     };
 
     recognition.onerror = (event) => {
-      if (recognitionTimeout) clearTimeout(recognitionTimeout);
-      if (silenceTimeout) clearTimeout(silenceTimeout);
-      
-      const errorMap = {
-        'no-speech': '未检测到语音，请检查：① 麦克风是否连接 ② 是否允许浏览器使用麦克风 ③ 说话是否足够响亮 → 点击"清除"重试',
-        'not-allowed': '需要麦克风权限。请在浏览器设置中允许访问麦克风，然后重试',
-        'network': '网络连接不稳定，请检查网络后重试',
-        'aborted': '识别已中止',
-        'bad-grammar': '无法识别，请用更标准的语言重试'
-      };
-      
-      const errorMsg = errorMap[event.error] || `语音识别错误: ${event.error}。请重试`;
-      
-      if (event.error === 'no-speech' || event.error === 'not-allowed') {
-        ErrorHandler.showError(errorMsg, 'permission');
-      } else if (event.error !== 'aborted') {
-        self._showDemoStatus(`❌ ${errorMsg.split('→')[0]}`);
-        console.warn('Demo STT error:', event.error);
+      if (event.error === 'aborted' || event.error === 'no-speech') return;
+      if (event.error === 'not-allowed') {
+        ErrorHandler.showError('需要麦克风权限。请在浏览器设置中允许访问麦克风', 'permission');
+        return;
       }
-      
-      document.getElementById('demoLiveInterimBox').classList.add('hidden');
+      console.warn('Demo STT error:', event.error);
+      this._showDemoStatus(`语音识别错误: ${event.error}`);
     };
 
     recognition.onend = () => {
-      if (recognitionTimeout) clearTimeout(recognitionTimeout);
-      if (silenceTimeout) clearTimeout(silenceTimeout);
-      self.demoRecognition = null;
-      recognitionAutoStopped = true;  // Mark that recognition stopped
-      document.getElementById('demoLiveInterimBox').classList.add('hidden');
-      
-      // If recognition successfully completed (has recognized text), auto-stop AudioRecorder
-      const recognizedText = document.getElementById('demoRecognitionText').textContent;
-      if (recognizedText && self.audioRecorder.isRecording()) {
-        // Auto-stop the audio recorder when speech recognition completes
-        self.audioRecorder.stopRecording().catch(e => {
-          console.error('Error stopping audio recorder after recognition:', e);
-        });
-        self._updateDemoRecordingUI(false);
+      if (this._demoStopRequested || !this.audioRecorder.isRecording()) {
+        if (this.demoRecognition === recognition) this.demoRecognition = null;
+        document.getElementById('demoLiveInterim').textContent = '';
+        return;
       }
-      
-      if (!hasReceivedSpeech && !recognizedText) {
-        self._showDemoStatus('');
+
+      // Chrome may end a session after a pause; keep listening while still recording.
+      if (this.demoRecognition !== recognition) return;
+      try {
+        recognition.start();
+      } catch (e) {
+        setTimeout(() => {
+          if (!this._demoStopRequested && this.audioRecorder.isRecording()) {
+            this._startDemoLiveRecognition();
+          }
+        }, 250);
       }
     };
 
-    self.demoRecognition = recognition;
-    self._demoRecognitionAutoStopped = false;  // Reset state on new recognition
     try {
       recognition.start();
+      this.demoRecognition = recognition;
+      document.getElementById('demoLiveInterimBox').classList.remove('hidden');
+      document.getElementById('demoLiveInterim').textContent = '';
     } catch (e) {
       ErrorHandler.showError('无法启动语音识别: ' + e.message, 'permission');
     }
+  }
+
+  async _haltDemoLiveRecognition(mode = 'stop') {
+    this._demoStopRequested = true;
+    const recognition = this.demoRecognition;
+    if (!recognition) return;
+
+    try {
+      if (mode === 'abort') recognition.abort();
+      else recognition.stop();
+    } catch (e) {}
+
+    await new Promise(resolve => setTimeout(resolve, 350));
+    this.demoRecognition = null;
+    document.getElementById('demoLiveInterimBox').classList.add('hidden');
+    document.getElementById('demoLiveInterim').textContent = '';
   }
 
   _showDemoStatus(msg, type = '') {
@@ -726,7 +720,7 @@ class App {
 
     // AudioRecorder state changes
     this.audioRecorder.onRecordingStateChange((isRecording) => {
-      if (!isRecording && document.getElementById('practiceStopBtn').style.display !== 'none') {
+      if (!isRecording && !document.getElementById('practiceStopBtn').classList.contains('hidden')) {
         // Auto-stopped
         document.getElementById('practiceStopBtn').click();
       }
