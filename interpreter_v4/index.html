@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interpreter V4 - 中英转换训练台</title>
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+  <div class="app" id="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" role="img">
+            <path d="M8 24V9m0 15 8-6m-8 6 8 2m0-8V6m0 12 8-5m-8 13v-8m8-5v10" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="8" cy="9" r="2.5" fill="currentColor"/>
+            <circle cx="16" cy="6" r="2.5" fill="currentColor"/>
+            <circle cx="24" cy="13" r="2.5" fill="currentColor"/>
+            <circle cx="24" cy="23" r="2.5" fill="currentColor"/>
+          </svg>
+        </span>
+        <span>
+          <strong>Interpreter V4</strong>
+          <small>中英转换训练台</small>
+        </span>
+      </div>
+
+      <nav class="surface-tabs" aria-label="主界面">
+        <button class="surface-tab active" data-surface="desk">训练桌面</button>
+        <button class="surface-tab" data-surface="workspace">实战工作区</button>
+        <button class="surface-tab" data-surface="records">学习记录</button>
+      </nav>
+
+      <button class="icon-btn" id="settingsBtn" type="button" aria-label="API 与偏好设置" title="API 与偏好设置">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/>
+        </svg>
+      </button>
+    </header>
+
+    <main>
+      <section class="surface active" id="surface-desk" aria-labelledby="deskTitle">
+        <div class="desk-layout">
+          <div class="desk-heading">
+            <p class="eyebrow">Language Transcoding Workbench</p>
+            <h1 id="deskTitle">我的中英转换训练桌面</h1>
+            <div class="heading-rule" aria-hidden="true"></div>
+          </div>
+
+          <div class="desk-actions">
+            <label class="search-field">
+              <span class="sr-only">搜索训练素材或规则</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m21 21-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              <input id="deskSearch" type="search" placeholder="搜索素材、规则、模块">
+            </label>
+            <select id="deskSort" aria-label="排序">
+              <option value="module">按模块</option>
+              <option value="difficulty">按难度</option>
+              <option value="direction">按方向</option>
+            </select>
+            <div class="segmented" role="group" aria-label="卡片视图">
+              <button class="segment active" data-view="grid" type="button" aria-label="网格视图" title="网格视图">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6H4V4Zm10 0h6v6h-6V4ZM4 14h6v6H4v-6Zm10 0h6v6h-6v-6Z" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+              </button>
+              <button class="segment" data-view="list" type="button" aria-label="列表视图" title="列表视图">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+            <button class="btn primary" id="quickStartBtn" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14m-7-7h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              新练习
+            </button>
+          </div>
+
+          <div class="desk-grid" id="deskCards"></div>
+        </div>
+      </section>
+
+      <section class="surface" id="surface-workspace" aria-labelledby="workspaceTitle">
+        <div class="workspace-shell">
+          <aside class="sidebar" aria-label="规则树">
+            <div class="sidebar-head">
+              <button class="ghost-link" id="backToDeskBtn" type="button">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                桌面
+              </button>
+              <strong>转换规则树</strong>
+            </div>
+            <div class="workspace-switch segmented wide" role="group" aria-label="工作区视图">
+              <button class="segment active" data-workspace-view="practice" type="button">练习</button>
+              <button class="segment" data-workspace-view="map" type="button">规则地图</button>
+            </div>
+            <div class="rule-tree" id="ruleTree"></div>
+          </aside>
+
+          <section class="workspace-main" aria-labelledby="workspaceTitle">
+            <div class="workspace-toolbar">
+              <div>
+                <p class="eyebrow">Practice Workspace</p>
+                <h2 id="workspaceTitle">当前训练</h2>
+              </div>
+              <div class="toolbar-actions">
+                <button class="btn secondary" id="newMaterialBtn" type="button">抽题</button>
+                <button class="btn secondary" id="translateSourceBtn" type="button">机器翻译</button>
+                <button class="btn primary" id="analyzeBtn" type="button">诊断</button>
+              </div>
+            </div>
+
+            <div class="workspace-view active" id="practiceView">
+              <form class="practice-form" id="practiceForm">
+                <div class="control-row">
+                  <label>
+                    <span>方向</span>
+                    <select id="directionSelect">
+                      <option value="zh-en">中 → 英</option>
+                      <option value="en-zh">英 → 中</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>难度</span>
+                    <select id="difficultySelect">
+                      <option value="all">全部</option>
+                      <option value="easy">基础</option>
+                      <option value="medium">进阶</option>
+                      <option value="hard">综合</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>模块</span>
+                    <select id="moduleSelect">
+                      <option value="all">全部模块</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>规则</span>
+                    <select id="ruleSelect">
+                      <option value="all">全部规则</option>
+                    </select>
+                  </label>
+                </div>
+
+                <div class="text-grid">
+                  <label class="field-block source-block">
+                    <span>原文</span>
+                    <textarea id="sourceText" rows="6" placeholder="输入或抽取原文"></textarea>
+                  </label>
+                  <label class="field-block">
+                    <span>参考译文</span>
+                    <textarea id="referenceText" rows="6" placeholder="抽题或机器翻译后生成参考译文"></textarea>
+                  </label>
+                </div>
+
+                <label class="field-block">
+                  <span>你的译文</span>
+                  <textarea id="userTranslation" rows="7" placeholder="输入你的译文，或使用语音识别"></textarea>
+                </label>
+
+                <div class="voice-strip">
+                  <button class="btn secondary" id="recordBtn" type="button">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a4 4 0 0 0 4-4V6a4 4 0 0 0-8 0v4a4 4 0 0 0 4 4Zm7-4a7 7 0 0 1-14 0m7 7v4m-4 0h8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    开始录音
+                  </button>
+                  <button class="btn danger hidden" id="stopRecordBtn" type="button">停止</button>
+                  <button class="btn secondary" id="speakReferenceBtn" type="button">朗读参考</button>
+                  <span class="status-line" id="recordStatus"></span>
+                </div>
+                <div class="interim-line hidden" id="interimLine"></div>
+              </form>
+            </div>
+
+            <div class="workspace-view" id="mapView">
+              <div class="rule-map" id="ruleMap" aria-label="转换规则地图"></div>
+            </div>
+          </section>
+
+          <aside class="feedback-panel" aria-label="诊断反馈">
+            <div class="feedback-head">
+              <p class="eyebrow">Diagnostic Feedback</p>
+              <h2>反馈面板</h2>
+            </div>
+            <div id="feedbackContent" class="feedback-content empty-state">
+              <p>完成一次诊断后，规则触发、思维对比、参考译文和迁移口诀会显示在这里。</p>
+            </div>
+            <button class="btn primary full" id="saveRecordBtn" type="button" disabled>保存本次训练</button>
+          </aside>
+        </div>
+      </section>
+
+      <section class="surface" id="surface-records" aria-labelledby="recordsTitle">
+        <div class="records-layout">
+          <div class="records-head">
+            <div>
+              <p class="eyebrow">Learning Records</p>
+              <h1 id="recordsTitle">学习记录</h1>
+            </div>
+            <div class="records-actions">
+              <button class="btn secondary" id="exportCsvBtn" type="button">导出 CSV</button>
+              <button class="btn danger" id="clearRecordsBtn" type="button">清空</button>
+            </div>
+          </div>
+          <div class="stats-grid" id="statsGrid"></div>
+          <div class="records-table-wrap">
+            <table class="records-table">
+              <thead>
+                <tr>
+                  <th>时间</th>
+                  <th>方向</th>
+                  <th>模块</th>
+                  <th>总分</th>
+                  <th>触发规则</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="recordsTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="modal-backdrop hidden" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <section class="modal-panel">
+        <div class="modal-head">
+          <h2 id="settingsTitle">API 与偏好设置</h2>
+          <button class="icon-btn" id="closeSettingsBtn" type="button" aria-label="关闭设置" title="关闭设置">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <p class="modal-note">密钥只保存在当前浏览器的 localStorage 中。不开启 AI 增强时，本地规则诊断仍可完整运行。</p>
+        <label class="check-row">
+          <input id="aiEnabled" type="checkbox">
+          <span>启用 AI 反馈增强</span>
+        </label>
+        <label>
+          <span>AI Endpoint</span>
+          <input id="aiEndpoint" type="url" placeholder="https://.../v1/chat/completions">
+        </label>
+        <label>
+          <span>AI Model</span>
+          <input id="aiModel" type="text" placeholder="model-name">
+        </label>
+        <label>
+          <span>AI API Key</span>
+          <input id="aiApiKey" type="password" placeholder="仅存储在本地浏览器">
+        </label>
+        <label>
+          <span>DeepL API Key</span>
+          <input id="deeplApiKey" type="password" placeholder="可选，用于机器翻译">
+        </label>
+        <label>
+          <span>主题</span>
+          <select id="themeSelect">
+            <option value="light">纸面浅色</option>
+            <option value="dark">墨色深色</option>
+          </select>
+        </label>
+        <button class="btn primary full" id="saveSettingsBtn" type="button">保存设置</button>
+      </section>
+    </div>
+
+    <div class="modal-backdrop hidden" id="recordModal" role="dialog" aria-modal="true" aria-labelledby="recordModalTitle">
+      <section class="modal-panel wide-modal">
+        <div class="modal-head">
+          <h2 id="recordModalTitle">记录详情</h2>
+          <button class="icon-btn" id="closeRecordBtn" type="button" aria-label="关闭记录详情" title="关闭记录详情">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <div id="recordDetail"></div>
+      </section>
+    </div>
+
+    <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

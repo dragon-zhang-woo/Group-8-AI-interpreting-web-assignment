@@ -1,0 +1,359 @@
+const ERROR_DEFINITIONS = {
+  "verb-piling": {
+    name: "动词并列堆砌",
+    mantra: "一个英文句子先保一个主干，次要动作收进从句、分词或连接词。"
+  },
+  "chinese-order-literalism": {
+    name: "按中文语序直译",
+    mantra: "不要跟着中文逗号走，先找目标语主干再安排背景信息。"
+  },
+  "missing-logical-connector": {
+    name: "缺少逻辑连词",
+    mantra: "看到中文两个短句并排，先问它们是条件、因果、转折还是让步。"
+  },
+  "topic-subject-mismatch": {
+    name: "话题-主语未转换",
+    mantra: "中文话题不等于英文主语，英文必须找出动作真正的承担者。"
+  },
+  "redundancy-category-word": {
+    name: "范畴词 / 冗余未删除",
+    mantra: "遇到“工作、问题、情况、状态、趋势”，先删一遍再译。"
+  },
+  "cultural-imagery-literalism": {
+    name: "文化意象直译",
+    mantra: "成语先译功能，意象只有在目标语能懂时才保留。"
+  },
+  "passive-active-mismatch": {
+    name: "被动 / 主动语态不当",
+    mantra: "英译中多转主动，中译英遇到无施动者常用被动。"
+  }
+};
+
+const CULTURE_PATTERNS = [
+  {
+    source: /对牛弹琴/,
+    literal: /\b(cow|cattle|ox|lute|piano)\b/i,
+    better: "cast pearls before swine / talk to the wrong audience"
+  },
+  {
+    source: /画蛇添足/,
+    literal: /\b(draw|paint).{0,20}\bsnake\b|\bfeet\b/i,
+    better: "unnecessary and overdone"
+  },
+  {
+    source: /摸着石头过河/,
+    literal: /\b(stone|stones|river|cross).{0,30}\b(stone|river|cross)\b/i,
+    better: "take a trial-and-error approach"
+  },
+  {
+    source: /万事俱备，只欠东风/,
+    literal: /\beast wind\b|\bwind\b/i,
+    better: "Everything is ready; only one crucial condition is missing."
+  },
+  {
+    source: /拖泥带水/,
+    literal: /\b(mud|water|drag)\b/i,
+    better: "sloppy and inefficient"
+  }
+];
+
+function normalize(text = "") {
+  return String(text).replace(/\s+/g, " ").trim();
+}
+
+function containsChinese(text) {
+  return /[\u4e00-\u9fff]/.test(text);
+}
+
+function detectDirection(sourceText) {
+  return containsChinese(sourceText) ? "zh-en" : "en-zh";
+}
+
+function tokenizeWords(text) {
+  return normalize(text)
+    .toLowerCase()
+    .replace(/[^a-z0-9\u4e00-\u9fff\s'-]/g, " ")
+    .split(/\s+/)
+    .filter(Boolean);
+}
+
+function clampScore(value) {
+  return Math.max(0, Math.min(3, Number(value.toFixed(1))));
+}
+
+function uniqueFindings(findings) {
+  const seen = new Set();
+  return findings.filter((finding) => {
+    if (!finding || seen.has(finding.id)) return false;
+    seen.add(finding.id);
+    return true;
+  });
+}
+
+export class TranscodingFeedbackEngine {
+  analyze({ sourceText, userTranslation, referenceTranslation = "", direction, mode = "default" }) {
+    const source = normalize(sourceText);
+    const user = normalize(userTranslation);
+    const reference = normalize(referenceTranslation);
+    const activeDirection = direction || detectDirection(source);
+
+    const findings = uniqueFindings([
+      this.detectVerbPiling(source, user, activeDirection),
+      this.detectChineseOrderLiteralism(source, user, activeDirection),
+      this.detectMissingLogicalConnector(source, user, activeDirection),
+      this.detectTopicSubjectMismatch(source, user, activeDirection),
+      this.detectRedundancyCategoryWord(source, user, activeDirection),
+      this.detectCulturalImageryLiteralism(source, user, activeDirection),
+      this.detectPassiveActiveMismatch(source, user, activeDirection)
+    ]);
+
+    const scores = this.score({ sourceText: source, userTranslation: user, referenceTranslation: reference, findings });
+    const triggeredRuleIds = findings.map((finding) => finding.id);
+
+    return {
+      mode,
+      direction: activeDirection,
+      diagnosis: {
+        count: findings.length,
+        triggeredRuleIds,
+        triggeredRuleNames: findings.map((finding) => finding.ruleName),
+        summary:
+          findings.length > 0
+            ? `这句译文触犯了 ${findings.length} 条转换规则：${findings.map((finding) => finding.ruleName).join("、")}。`
+            : "未发现明显转换规则问题，可以继续检查表达自然度和信息完整性。"
+      },
+      breakdown: findings.map((finding) => ({
+        ruleId: finding.id,
+        ruleName: finding.ruleName,
+        chineseThinking: finding.chineseThinking,
+        requirement: finding.requirement,
+        application: finding.application
+      })),
+      referenceTranslation: reference,
+      mantras: findings.length > 0 ? findings.map((finding) => finding.mantra) : ["先抓主干，再处理逻辑，最后打磨自然度。"],
+      scores,
+      feedbackSource: "local",
+      aiNotice: "",
+      createdAt: Date.now()
+    };
+  }
+
+  detectVerbPiling(source, user, direction) {
+    if (direction !== "zh-en" || !user) return null;
+    const lower = user.toLowerCase();
+    const commaClauses = lower.split(/[,;]/).map((part) => part.trim()).filter(Boolean);
+    const hasWeakCommaChain = commaClauses.length >= 3;
+    const hasKnownPattern = /,\s*(cut|laid|lost|now\s+is|now\s+are|is\s+now|are\s+now|looks?|seeks?|wants?)\b/.test(lower);
+    const hasConnectorRepair = /\b(which|who|because|although|while|and|but|so that|therefore|after|before)\b/.test(lower);
+
+    if ((hasWeakCommaChain || hasKnownPattern) && !hasConnectorRepair) {
+      return this.finding(
+        "verb-piling",
+        "学生译文把中文连续动作照搬成英文逗号串，像中文流水句一样一路排下去。",
+        "英语需要明确主句和从属信息，多个谓语不能只靠逗号连接。",
+        `本句应把“${source.slice(0, 22)}...”中的背景动作降级，例如改成 which 从句、分词结构或 and 连接。`
+      );
+    }
+    return null;
+  }
+
+  detectChineseOrderLiteralism(source, user, direction) {
+    if (!user) return null;
+    const lower = user.toLowerCase();
+
+    if (direction === "zh-en") {
+      const startsWithCondition = /^(if|when|because|although)\b/.test(lower);
+      const commaCount = (user.match(/[,;]/g) || []).length;
+      const sourceHasCondition = /如果|要是|若|只要/.test(source);
+      const literalTopic = /^(that|the|this)\s+(house|problem|matter|issue)\s+(you|we|they|i)\b/.test(lower);
+
+      if ((sourceHasCondition && startsWithCondition && commaCount >= 2) || literalTopic) {
+        return this.finding(
+          "chinese-order-literalism",
+          "学生译文跟着中文的先后顺序走，把条件或话题直接放到英文句首。",
+          "英语更重信息主次，常把主命令或主判断提前，再用从句说明条件。",
+          "本句应先确定主句，再把条件、背景或话题转成从句、宾语或独立句。"
+        );
+      }
+    }
+
+    if (direction === "en-zh") {
+      const deCount = (user.match(/的/g) || []).length;
+      const passiveLiteral = /是被|被建造在|被构建在|被设计来/.test(user);
+      if (deCount >= 4 || passiveLiteral) {
+        return this.finding(
+          "chinese-order-literalism",
+          "学生译文保留英文长定语和被动骨架，中文读起来层层套叠。",
+          "汉语更适合短句分述，先说事件，再补背景和条件。",
+          "本句应拆成两到三个短句，减少连续“的”字结构。"
+        );
+      }
+    }
+
+    return null;
+  }
+
+  detectMissingLogicalConnector(source, user, direction) {
+    if (direction !== "zh-en" || !user) return null;
+    const lower = user.toLowerCase();
+    const hasLogicalSource =
+      /你不来，我不走|有.+大家|如果|要是|因为|所以|虽然|但是|否则|以便|为了/.test(source) ||
+      (/，/.test(source) && source.length <= 40);
+    const hasExplicitConnector = /\b(if|because|so that|unless|although|though|while|when|therefore|so|but|and)\b/.test(lower);
+    const hasCommaOnlyJoin = /,\s*(there|we|i|you|he|she|they|it|this|that|the)\b/.test(lower);
+
+    if (hasLogicalSource && (!hasExplicitConnector || hasCommaOnlyJoin)) {
+      return this.finding(
+        "missing-logical-connector",
+        "学生译文让英文读者自己猜条件、因果或目的关系。",
+        "英语句间逻辑必须显化，尤其是条件句和目的句。",
+        "本句应根据语义补出 if, because, so that, unless 等连接词。"
+      );
+    }
+    return null;
+  }
+
+  detectTopicSubjectMismatch(source, user, direction) {
+    if (direction !== "zh-en" || !user) return null;
+    const lower = user.toLowerCase();
+    const sourceTopic = /^(那所房子|这所房子|这个问题|这个项目|这件事|这家公司)/.test(source);
+    const literalTopic = /^(that|this|the)\s+(house|problem|project|matter|company)\s+(you|we|they|i)\b/.test(lower);
+    const missingSubject = /\b(no subject|without subject)\b/.test(lower);
+
+    if (sourceTopic && (literalTopic || missingSubject)) {
+      return this.finding(
+        "topic-subject-mismatch",
+        "学生译文把中文话题当成英文主语，后面又另起执行者。",
+        "英语句子需要清楚的主语和谓语，话题若不是施动者就要转为宾语或拆句。",
+        "本句应把真正执行动作的人或机构放到主语位置，例如 You should have repaired that house."
+      );
+    }
+    return null;
+  }
+
+  detectRedundancyCategoryWord(source, user, direction) {
+    if (direction !== "zh-en" || !user) return null;
+    const lower = user.toLowerCase();
+    const sourceHasCategoryWord = /工作|问题|情况|状态|趋势|方面|任务/.test(source);
+    const targetHasCategoryWord =
+      /\b(work|task)\s+of\b|\bproblem\s+of\b|\bsituation\s+of\b|\bstate\s+of\b|\btrend\s+of\b|\baspect\s+of\b/.test(lower);
+
+    if (sourceHasCategoryWord && targetHasCategoryWord) {
+      return this.finding(
+        "redundancy-category-word",
+        "学生译文把中文空泛范畴词原样带入英文。",
+        "英文倾向直接表达核心概念，空泛名词会让表达拖沓。",
+        "本句应删除 work/problem/situation 等壳词，直接说 strengthen environmental protection 一类结构。"
+      );
+    }
+    return null;
+  }
+
+  detectCulturalImageryLiteralism(source, user, direction) {
+    if (direction !== "zh-en" || !user) return null;
+    const match = CULTURE_PATTERNS.find((pattern) => pattern.source.test(source) && pattern.literal.test(user));
+    if (!match) return null;
+
+    return this.finding(
+      "cultural-imagery-literalism",
+      "学生译文保留了中文文化意象，但没有保证英语读者能理解其功能。",
+      "文化负载词要优先传达交际功能，必要时用功能对应或意译。",
+      `本句更适合译成 ${match.better}，而不是逐字保留原意象。`
+    );
+  }
+
+  detectPassiveActiveMismatch(source, user, direction) {
+    if (!user) return null;
+
+    if (direction === "zh-en") {
+      const sourceNoAgentPassive = /问题已经解决了|已经完成了|已经确定了|已经批准了|已经公布了|得到解决/.test(source);
+      const lower = user.toLowerCase();
+      const hasEnglishPassive = /\b(is|are|was|were|be|been|being|has been|have been)\s+\w+(ed|en)\b/.test(lower);
+      if (sourceNoAgentPassive && !hasEnglishPassive) {
+        return this.finding(
+          "passive-active-mismatch",
+          "学生译文没有处理中文无施动者句，只是顺着中文主动语气说。",
+          "英语遇到施动者不明或不重要时，常用被动语态让对象成为主语。",
+          "本句应译为 The problem has been solved. 这类被动结构。"
+        );
+      }
+    }
+
+    if (direction === "en-zh") {
+      const sourcePassive = /\b(was|were|is|are|been|being)\s+\w+(ed|en)\b/.test(source.toLowerCase());
+      const overPassiveChinese = /是被|被建造|被构建|被设计|被摧毁|被制造/.test(user);
+      if (sourcePassive && overPassiveChinese) {
+        return this.finding(
+          "passive-active-mismatch",
+          "学生译文机械保留英文被动，导致中文出现生硬的“是被...”结构。",
+          "汉语更常把被动改成主动或拆成短句，必要时补出泛指施动者。",
+          "本句应改为“地震摧毁了许多建筑。这些建筑当初建造时...”这样的主动短句。"
+        );
+      }
+    }
+
+    return null;
+  }
+
+  score({ sourceText, userTranslation, referenceTranslation, findings }) {
+    const accuracy = this.scoreAccuracy(userTranslation, referenceTranslation, findings);
+    const fluency = this.scoreFluency(userTranslation);
+    const pronunciation = this.scorePronunciation(userTranslation, referenceTranslation);
+    return {
+      pronunciation,
+      fluency,
+      accuracy,
+      total: clampScore((pronunciation + fluency + accuracy) / 3)
+    };
+  }
+
+  scoreAccuracy(userTranslation, referenceTranslation, findings) {
+    if (!userTranslation || !referenceTranslation) return 0;
+    const refBigrams = this.bigrams(referenceTranslation);
+    const userBigrams = this.bigrams(userTranslation);
+    const intersection = userBigrams.filter((item) => refBigrams.includes(item)).length;
+    const union = new Set([...refBigrams, ...userBigrams]).size || 1;
+    const bigramScore = intersection / union;
+    const penalty = Math.min(1.2, findings.length * 0.22);
+    return clampScore(bigramScore * 3.2 - penalty + 0.2);
+  }
+
+  scoreFluency(userTranslation) {
+    if (!userTranslation) return 0;
+    const fillerCount = (userTranslation.match(/\b(um|uh|er|like|you know|i mean)\b|嗯|啊|呃|那个|这个|就是说/gim) || []).length;
+    const repeatedCount = (userTranslation.match(/\b(\w+)\s+\1\b/gi) || []).length;
+    const commaRun = (userTranslation.match(/,\s*[^,]+,\s*[^,]+,/g) || []).length;
+    return clampScore(3 - fillerCount * 0.45 - repeatedCount * 0.55 - commaRun * 0.35);
+  }
+
+  scorePronunciation(userTranslation, referenceTranslation) {
+    if (!userTranslation || !referenceTranslation) return 0;
+    const userWords = tokenizeWords(userTranslation);
+    const refWords = new Set(tokenizeWords(referenceTranslation));
+    if (userWords.length === 0) return 0;
+    const overlap = userWords.filter((word) => refWords.has(word)).length / Math.max(userWords.length, refWords.size, 1);
+    return clampScore(1.5 + overlap * 1.5);
+  }
+
+  bigrams(text) {
+    const compact = normalize(text).replace(/\s+/g, "");
+    if (compact.length < 2) return compact ? [compact] : [];
+    const result = [];
+    for (let i = 0; i < compact.length - 1; i += 1) result.push(compact.slice(i, i + 2).toLowerCase());
+    return result;
+  }
+
+  finding(id, chineseThinking, requirement, application) {
+    const definition = ERROR_DEFINITIONS[id];
+    return {
+      id,
+      ruleName: definition.name,
+      chineseThinking,
+      requirement,
+      application,
+      mantra: definition.mantra
+    };
+  }
+}
+
+export { ERROR_DEFINITIONS };

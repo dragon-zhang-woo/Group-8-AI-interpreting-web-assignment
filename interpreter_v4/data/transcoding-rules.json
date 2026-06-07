@@ -1,0 +1,90 @@
+{
+  "modules": [
+    {
+      "id": "hypotaxis-parataxis",
+      "title": "形合 vs 意合",
+      "summary": "汉语常靠语义隐含逻辑，英语需要把条件、因果、让步、转折等关系显化。",
+      "errorTypes": ["missing-logical-connector", "verb-piling"],
+      "mantra": "中文靠意会，英文要接线。"
+    },
+    {
+      "id": "topic-subject",
+      "title": "话题-评论 vs 主谓结构",
+      "summary": "汉译英时要把中文话题改造成英语主语，必要时补出主语或拆句。",
+      "errorTypes": ["topic-subject-mismatch", "chinese-order-literalism"],
+      "mantra": "中文先摆话题，英文先立主语。"
+    },
+    {
+      "id": "syntax-integration",
+      "title": "句法整合",
+      "summary": "中译英要避免多个动作用逗号硬拼，英译中要拆开过长修饰链。",
+      "errorTypes": ["verb-piling", "chinese-order-literalism"],
+      "mantra": "主干先站稳，旁枝再收进从句或分词。"
+    },
+    {
+      "id": "static-dynamic",
+      "title": "词性 / 语态 / 主语转换",
+      "summary": "英语偏静态、名词化、物称主语和被动结构；汉语偏动态、主动和人称表达。",
+      "errorTypes": ["passive-active-mismatch", "topic-subject-mismatch"],
+      "mantra": "英译要定骨架，汉译要顺口气。"
+    },
+    {
+      "id": "logic-redundancy",
+      "title": "冗余 / 逻辑 / 文化",
+      "summary": "删除汉语范畴词和同义堆叠，为英文补出显性逻辑，文化词按功能或意义转换。",
+      "errorTypes": ["redundancy-category-word", "missing-logical-connector", "cultural-imagery-literalism"],
+      "mantra": "废话删掉，逻辑补上，文化换功能。"
+    },
+    {
+      "id": "culture-loaded",
+      "title": "文化负载词实战",
+      "summary": "成语、俗语和政策性表达要优先传达交际功能，避免生硬直译。",
+      "errorTypes": ["cultural-imagery-literalism"],
+      "mantra": "能对等就对等，不能对等就解释，解释太重就意译。"
+    }
+  ],
+  "errorTypes": [
+    {
+      "id": "verb-piling",
+      "name": "动词并列堆砌",
+      "description": "多个完整英文谓语只用逗号连接，缺少主从结构、分词结构或连接词。",
+      "defaultFix": "把次要动作改成定语从句、分词结构，或用 and/because/while 等连接。"
+    },
+    {
+      "id": "chinese-order-literalism",
+      "name": "按中文语序直译",
+      "description": "译文保留中文信息顺序和停顿方式，没有重排主次或拆分长定语。",
+      "defaultFix": "先确定目标语主干，再把条件、背景、补充信息放到合适位置。"
+    },
+    {
+      "id": "missing-logical-connector",
+      "name": "缺少逻辑连词",
+      "description": "英语句间逻辑靠逗号或并列硬接，条件、因果、让步等关系没有显化。",
+      "defaultFix": "根据原文语义补出 if, because, so that, unless, although, while 等连接词。"
+    },
+    {
+      "id": "topic-subject-mismatch",
+      "name": "话题-主语未转换",
+      "description": "中文话题被照搬成英文句首，导致英语主语不清或结构不自然。",
+      "defaultFix": "把真正执行动作的人、物、事件改成英语主语；话题太长时拆句或用 it。"
+    },
+    {
+      "id": "redundancy-category-word",
+      "name": "范畴词 / 冗余未删除",
+      "description": "把“工作、问题、情况、状态、趋势”等范畴词直译进英文，造成累赘。",
+      "defaultFix": "删除空泛范畴词，直接表达核心名词或动作。"
+    },
+    {
+      "id": "cultural-imagery-literalism",
+      "name": "文化意象直译",
+      "description": "成语、俗语或文化表达按字面翻译，目标语读者难以理解。",
+      "defaultFix": "优先功能对应，其次直译加解释，再其次意译。"
+    },
+    {
+      "id": "passive-active-mismatch",
+      "name": "被动 / 主动语态不当",
+      "description": "中译英时该用被动却没有用；英译中时机械保留英文被动。",
+      "defaultFix": "无明确施动者的中文常译为英文被动；英文被动译中时常拆句并转主动。"
+    }
+  ]
+}

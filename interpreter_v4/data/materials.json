@@ -1,0 +1,134 @@
+[
+  {
+    "id": "v4_zh_en_001",
+    "sourceText": "这家公司去年亏损严重，裁掉了30%的员工，现在正在寻找新的投资者。",
+    "referenceTranslation": "This company, which suffered heavy losses and laid off 30% of its employees last year, is now looking for new investors.",
+    "difficultyLevel": "medium",
+    "topicCategory": "business",
+    "direction": "zh-en",
+    "wordCount": 35,
+    "focusModule": "syntax-integration",
+    "focusRules": ["verb-piling", "chinese-order-literalism"]
+  },
+  {
+    "id": "v4_en_zh_001",
+    "sourceText": "Many of the buildings destroyed in the earthquake were constructed without proper safety standards.",
+    "referenceTranslation": "地震摧毁了许多建筑。这些建筑当初建造时，没有遵循适当的安全标准。",
+    "difficultyLevel": "medium",
+    "topicCategory": "public-safety",
+    "direction": "en-zh",
+    "wordCount": 13,
+    "focusModule": "static-dynamic",
+    "focusRules": ["passive-active-mismatch", "chinese-order-literalism"]
+  },
+  {
+    "id": "v4_zh_en_002",
+    "sourceText": "你不来，我不走。",
+    "referenceTranslation": "I will not leave if you do not come.",
+    "difficultyLevel": "easy",
+    "topicCategory": "daily",
+    "direction": "zh-en",
+    "wordCount": 7,
+    "focusModule": "hypotaxis-parataxis",
+    "focusRules": ["missing-logical-connector"]
+  },
+  {
+    "id": "v4_zh_en_003",
+    "sourceText": "那所房子你们早该修了。",
+    "referenceTranslation": "You should have repaired that house long ago.",
+    "difficultyLevel": "easy",
+    "topicCategory": "daily",
+    "direction": "zh-en",
+    "wordCount": 8,
+    "focusModule": "topic-subject",
+    "focusRules": ["topic-subject-mismatch"]
+  },
+  {
+    "id": "v4_zh_en_004",
+    "sourceText": "我们要加强环境保护的工作。",
+    "referenceTranslation": "We should strengthen environmental protection.",
+    "difficultyLevel": "easy",
+    "topicCategory": "environment",
+    "direction": "zh-en",
+    "wordCount": 6,
+    "focusModule": "logic-redundancy",
+    "focusRules": ["redundancy-category-word"]
+  },
+  {
+    "id": "v4_zh_en_005",
+    "sourceText": "他做事总是拖泥带水，客户很不满意。",
+    "referenceTranslation": "The client is very dissatisfied with his sloppy and inefficient work style.",
+    "difficultyLevel": "medium",
+    "topicCategory": "business",
+    "direction": "zh-en",
+    "wordCount": 13,
+    "focusModule": "culture-loaded",
+    "focusRules": ["cultural-imagery-literalism"]
+  },
+  {
+    "id": "v4_zh_en_006",
+    "sourceText": "这个项目要摸着石头过河，边做边调整。",
+    "referenceTranslation": "We need to take a trial-and-error approach in this project and adjust as we go.",
+    "difficultyLevel": "medium",
+    "topicCategory": "project",
+    "direction": "zh-en",
+    "wordCount": 15,
+    "focusModule": "culture-loaded",
+    "focusRules": ["cultural-imagery-literalism"]
+  },
+  {
+    "id": "v4_zh_en_007",
+    "sourceText": "问题已经解决了。",
+    "referenceTranslation": "The problem has been solved.",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "zh-en",
+    "wordCount": 5,
+    "focusModule": "static-dynamic",
+    "focusRules": ["passive-active-mismatch"]
+  },
+  {
+    "id": "v4_en_zh_002",
+    "sourceText": "The proposal put forward by a researcher who joined the team only three months ago has attracted wide attention.",
+    "referenceTranslation": "一名研究员提出了这项议案。他三个月前才加入团队，这项议案已经引起广泛关注。",
+    "difficultyLevel": "hard",
+    "topicCategory": "academic",
+    "direction": "en-zh",
+    "wordCount": 17,
+    "focusModule": "syntax-integration",
+    "focusRules": ["chinese-order-literalism"]
+  },
+  {
+    "id": "v4_zh_en_008",
+    "sourceText": "如果你不能来，请提前告诉我们，我们可以重新安排时间。",
+    "referenceTranslation": "Please let us know in advance if you cannot come, so that we can reschedule.",
+    "difficultyLevel": "medium",
+    "topicCategory": "coordination",
+    "direction": "zh-en",
+    "wordCount": 14,
+    "focusModule": "hypotaxis-parataxis",
+    "focusRules": ["missing-logical-connector", "chinese-order-literalism"]
+  },
+  {
+    "id": "v4_en_zh_003",
+    "sourceText": "The policy was designed to reduce waste and encourage companies to reuse materials.",
+    "referenceTranslation": "这项政策旨在减少浪费，并鼓励企业重复利用材料。",
+    "difficultyLevel": "medium",
+    "topicCategory": "policy",
+    "direction": "en-zh",
+    "wordCount": 13,
+    "focusModule": "static-dynamic",
+    "focusRules": ["passive-active-mismatch"]
+  },
+  {
+    "id": "v4_zh_en_009",
+    "sourceText": "万事俱备，只欠东风。",
+    "referenceTranslation": "Everything is ready; only one crucial condition is still missing.",
+    "difficultyLevel": "hard",
+    "topicCategory": "culture",
+    "direction": "zh-en",
+    "wordCount": 8,
+    "focusModule": "culture-loaded",
+    "focusRules": ["cultural-imagery-literalism", "missing-logical-connector"]
+  }
+]
