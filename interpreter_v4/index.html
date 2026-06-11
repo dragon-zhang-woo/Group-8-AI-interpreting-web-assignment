@@ -115,6 +115,7 @@
                   <label>
                     <span>方向</span>
                     <select id="directionSelect">
+                      <option value="auto" selected>自动检测</option>
                       <option value="zh-en">中 → 英</option>
                       <option value="en-zh">英 → 中</option>
                     </select>
@@ -154,8 +155,8 @@
                 </div>
 
                 <label class="field-block">
-                  <span>你的译文</span>
-                  <textarea id="userTranslation" rows="7" placeholder="输入你的译文，或使用语音识别"></textarea>
+                  <span>你的译文（可选）</span>
+                  <textarea id="userTranslation" rows="7" placeholder="输入译文可做精确纠错；留空则进入原文直诊"></textarea>
                 </label>
 
                 <div class="voice-strip">
@@ -201,7 +202,39 @@
               <button class="btn danger" id="clearRecordsBtn" type="button">清空</button>
             </div>
           </div>
+          <div class="record-filter-bar" aria-label="学习记录筛选">
+            <label>
+              <span>模块</span>
+              <select id="recordModuleFilter">
+                <option value="all">全部模块</option>
+              </select>
+            </label>
+            <label>
+              <span>规则</span>
+              <select id="recordRuleFilter">
+                <option value="all">全部规则</option>
+              </select>
+            </label>
+            <button class="btn secondary" id="resetRecordFiltersBtn" type="button">重置筛选</button>
+            <span class="status-line" id="recordFilterSummary"></span>
+          </div>
           <div class="stats-grid" id="statsGrid"></div>
+          <div class="records-insights">
+            <section class="insight-card" aria-labelledby="trendTitle">
+              <div class="insight-head">
+                <h2 id="trendTitle">分数趋势</h2>
+                <span class="tag teal" id="trendCount">0 次</span>
+              </div>
+              <div class="trend-chart" id="scoreTrend"></div>
+            </section>
+            <section class="insight-card" aria-labelledby="rulesTitle">
+              <div class="insight-head">
+                <h2 id="rulesTitle">规则频次</h2>
+                <span class="tag amber" id="ruleCountSummary">0 类</span>
+              </div>
+              <div class="rule-frequency" id="ruleFrequency"></div>
+            </section>
+          </div>
           <div class="records-table-wrap">
             <table class="records-table">
               <thead>

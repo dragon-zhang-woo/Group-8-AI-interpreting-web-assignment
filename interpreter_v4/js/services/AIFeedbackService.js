@@ -6,6 +6,14 @@ Do not remove locally detected rule violations.
 Feedback must follow this teaching logic: diagnosis, thinking contrast, reference translation, transferable mantra.
 `;
 
+const FALLBACK_RUBRIC = {
+  role: "中英转换训练专家",
+  modes: ["默认模式：直接给出译文与训练反馈", "备选模式：按方向、难度、模块逐题训练"],
+  modules: ["形合 vs 意合", "话题-评论 vs 主谓结构", "句法整合", "词性/语态/主语转换", "冗余/逻辑/文化", "文化负载词实战"],
+  requiredScans: ["动词并列堆砌", "按中文语序直译", "缺少逻辑连词", "话题-主语未转换", "范畴词/冗余未删除", "文化意象直译", "被动/主动语态不当"],
+  feedbackTemplate: ["诊断", "拆解：中文思维 / 目标语要求 / 本句应用", "参考译文", "迁移口诀"]
+};
+
 function extractJson(text) {
   const trimmed = text.trim();
   if (trimmed.startsWith("{")) return JSON.parse(trimmed);
@@ -27,8 +35,13 @@ function isValidReport(value) {
 }
 
 export class AIFeedbackService {
-  constructor(settings = {}) {
+  constructor(settings = {}, rubric = FALLBACK_RUBRIC) {
     this.settings = settings;
+    this.rubric = rubric || FALLBACK_RUBRIC;
+  }
+
+  setRubric(rubric) {
+    this.rubric = rubric || FALLBACK_RUBRIC;
   }
 
   get enabled() {
@@ -44,7 +57,7 @@ export class AIFeedbackService {
     if (!this.enabled) return localReport;
 
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 18000);
+    const timeout = setTimeout(() => controller.abort(), this.settings.aiTimeoutMs || 18000);
 
     try {
       const response = await fetch(this.settings.aiEndpoint, {
@@ -63,6 +76,7 @@ export class AIFeedbackService {
               role: "user",
               content: JSON.stringify({
                 task: "Enhance this deterministic training report without changing its schema.",
+                rubric: this.rubric || FALLBACK_RUBRIC,
                 context,
                 localReport
               })

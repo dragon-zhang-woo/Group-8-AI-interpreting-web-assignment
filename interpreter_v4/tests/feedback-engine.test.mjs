@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { TranscodingFeedbackEngine } from "../js/components/TranscodingFeedbackEngine.js";
+import { AIFeedbackService } from "../js/services/AIFeedbackService.js";
 
 const engine = new TranscodingFeedbackEngine();
 
@@ -78,6 +79,33 @@ assert.ok(
   "Expected over-literal Chinese order to be detected for the passive EN-ZH example."
 );
 
+const sourceOnlyZh = report({
+  sourceText: "你不来，我不走。",
+  userTranslation: "",
+  referenceTranslation: "I will not leave if you do not come."
+});
+assert.equal(sourceOnlyZh.direction, "zh-en");
+assert.ok(sourceOnlyZh.diagnosis.triggeredRuleIds.includes("missing-logical-connector"));
+assert.equal(sourceOnlyZh.mode, "default");
+
+const sourceOnlyEn = report({
+  sourceText: "The proposal put forward by a researcher who joined the team only three months ago has attracted wide attention.",
+  userTranslation: "",
+  referenceTranslation: "一名研究员提出了这项议案。他三个月前才加入团队，这项议案已经引起广泛关注。"
+});
+assert.equal(sourceOnlyEn.direction, "en-zh");
+assert.ok(sourceOnlyEn.breakdown.some((item) => item.diagnosticLabel === "的的不休"));
+
+const deRunReport = assertTriggered(
+  {
+    sourceText: "The proposal put forward by a researcher who joined the team only three months ago has attracted wide attention.",
+    userTranslation: "一位三个月前才加入团队的研究员提出的已经被广泛关注的议案。",
+    direction: "en-zh"
+  },
+  "chinese-order-literalism"
+);
+assert.ok(deRunReport.breakdown.some((item) => item.diagnosticLabel === "的的不休"));
+
 const cleanReport = report({
   sourceText: "问题已经解决了。",
   userTranslation: "The problem has been solved.",
@@ -86,5 +114,18 @@ const cleanReport = report({
 });
 assert.equal(cleanReport.feedbackSource, "local");
 assert.deepEqual(cleanReport.scores.total >= 0 && cleanReport.scores.total <= 3, true);
+
+const noKeyReport = await new AIFeedbackService({}).enhance(cleanReport, {});
+assert.equal(noKeyReport.feedbackSource, "local");
+
+const fallbackReport = await new AIFeedbackService({
+  aiEnabled: true,
+  aiEndpoint: "http://127.0.0.1:9/v1/chat/completions",
+  aiModel: "invalid-model",
+  aiApiKey: "test-key",
+  aiTimeoutMs: 500
+}).enhance(cleanReport, {});
+assert.equal(fallbackReport.feedbackSource, "local-fallback");
+assert.ok(fallbackReport.aiNotice.includes("AI 增强未完成"));
 
 console.log("feedback-engine tests passed");

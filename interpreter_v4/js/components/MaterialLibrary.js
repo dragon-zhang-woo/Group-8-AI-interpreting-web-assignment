@@ -19,13 +19,13 @@ export class MaterialLibrary {
     return this.materials.find((material) => material.id === id) || null;
   }
 
-  getRandom({ direction = "zh-en", difficulty = "all", focusModule = "all", focusRule = "all" } = {}) {
-    let pool = this.materials.filter((material) => material.direction === direction);
+  getRandom({ direction = "all", difficulty = "all", focusModule = "all", focusRule = "all" } = {}) {
+    let pool = direction === "all" || direction === "auto" ? [...this.materials] : this.materials.filter((material) => material.direction === direction);
     if (difficulty !== "all") pool = pool.filter((material) => material.difficultyLevel === difficulty);
     if (focusModule !== "all") pool = pool.filter((material) => material.focusModule === focusModule);
     if (focusRule !== "all") pool = pool.filter((material) => material.focusRules?.includes(focusRule));
 
-    if (pool.length === 0) pool = this.materials.filter((material) => material.direction === direction);
+    if (pool.length === 0 && direction !== "all" && direction !== "auto") pool = this.materials.filter((material) => material.direction === direction);
     if (pool.length === 0) pool = [...this.materials];
 
     const recentIds = this.storage.getRecentMaterialIds();

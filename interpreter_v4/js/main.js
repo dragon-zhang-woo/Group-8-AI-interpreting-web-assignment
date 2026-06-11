@@ -3,7 +3,7 @@ import { IndexedDBManager } from "./storage/IndexedDBManager.js";
 import { TranslationService } from "./services/TranslationService.js";
 import { AIFeedbackService } from "./services/AIFeedbackService.js";
 import { AudioRecorder, SpeechRecognitionService, SpeechSynthesisService } from "./services/SpeechService.js";
-import { TranscodingFeedbackEngine, ERROR_DEFINITIONS } from "./components/TranscodingFeedbackEngine.js";
+import { TranscodingFeedbackEngine, ERROR_DEFINITIONS, detectDirection } from "./components/TranscodingFeedbackEngine.js";
 import { MaterialLibrary } from "./components/MaterialLibrary.js";
 import { RecordManager } from "./components/RecordManager.js";
 
@@ -11,6 +11,7 @@ const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
 
 const directionLabel = {
+  auto: "自动检测",
   "zh-en": "中 → 英",
   "en-zh": "英 → 中"
 };
@@ -51,11 +52,14 @@ class InterpreterV4App {
     this.speechSynthesis = new SpeechSynthesisService();
     this.audioRecorder = new AudioRecorder();
     this.rules = { modules: [], errorTypes: [] };
+    this.rubric = null;
     this.currentMaterial = null;
     this.currentReport = null;
     this.currentAudioBlobId = "";
     this.recordsCache = [];
     this.deskView = "grid";
+    this.recordModuleFilter = "all";
+    this.recordRuleFilter = "all";
   }
 
   async init() {
@@ -63,7 +67,8 @@ class InterpreterV4App {
     this.bindGlobalEvents();
 
     try {
-      await Promise.all([this.loadRules(), this.materials.load(), this.db.init()]);
+      await Promise.all([this.loadRules(), this.loadRubric(), this.materials.load(), this.db.init()]);
+      this.aiFeedback.setRubric(this.rubric);
       this.records = new RecordManager(this.db);
       this.populateControls();
       this.bindWorkspaceEvents();
@@ -83,6 +88,17 @@ class InterpreterV4App {
     const response = await fetch("data/transcoding-rules.json");
     if (!response.ok) throw new Error("规则库加载失败。");
     this.rules = await response.json();
+  }
+
+  async loadRubric() {
+    try {
+      const response = await fetch("data/interpret-rubric.json");
+      if (!response.ok) throw new Error("rubric request failed");
+      this.rubric = await response.json();
+    } catch (error) {
+      console.warn("Rubric loading failed; using AI service fallback rubric.", error);
+      this.rubric = null;
+    }
   }
 
   bindGlobalEvents() {
@@ -116,6 +132,21 @@ class InterpreterV4App {
       this.pickMaterial();
     });
     $("#backToDeskBtn").addEventListener("click", () => this.showSurface("desk"));
+    $("#recordModuleFilter").addEventListener("change", () => {
+      this.recordModuleFilter = $("#recordModuleFilter").value;
+      if (this.recordModuleFilter !== "all" && $("#moduleSelect").value !== this.recordModuleFilter) {
+        $("#moduleSelect").value = this.recordModuleFilter;
+      }
+      this.renderRecords();
+    });
+    $("#recordRuleFilter").addEventListener("change", () => {
+      this.recordRuleFilter = $("#recordRuleFilter").value;
+      if (this.recordRuleFilter !== "all" && $("#ruleSelect").value !== this.recordRuleFilter) {
+        $("#ruleSelect").value = this.recordRuleFilter;
+      }
+      this.renderRecords();
+    });
+    $("#resetRecordFiltersBtn").addEventListener("click", () => this.syncRecordFilters("all", "all"));
   }
 
   bindWorkspaceEvents() {
@@ -138,6 +169,7 @@ class InterpreterV4App {
       $(`#${id}`).addEventListener("change", () => {
         this.saveDraft();
         if (id === "moduleSelect" || id === "ruleSelect") {
+          this.syncRecordFilters($("#moduleSelect").value, $("#ruleSelect").value, { silent: true });
           this.renderRuleTree();
           this.renderRuleMap();
         }
@@ -168,6 +200,8 @@ class InterpreterV4App {
     ruleSelect.innerHTML = `<option value="all">全部规则</option>${this.rules.errorTypes
       .map((rule) => `<option value="${rule.id}">${escapeHtml(rule.name)}</option>`)
       .join("")}`;
+    $("#recordModuleFilter").innerHTML = moduleSelect.innerHTML;
+    $("#recordRuleFilter").innerHTML = ruleSelect.innerHTML;
   }
 
   renderDesk() {
@@ -264,20 +298,14 @@ class InterpreterV4App {
 
     $$(".tree-module > button").forEach((button) => {
       button.addEventListener("click", () => {
-        $("#moduleSelect").value = button.dataset.moduleId;
-        $("#ruleSelect").value = "all";
+        this.applyPracticeFilters(button.dataset.moduleId, "all");
         this.saveDraft();
-        this.renderRuleTree();
-        this.renderRuleMap();
       });
     });
     $$(".tree-rule").forEach((button) => {
       button.addEventListener("click", () => {
-        $("#moduleSelect").value = button.dataset.parentModule;
-        $("#ruleSelect").value = button.dataset.ruleId;
+        this.applyPracticeFilters(button.dataset.parentModule, button.dataset.ruleId);
         this.saveDraft();
-        this.renderRuleTree();
-        this.renderRuleMap();
       });
     });
   }
@@ -333,7 +361,12 @@ class InterpreterV4App {
 
     const nodeMarkup = nodes
       .map((node) => {
-        const isActive = node.id === activeModule || node.ruleId === activeRule;
+        const isActive =
+          node.type === "module"
+            ? node.id === activeModule
+            : node.type === "rule"
+              ? node.ruleId === activeRule && (activeModule === "all" || node.parentId === activeModule)
+              : false;
         const attrs =
           node.type === "module"
             ? `data-map-module="${node.id}"`
@@ -349,25 +382,45 @@ class InterpreterV4App {
     $("#ruleMap").innerHTML = `<div class="map-canvas">${linkMarkup}${nodeMarkup}</div>`;
     $$("[data-map-module]").forEach((button) => {
       button.addEventListener("click", () => {
-        $("#moduleSelect").value = button.dataset.mapModule;
-        $("#ruleSelect").value = "all";
-        this.renderRuleTree();
-        this.renderRuleMap();
+        this.applyPracticeFilters(button.dataset.mapModule, "all");
       });
     });
     $$("[data-map-rule]").forEach((button) => {
       button.addEventListener("click", () => {
-        $("#moduleSelect").value = button.dataset.mapParent;
-        $("#ruleSelect").value = button.dataset.mapRule;
-        this.renderRuleTree();
-        this.renderRuleMap();
+        this.applyPracticeFilters(button.dataset.mapParent, button.dataset.mapRule);
       });
     });
   }
 
+  applyPracticeFilters(moduleId = "all", ruleId = "all") {
+    $("#moduleSelect").value = moduleId;
+    $("#ruleSelect").value = ruleId;
+    this.syncRecordFilters(moduleId, ruleId);
+    this.renderRuleTree();
+    this.renderRuleMap();
+    this.saveDraft();
+  }
+
+  syncRecordFilters(moduleId = "all", ruleId = "all", { silent = false } = {}) {
+    this.recordModuleFilter = moduleId || "all";
+    this.recordRuleFilter = ruleId || "all";
+    if ($("#recordModuleFilter")) $("#recordModuleFilter").value = this.recordModuleFilter;
+    if ($("#recordRuleFilter")) $("#recordRuleFilter").value = this.recordRuleFilter;
+    if (!silent) this.renderRecords();
+  }
+
+  resolveDirection(sourceText = "", selectedDirection = $("#directionSelect").value) {
+    return selectedDirection === "auto" ? detectDirection(sourceText) : selectedDirection;
+  }
+
+  selectedMaterialDirection() {
+    const selected = $("#directionSelect").value;
+    return selected === "auto" ? "all" : selected;
+  }
+
   pickMaterial() {
     const material = this.materials.getRandom({
-      direction: $("#directionSelect").value,
+      direction: this.selectedMaterialDirection(),
       difficulty: $("#difficultySelect").value,
       focusModule: $("#moduleSelect").value,
       focusRule: $("#ruleSelect").value
@@ -416,12 +469,13 @@ class InterpreterV4App {
       this.toast("请先输入原文。", "error");
       return;
     }
+    const activeDirection = this.resolveDirection(sourceText);
     const button = $("#translateSourceBtn");
     button.disabled = true;
     try {
-      const result = await this.translation.translate(sourceText, $("#directionSelect").value);
+      const result = await this.translation.translate(sourceText, activeDirection);
       $("#referenceText").value = result.translatedText;
-      this.toast(`机器翻译完成：${result.provider}`, "success");
+      this.toast(`机器翻译完成：${result.provider} / ${directionLabel[activeDirection]}`, "success");
       this.saveDraft();
     } catch (error) {
       this.toast(`机器翻译失败：${error.message}`, "error");
@@ -430,35 +484,43 @@ class InterpreterV4App {
     }
   }
 
+  async ensureReferenceTranslation(sourceText, activeDirection) {
+    const currentReference = $("#referenceText").value.trim();
+    if (currentReference) return currentReference;
+
+    const result = await this.translation.translate(sourceText, activeDirection);
+    $("#referenceText").value = result.translatedText;
+    this.toast(`已生成参考译文：${result.provider}`, "success");
+    this.saveDraft();
+    return result.translatedText;
+  }
+
   async analyzeCurrentPractice() {
     const sourceText = $("#sourceText").value.trim();
     const userTranslation = $("#userTranslation").value.trim();
-    const referenceTranslation = $("#referenceText").value.trim();
-    if (!sourceText || !userTranslation) {
-      this.toast("请填写原文和你的译文。", "error");
+    if (!sourceText) {
+      this.toast("请先填写原文。", "error");
       return;
     }
-    if (!referenceTranslation) {
-      this.toast("请填写参考译文，或先使用机器翻译。", "error");
-      return;
-    }
+    const activeDirection = this.resolveDirection(sourceText);
 
     const button = $("#analyzeBtn");
     button.disabled = true;
-    this.renderFeedbackEmpty("正在诊断...");
+    this.renderFeedbackEmpty(userTranslation ? "正在诊断..." : "正在生成默认训练反馈...");
     try {
+      const referenceTranslation = await this.ensureReferenceTranslation(sourceText, activeDirection);
       const localReport = this.feedbackEngine.analyze({
         sourceText,
         userTranslation,
         referenceTranslation,
-        direction: $("#directionSelect").value,
-        mode: this.currentMaterial ? "guided" : "default"
+        direction: activeDirection,
+        mode: this.currentMaterial ? "guided" : userTranslation ? "default" : "source-only"
       });
       const report = await this.aiFeedback.enhance(localReport, {
         sourceText,
         userTranslation,
         referenceTranslation,
-        direction: $("#directionSelect").value,
+        direction: activeDirection,
         material: this.currentMaterial
       });
       this.currentReport = report;
@@ -514,8 +576,16 @@ class InterpreterV4App {
   }
 
   renderBreakdown(item) {
+    const title = item.displayRuleName || item.diagnosticLabel || item.ruleName;
+    const parentRule =
+      item.diagnosticLabel && item.ruleName && item.diagnosticLabel !== item.ruleName
+        ? `<span class="tag">${escapeHtml(item.ruleName)}</span>`
+        : "";
     return `<article class="breakdown-item">
-      <h3>${escapeHtml(item.ruleName)}</h3>
+      <div class="breakdown-title">
+        <h3>${escapeHtml(title)}</h3>
+        ${parentRule}
+      </div>
       <p><strong>中文思维：</strong>${escapeHtml(item.chineseThinking)}</p>
       <p><strong>目标语要求：</strong>${escapeHtml(item.requirement)}</p>
       <p><strong>本句应用：</strong>${escapeHtml(item.application)}</p>
@@ -545,8 +615,9 @@ class InterpreterV4App {
   async startRecording() {
     try {
       await this.audioRecorder.start();
+      const activeDirection = this.resolveDirection($("#sourceText").value.trim());
       this.speechRecognition.start({
-        direction: $("#directionSelect").value,
+        direction: activeDirection,
         onInterim: (text) => {
           $("#interimLine").classList.remove("hidden");
           $("#interimLine").textContent = text;
@@ -589,7 +660,7 @@ class InterpreterV4App {
       this.toast("请先填写参考译文。", "error");
       return;
     }
-    const language = $("#directionSelect").value === "zh-en" ? "en" : "zh";
+    const language = this.resolveDirection($("#sourceText").value.trim()) === "zh-en" ? "en" : "zh";
     try {
       await this.speechSynthesis.speak(text, language);
     } catch (error) {
@@ -600,9 +671,70 @@ class InterpreterV4App {
   async refreshRecords() {
     if (!this.records) return;
     this.recordsCache = await this.records.getAll();
-    const stats = await this.records.getStatistics();
+    this.renderRecords();
+  }
+
+  renderRecords() {
+    const records = this.getFilteredRecords();
+    const stats = this.computeRecordStats(records);
     this.renderStats(stats);
-    this.renderRecordsTable(this.recordsCache);
+    this.renderTrend(stats.trend);
+    this.renderRuleFrequency(stats.ruleCounts);
+    this.renderRecordFilterSummary(records.length);
+    this.renderRecordsTable(records);
+  }
+
+  getFilteredRecords() {
+    return this.recordsCache.filter((record) => {
+      const moduleOk = this.recordModuleFilter === "all" || record.focusModule === this.recordModuleFilter;
+      const ruleOk = this.recordRuleFilter === "all" || (record.triggeredRules || []).includes(this.recordRuleFilter);
+      return moduleOk && ruleOk;
+    });
+  }
+
+  computeRecordStats(records) {
+    if (!records.length) {
+      return {
+        totalSessions: 0,
+        averageScore: 0,
+        averageAccuracy: 0,
+        averageFluency: 0,
+        averagePronunciation: 0,
+        ruleCounts: {},
+        trend: []
+      };
+    }
+
+    const sums = records.reduce(
+      (acc, record) => {
+        acc.total += record.scores?.total || 0;
+        acc.accuracy += record.scores?.accuracy || 0;
+        acc.fluency += record.scores?.fluency || 0;
+        acc.pronunciation += record.scores?.pronunciation || 0;
+        (record.triggeredRuleNames || []).forEach((ruleName) => {
+          acc.ruleCounts[ruleName] = (acc.ruleCounts[ruleName] || 0) + 1;
+        });
+        const day = new Date(record.timestamp).toISOString().slice(0, 10);
+        acc.trendMap[day] ||= { total: 0, count: 0 };
+        acc.trendMap[day].total += record.scores?.total || 0;
+        acc.trendMap[day].count += 1;
+        return acc;
+      },
+      { total: 0, accuracy: 0, fluency: 0, pronunciation: 0, ruleCounts: {}, trendMap: {} }
+    );
+
+    const round = (value) => Number(value.toFixed(1));
+    return {
+      totalSessions: records.length,
+      averageScore: round(sums.total / records.length),
+      averageAccuracy: round(sums.accuracy / records.length),
+      averageFluency: round(sums.fluency / records.length),
+      averagePronunciation: round(sums.pronunciation / records.length),
+      ruleCounts: sums.ruleCounts,
+      trend: Object.entries(sums.trendMap)
+        .map(([date, data]) => ({ date, score: round(data.total / data.count), count: data.count }))
+        .sort((a, b) => a.date.localeCompare(b.date))
+    };
   }
 
   renderStats(stats) {
@@ -615,6 +747,51 @@ class InterpreterV4App {
     ]
       .map(([label, value]) => `<div class="stat"><strong>${value}</strong><span>${label}</span></div>`)
       .join("");
+  }
+
+  renderTrend(trend) {
+    $("#trendCount").textContent = `${trend.reduce((sum, item) => sum + item.count, 0)} 次`;
+    if (!trend.length) {
+      $("#scoreTrend").innerHTML = `<div class="mini-empty">暂无趋势</div>`;
+      return;
+    }
+    const maxScore = 3;
+    $("#scoreTrend").innerHTML = trend
+      .map((item) => {
+        const height = Math.max(8, Math.round((item.score / maxScore) * 100));
+        return `<div class="trend-bar" title="${escapeHtml(item.date)}：${item.score}">
+          <span style="height:${height}%"></span>
+          <strong>${item.score}</strong>
+          <em>${escapeHtml(item.date.slice(5))}</em>
+        </div>`;
+      })
+      .join("");
+  }
+
+  renderRuleFrequency(ruleCounts) {
+    const entries = Object.entries(ruleCounts).sort((a, b) => b[1] - a[1]).slice(0, 7);
+    $("#ruleCountSummary").textContent = `${entries.length} 类`;
+    if (!entries.length) {
+      $("#ruleFrequency").innerHTML = `<div class="mini-empty">暂无触发</div>`;
+      return;
+    }
+    const max = Math.max(...entries.map(([, count]) => count), 1);
+    $("#ruleFrequency").innerHTML = entries
+      .map(([ruleName, count]) => {
+        const width = Math.max(8, Math.round((count / max) * 100));
+        return `<div class="frequency-row">
+          <span>${escapeHtml(ruleName)}</span>
+          <div><i style="width:${width}%"></i></div>
+          <strong>${count}</strong>
+        </div>`;
+      })
+      .join("");
+  }
+
+  renderRecordFilterSummary(count) {
+    const moduleText = this.recordModuleFilter === "all" ? "全部模块" : this.moduleTitle(this.recordModuleFilter);
+    const ruleText = this.recordRuleFilter === "all" ? "全部规则" : ERROR_DEFINITIONS[this.recordRuleFilter]?.name || this.recordRuleFilter;
+    $("#recordFilterSummary").textContent = `${moduleText} / ${ruleText} / ${count} 条`;
   }
 
   renderRecordsTable(records) {
@@ -658,7 +835,7 @@ class InterpreterV4App {
         <h3>原文</h3>
         <p>${escapeHtml(record.sourceText)}</p>
         <h3>用户译文</h3>
-        <p>${escapeHtml(record.userTranslation)}</p>
+        <p>${escapeHtml(record.userTranslation || "未提交译文（默认模式）")}</p>
         <h3>参考译文</h3>
         <p>${escapeHtml(record.referenceTranslation)}</p>
       </section>
@@ -679,11 +856,12 @@ class InterpreterV4App {
   }
 
   exportRecords() {
-    if (!this.recordsCache.length) {
+    const records = this.getFilteredRecords();
+    if (!records.length) {
       this.toast("暂无可导出的记录。", "error");
       return;
     }
-    this.records.downloadCSV(this.recordsCache);
+    this.records.downloadCSV(records);
   }
 
   async clearRecords() {
@@ -720,7 +898,7 @@ class InterpreterV4App {
     };
     this.storage.saveSettings(this.settings);
     this.translation = new TranslationService(this.settings);
-    this.aiFeedback = new AIFeedbackService(this.settings);
+    this.aiFeedback = new AIFeedbackService(this.settings, this.rubric);
     this.applyTheme();
     this.closeSettings();
     this.toast("设置已保存。", "success");
@@ -758,6 +936,7 @@ class InterpreterV4App {
   }
 
   moduleTitle(id) {
+    if (id === "all") return "全部模块";
     if (id === "direct") return "直接训练";
     return this.rules.modules.find((module) => module.id === id)?.title || id || "";
   }

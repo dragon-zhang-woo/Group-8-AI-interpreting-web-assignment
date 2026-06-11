@@ -613,6 +613,18 @@ h3 {
   justify-content: flex-end;
 }
 
+.record-filter-bar {
+  display: grid;
+  grid-template-columns: minmax(160px, 1fr) minmax(160px, 1fr) auto minmax(180px, auto);
+  align-items: end;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding: 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--sheet) 86%, var(--paper));
+}
+
 .workspace-view {
   display: none;
 }
@@ -732,6 +744,19 @@ label > span {
   border-left: 4px solid var(--teal);
 }
 
+.breakdown-title,
+.insight-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.breakdown-title h3,
+.insight-head h2 {
+  margin: 0;
+}
+
 .breakdown-item p {
   margin-bottom: 0.45rem;
 }
@@ -800,6 +825,104 @@ label > span {
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 0.8rem;
   margin: 1rem 0;
+}
+
+.records-insights {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.insight-card {
+  min-height: 220px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--sheet);
+  padding: 1rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.trend-chart {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(48px, 1fr);
+  align-items: end;
+  gap: 0.55rem;
+  min-height: 150px;
+  margin-top: 1rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+
+.trend-bar {
+  display: grid;
+  grid-template-rows: 1fr auto auto;
+  justify-items: center;
+  gap: 0.25rem;
+  min-height: 140px;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.trend-bar span {
+  align-self: end;
+  width: 100%;
+  max-width: 34px;
+  border: 1px solid color-mix(in srgb, var(--teal) 40%, var(--line));
+  border-radius: 6px 6px 2px 2px;
+  background: linear-gradient(180deg, var(--teal), var(--blue));
+}
+
+.trend-bar strong {
+  color: var(--ink);
+  font-size: 0.82rem;
+}
+
+.trend-bar em {
+  font-style: normal;
+}
+
+.rule-frequency {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+
+.frequency-row {
+  display: grid;
+  grid-template-columns: minmax(92px, 1.1fr) minmax(80px, 2fr) auto;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.frequency-row > div {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--paper-2);
+}
+
+.frequency-row i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--amber);
+}
+
+.frequency-row strong {
+  color: var(--ink);
+}
+
+.mini-empty {
+  display: grid;
+  place-items: center;
+  min-height: 130px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  color: var(--muted);
 }
 
 .stat {
@@ -1053,7 +1176,9 @@ label > span {
   .control-row,
   .text-grid,
   .score-row,
-  .stats-grid {
+  .stats-grid,
+  .records-insights,
+  .record-filter-bar {
     grid-template-columns: 1fr;
   }
 

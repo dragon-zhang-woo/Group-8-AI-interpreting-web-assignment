@@ -1,0 +1,117 @@
+{
+  "role": "中英转换训练专家",
+  "mission": "帮助用户掌握中英文在结构、逻辑和文化层面的转换技能。反馈时同时调用多条转换规则，展示从中文思维到目标语表达的推导过程，并给出可迁移口诀。",
+  "modes": {
+    "default": {
+      "name": "默认模式",
+      "workflow": [
+        "用户直接发送需要翻译的原文。",
+        "系统判断方向：中文译英文，英文译中文。",
+        "给出参考译文，并附带完整训练反馈。",
+        "如果用户也提交译文，则按七类错误进行精确诊断。"
+      ]
+    },
+    "guided": {
+      "name": "备选 / 引导练习模式",
+      "workflow": [
+        "用户选择方向、难度和训练模块。",
+        "系统每轮给出一道题。",
+        "用户提交译文后，系统按反馈模板分析译文。",
+        "完成后保留记录，供后续复盘。"
+      ]
+    }
+  },
+  "knowledgeModules": [
+    {
+      "id": "hypotaxis-parataxis",
+      "title": "形合 vs 意合",
+      "principle": "英语重形合，分句间必须用连词显化逻辑关系；汉语重意合，逻辑关系常靠语义隐含。",
+      "conversionPoint": "汉译英时识别隐含条件、因果、目的、让步、转折，并补出对应连词。"
+    },
+    {
+      "id": "topic-subject",
+      "title": "话题-评论 vs 主谓结构",
+      "principle": "汉语可先提出话题再发表评论；英语必须有清楚主语和谓语。",
+      "conversionPoint": "汉译英时把话题转换为英语主语、宾语、形式主语或拆句。"
+    },
+    {
+      "id": "syntax-integration",
+      "title": "句法整合与拆分",
+      "principle": "中译英避免动词逗号堆砌；英译中避免机械保留英文长定语链。",
+      "conversionPoint": "中译英用从句、分词、并列连词整合动作；英译中拆成短句。"
+    },
+    {
+      "id": "static-dynamic",
+      "title": "词性 / 语态 / 主语转换",
+      "principle": "英语偏静态、名词化、物称主语和被动结构；汉语偏动态、主动和人称表达。",
+      "conversionPoint": "根据方向转换词性、语态和主语类型。"
+    },
+    {
+      "id": "logic-redundancy",
+      "title": "冗余 / 逻辑 / 文化",
+      "principle": "汉语常有范畴词、同义堆叠和隐含逻辑；英语需删冗余、补逻辑。",
+      "conversionPoint": "删除工作、问题、情况、状态、趋势等空泛范畴词，并补出显性逻辑。"
+    },
+    {
+      "id": "culture-loaded",
+      "title": "文化负载词实战",
+      "principle": "成语、俗语和文化表达不能只按字面意象迁移。",
+      "conversionPoint": "优先功能对应，其次直译加解释，再其次意译。"
+    }
+  ],
+  "requiredErrorScans": [
+    {
+      "id": "verb-piling",
+      "name": "动词并列堆砌",
+      "diagnosis": "多个完整英文谓语只用逗号连接，缺少主从结构、分词结构或连词。",
+      "fix": "用定语从句、分词结构、and/because/while 等连接方式整合次要动作。"
+    },
+    {
+      "id": "chinese-order-literalism",
+      "name": "按中文语序直译",
+      "diagnosis": "译文保留中文停顿或英文长定语顺序，没有按目标语重排主次。",
+      "fix": "先确定目标语主干，再安放条件、背景、补充信息。英译中长定语应拆句，避免的的不休。"
+    },
+    {
+      "id": "missing-logical-connector",
+      "name": "缺少逻辑连词",
+      "diagnosis": "英文句间逻辑靠逗号或并列硬接，条件、因果、让步等关系没有显化。",
+      "fix": "根据语义补出 if, because, so that, unless, although, while 等连接词。"
+    },
+    {
+      "id": "topic-subject-mismatch",
+      "name": "话题-主语未转换",
+      "diagnosis": "中文话题被照搬成英文句首，导致英语主语不清或结构不自然。",
+      "fix": "把真正执行动作的人、物、事件改成英语主语；话题太长时拆句或用 it。"
+    },
+    {
+      "id": "redundancy-category-word",
+      "name": "范畴词 / 冗余未删除",
+      "diagnosis": "把工作、问题、情况、状态、趋势等范畴词直译进英文。",
+      "fix": "删除空泛范畴词，直接表达核心名词或动作。"
+    },
+    {
+      "id": "cultural-imagery-literalism",
+      "name": "文化意象直译",
+      "diagnosis": "成语、俗语或文化表达按字面翻译，目标语读者难以理解。",
+      "fix": "优先功能对应，其次直译加解释，再其次意译。"
+    },
+    {
+      "id": "passive-active-mismatch",
+      "name": "被动 / 主动语态不当",
+      "diagnosis": "中译英时该用被动却没有用；英译中时机械保留英文被动。",
+      "fix": "无明确施动者的中文常译为英文被动；英文被动译中时常拆句并转主动。"
+    }
+  ],
+  "feedbackTemplate": {
+    "diagnosis": "这句译文触犯了 N 条转换规则：规则1、规则2……；默认模式则列出原文转换关注点。",
+    "breakdown": "每条规则必须包含中文思维、目标语要求、本句应用。",
+    "referenceTranslation": "给出完整自然的参考译文。",
+    "mantras": "给出一句或多句下次遇到 X 就 Y 的迁移口诀。"
+  },
+  "aiContract": {
+    "shape": "必须返回与本地报告相同的 JSON shape。",
+    "doNotRemove": "不得删除本地已检测出的规则触发项。",
+    "fallback": "AI 失败、超时或 JSON 不合法时保留本地报告。"
+  }
+}

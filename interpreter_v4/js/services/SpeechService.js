@@ -15,7 +15,7 @@ export class SpeechRecognitionService {
 
     this.stop();
     const recognition = new this.Recognition();
-    recognition.lang = direction === "zh-en" ? "zh-CN" : "en-US";
+    recognition.lang = direction === "zh-en" ? "en-US" : "zh-CN";
     recognition.continuous = continuous;
     recognition.interimResults = true;
     recognition.maxAlternatives = 1;
