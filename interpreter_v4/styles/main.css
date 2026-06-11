@@ -255,6 +255,7 @@ main {
 }
 
 .desk-layout,
+.expert-layout,
 .records-layout {
   width: min(100% - 2rem, 1360px);
   margin: 0 auto;
@@ -606,11 +607,119 @@ h3 {
 }
 
 .toolbar-actions,
+.expert-actions,
 .records-actions {
   display: flex;
   gap: 0.55rem;
   flex-wrap: wrap;
   justify-content: flex-end;
+}
+
+.expert-layout {
+  padding-top: 2.5rem;
+}
+
+.expert-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.expert-head h1 {
+  margin-bottom: 0;
+  font-size: clamp(1.8rem, 4vw, 3.3rem);
+}
+
+.expert-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 420px;
+  gap: 1rem;
+  align-items: start;
+}
+
+.expert-chat,
+.expert-controls {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--sheet) 88%, var(--paper));
+  box-shadow: var(--shadow-soft);
+}
+
+.expert-chat {
+  display: grid;
+  grid-template-rows: minmax(420px, 1fr) auto;
+  min-height: calc(100vh - var(--topbar-height) - 8rem);
+  overflow: hidden;
+}
+
+.expert-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  overflow: auto;
+  padding: 1rem;
+}
+
+.message {
+  width: min(88%, 720px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.85rem 0.95rem;
+  background: var(--sheet);
+  box-shadow: var(--shadow-soft);
+}
+
+.message.user {
+  align-self: flex-end;
+  border-color: color-mix(in srgb, var(--teal) 32%, var(--line));
+  background: var(--teal-2);
+}
+
+.message.assistant {
+  align-self: flex-start;
+}
+
+.message.system {
+  width: 100%;
+  color: var(--muted);
+  background: var(--paper-2);
+  box-shadow: none;
+}
+
+.message p,
+.message ul {
+  margin-bottom: 0.55rem;
+}
+
+.message :last-child {
+  margin-bottom: 0;
+}
+
+.expert-composer {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-top: 1px solid var(--line);
+  background: var(--sheet);
+}
+
+.expert-composer-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+}
+
+.expert-controls {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.expert-control-row {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .record-filter-bar {
@@ -1088,6 +1197,10 @@ label > span {
     grid-template-columns: 260px minmax(0, 1fr);
   }
 
+  .expert-shell {
+    grid-template-columns: 1fr;
+  }
+
   .feedback-panel {
     grid-column: 1 / -1;
     border-left: 0;
@@ -1123,6 +1236,7 @@ label > span {
   }
 
   .desk-layout,
+  .expert-layout,
   .records-layout {
     width: min(100% - 1rem, 1360px);
     padding-top: 2rem;
@@ -1158,22 +1272,27 @@ label > span {
   }
 
   .workspace-toolbar,
+  .expert-head,
   .records-head {
     align-items: stretch;
     flex-direction: column;
   }
 
   .toolbar-actions,
+  .expert-actions,
   .records-actions {
     justify-content: stretch;
   }
 
   .toolbar-actions .btn,
+  .expert-actions .btn,
   .records-actions .btn {
     flex: 1;
   }
 
   .control-row,
+  .expert-shell,
+  .expert-control-row,
   .text-grid,
   .score-row,
   .stats-grid,

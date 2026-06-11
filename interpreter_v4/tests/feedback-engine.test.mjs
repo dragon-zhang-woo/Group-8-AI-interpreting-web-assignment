@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { TranscodingFeedbackEngine } from "../js/components/TranscodingFeedbackEngine.js";
+import { parseExpertRequestIntent } from "../js/components/ExpertConversation.js";
 import { AIFeedbackService } from "../js/services/AIFeedbackService.js";
 
 const engine = new TranscodingFeedbackEngine();
@@ -118,6 +119,45 @@ assert.deepEqual(cleanReport.scores.total >= 0 && cleanReport.scores.total <= 3,
 const noKeyReport = await new AIFeedbackService({}).enhance(cleanReport, {});
 assert.equal(noKeyReport.feedbackSource, "local");
 
+const originalFetch = globalThis.fetch;
+const localViolationReport = report({
+  sourceText: "你不来，我不走。",
+  userTranslation: "I will not leave, you do not come.",
+  referenceTranslation: "I will not leave if you do not come.",
+  direction: "zh-en"
+});
+globalThis.fetch = async () =>
+  new Response(
+    JSON.stringify({
+      choices: [
+        {
+          message: {
+            content: JSON.stringify({
+              diagnosis: { count: 0, triggeredRuleIds: [], triggeredRuleNames: [], summary: "AI summary" },
+              breakdown: [],
+              referenceTranslation: "I will not leave if you do not come.",
+              mantras: [],
+              scores: { pronunciation: 3, fluency: 3, accuracy: 3, total: 3 },
+              feedbackSource: "ai",
+              aiNotice: ""
+            })
+          }
+        }
+      ]
+    }),
+    { status: 200, headers: { "Content-Type": "application/json" } }
+  );
+const mergedAiReport = await new AIFeedbackService({
+  aiEnabled: true,
+  aiEndpoint: "http://127.0.0.1:8080/v1/chat/completions",
+  aiModel: "test-model",
+  aiApiKey: "test-key"
+}).enhance(localViolationReport, {});
+globalThis.fetch = originalFetch;
+assert.ok(mergedAiReport.diagnosis.triggeredRuleIds.includes("missing-logical-connector"));
+assert.ok(mergedAiReport.breakdown.some((item) => item.ruleId === "missing-logical-connector"));
+assert.ok(mergedAiReport.diagnosis.count >= localViolationReport.diagnosis.count);
+
 const fallbackReport = await new AIFeedbackService({
   aiEnabled: true,
   aiEndpoint: "http://127.0.0.1:9/v1/chat/completions",
@@ -127,5 +167,13 @@ const fallbackReport = await new AIFeedbackService({
 }).enhance(cleanReport, {});
 assert.equal(fallbackReport.feedbackSource, "local-fallback");
 assert.ok(fallbackReport.aiNotice.includes("AI 增强未完成"));
+
+const expertIntent = parseExpertRequestIntent("我想练中→英，文化负载词，综合难度", [
+  { id: "cultural-imagery-literalism", name: "文化意象直译" }
+]);
+assert.equal(expertIntent.isPracticeRequest, true);
+assert.equal(expertIntent.direction, "zh-en");
+assert.equal(expertIntent.module, "culture-loaded");
+assert.equal(expertIntent.difficulty, "hard");
 
 console.log("feedback-engine tests passed");

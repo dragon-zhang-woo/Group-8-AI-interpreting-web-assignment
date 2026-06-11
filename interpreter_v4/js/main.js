@@ -4,6 +4,7 @@ import { TranslationService } from "./services/TranslationService.js";
 import { AIFeedbackService } from "./services/AIFeedbackService.js";
 import { AudioRecorder, SpeechRecognitionService, SpeechSynthesisService } from "./services/SpeechService.js";
 import { TranscodingFeedbackEngine, ERROR_DEFINITIONS, detectDirection } from "./components/TranscodingFeedbackEngine.js";
+import { looksLikePracticeRequest, parseExpertRequestIntent } from "./components/ExpertConversation.js";
 import { MaterialLibrary } from "./components/MaterialLibrary.js";
 import { RecordManager } from "./components/RecordManager.js";
 
@@ -38,6 +39,15 @@ function truncate(value = "", length = 120) {
   return text.length > length ? `${text.slice(0, length)}...` : text;
 }
 
+function textToParagraphs(value = "") {
+  return String(value)
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => `<p>${escapeHtml(line)}</p>`)
+    .join("");
+}
+
 class InterpreterV4App {
   constructor() {
     this.storage = new LocalStorageManager();
@@ -55,7 +65,10 @@ class InterpreterV4App {
     this.rubric = null;
     this.currentMaterial = null;
     this.currentReport = null;
+    this.currentReportMode = "workspace";
     this.currentAudioBlobId = "";
+    this.expertMaterial = null;
+    this.expertReport = null;
     this.recordsCache = [];
     this.deskView = "grid";
     this.recordModuleFilter = "all";
@@ -72,10 +85,12 @@ class InterpreterV4App {
       this.records = new RecordManager(this.db);
       this.populateControls();
       this.bindWorkspaceEvents();
+      this.bindExpertEvents();
       this.renderRuleTree();
       this.renderRuleMap();
       await this.refreshRecords();
       this.renderDesk();
+      this.renderExpertWelcome();
       this.restoreDraft();
       this.toast("Interpreter V4 已就绪。", "success");
     } catch (error) {
@@ -202,6 +217,8 @@ class InterpreterV4App {
       .join("")}`;
     $("#recordModuleFilter").innerHTML = moduleSelect.innerHTML;
     $("#recordRuleFilter").innerHTML = ruleSelect.innerHTML;
+    $("#expertModule").innerHTML = moduleSelect.innerHTML;
+    $("#expertRule").innerHTML = ruleSelect.innerHTML;
   }
 
   renderDesk() {
@@ -278,6 +295,181 @@ class InterpreterV4App {
     </article>`;
   }
 
+  renderExpertWelcome() {
+    if ($("#expertMessages").children.length > 0) return;
+    this.appendExpertMessage(
+      "system",
+      "专家对话支持两种用法：直接发送一句中文或英文原文，获得参考译文和转换关注点；也可以说“我想练中→英、文化负载词、综合难度”，系统会按条件出题。"
+    );
+  }
+
+  appendExpertMessage(role, content, { html = false } = {}) {
+    const message = document.createElement("article");
+    message.className = `message ${role}`;
+    message.innerHTML = html ? content : textToParagraphs(content);
+    $("#expertMessages").appendChild(message);
+    $("#expertMessages").scrollTop = $("#expertMessages").scrollHeight;
+  }
+
+  clearExpertConversation() {
+    $("#expertMessages").innerHTML = "";
+    $("#expertInput").value = "";
+    $("#expertSourceText").value = "";
+    $("#expertUserTranslation").value = "";
+    $("#expertReferenceText").value = "";
+    this.expertMaterial = null;
+    this.expertReport = null;
+    $("#expertSaveRecordBtn").disabled = true;
+    this.renderExpertWelcome();
+    this.saveDraft();
+  }
+
+  selectedExpertMaterialDirection() {
+    const selected = $("#expertDirection").value;
+    return selected === "auto" ? "all" : selected;
+  }
+
+  inferExpertPreferences(text) {
+    const intent = parseExpertRequestIntent(text, this.rules.errorTypes);
+    if (intent.direction) $("#expertDirection").value = intent.direction;
+    if (intent.difficulty) $("#expertDifficulty").value = intent.difficulty;
+    if (intent.module) $("#expertModule").value = intent.module;
+    if (intent.rule) $("#expertRule").value = intent.rule;
+    return intent;
+  }
+
+  pickExpertMaterial() {
+    const material = this.materials.getRandom({
+      direction: this.selectedExpertMaterialDirection(),
+      difficulty: $("#expertDifficulty").value,
+      focusModule: $("#expertModule").value,
+      focusRule: $("#expertRule").value
+    });
+    if (!material) {
+      this.toast("暂无符合条件的专家练习素材。", "error");
+      return;
+    }
+
+    this.expertMaterial = material;
+    this.expertReport = null;
+    $("#expertDirection").value = material.direction;
+    $("#expertDifficulty").value = material.difficultyLevel;
+    $("#expertModule").value = material.focusModule || "all";
+    $("#expertRule").value = material.focusRules?.[0] || "all";
+    $("#expertSourceText").value = material.sourceText;
+    $("#expertReferenceText").value = material.referenceTranslation;
+    $("#expertUserTranslation").value = "";
+    $("#expertSaveRecordBtn").disabled = true;
+
+    const module = this.moduleTitle(material.focusModule);
+    const rules = (material.focusRules || []).map((id) => ERROR_DEFINITIONS[id]?.name || id).join("、") || "综合转换";
+    this.appendExpertMessage(
+      "assistant",
+      `<p><strong>练习题</strong></p>
+       <p>${escapeHtml(material.sourceText)}</p>
+       <p class="status-line">${escapeHtml(directionLabel[material.direction])} / ${escapeHtml(difficultyLabel[material.difficultyLevel])} / ${escapeHtml(module)} / ${escapeHtml(rules)}</p>
+       <p>请在右侧“你的译文”输入答案，然后点击“诊断译文”。</p>`,
+      { html: true }
+    );
+    this.saveDraft();
+  }
+
+  async handleExpertSend() {
+    const text = $("#expertInput").value.trim();
+    if (!text) {
+      this.toast("请先输入要发送给专家的内容。", "error");
+      return;
+    }
+
+    this.appendExpertMessage("user", text);
+    $("#expertInput").value = "";
+    const intent = this.inferExpertPreferences(text);
+
+    if (intent.isPracticeRequest || looksLikePracticeRequest(text)) {
+      this.pickExpertMaterial();
+      return;
+    }
+
+    if (this.expertMaterial && !$("#expertUserTranslation").value.trim()) {
+      $("#expertUserTranslation").value = text;
+      await this.diagnoseExpertPractice();
+      return;
+    }
+
+    $("#expertSourceText").value = text;
+    $("#expertUserTranslation").value = "";
+    $("#expertReferenceText").value = "";
+    this.expertMaterial = null;
+    await this.diagnoseExpertPractice({ sourceOnly: true });
+  }
+
+  async diagnoseExpertPractice({ sourceOnly = false } = {}) {
+    const sourceText = $("#expertSourceText").value.trim();
+    const userTranslation = sourceOnly ? "" : $("#expertUserTranslation").value.trim();
+    if (!sourceText) {
+      this.toast("请先输入或抽取原文。", "error");
+      return;
+    }
+
+    const selectedDirection = $("#expertDirection").value;
+    const activeDirection = selectedDirection === "auto" || selectedDirection === "all" ? detectDirection(sourceText) : selectedDirection;
+    $("#expertDiagnoseBtn").disabled = true;
+
+    try {
+      const referenceTranslation = await this.ensureExpertReferenceTranslation(sourceText, activeDirection);
+      const localReport = this.feedbackEngine.analyze({
+        sourceText,
+        userTranslation,
+        referenceTranslation,
+        direction: activeDirection,
+        mode: this.expertMaterial ? "guided" : userTranslation ? "default" : "source-only"
+      });
+      const report = await this.aiFeedback.enhance(localReport, {
+        sourceText,
+        userTranslation,
+        referenceTranslation,
+        direction: activeDirection,
+        material: this.expertMaterial,
+        surface: "expert"
+      });
+      this.expertReport = report;
+      $("#expertSaveRecordBtn").disabled = false;
+      this.appendExpertMessage("assistant", this.renderExpertReport(report), { html: true });
+      this.toast(report.feedbackSource === "ai" ? "专家 AI 增强反馈已生成。" : "专家本地规则反馈已生成。", "success");
+      this.saveDraft();
+    } catch (error) {
+      this.toast(`专家诊断失败：${error.message}`, "error");
+      this.appendExpertMessage("assistant", `诊断失败：${error.message}`);
+    } finally {
+      $("#expertDiagnoseBtn").disabled = false;
+    }
+  }
+
+  async ensureExpertReferenceTranslation(sourceText, activeDirection) {
+    const currentReference = $("#expertReferenceText").value.trim();
+    if (currentReference) return currentReference;
+
+    const result = await this.translation.translate(sourceText, activeDirection);
+    $("#expertReferenceText").value = result.translatedText;
+    this.toast(`专家模式已生成参考译文：${result.provider}`, "success");
+    return result.translatedText;
+  }
+
+  renderExpertReport(report) {
+    const triggered = report.diagnosis.triggeredRuleNames?.join("、") || "无明显触发";
+    const breakdown = report.breakdown
+      .map(
+        (item) => `<li><strong>${escapeHtml(item.displayRuleName || item.ruleName)}</strong>：${escapeHtml(item.application)}</li>`
+      )
+      .join("");
+    const mantras = report.mantras.map((mantra) => `<li>${escapeHtml(mantra)}</li>`).join("");
+    return `<p><strong>诊断</strong>：${escapeHtml(report.diagnosis.summary)}</p>
+      <p class="status-line">触发规则：${escapeHtml(triggered)}；总分 ${escapeHtml(report.scores.total)}</p>
+      ${breakdown ? `<p><strong>拆解</strong></p><ul>${breakdown}</ul>` : ""}
+      <p><strong>参考译文</strong>：${escapeHtml(report.referenceTranslation)}</p>
+      <p><strong>迁移口诀</strong></p><ul>${mantras}</ul>`;
+  }
+
   renderRuleTree() {
     const activeModule = $("#moduleSelect").value;
     const activeRule = $("#ruleSelect").value;
@@ -307,6 +499,19 @@ class InterpreterV4App {
         this.applyPracticeFilters(button.dataset.parentModule, button.dataset.ruleId);
         this.saveDraft();
       });
+    });
+  }
+
+  bindExpertEvents() {
+    $("#expertSendBtn").addEventListener("click", () => this.handleExpertSend());
+    $("#expertDiagnoseBtn").addEventListener("click", () => this.diagnoseExpertPractice());
+    $("#expertNewPromptBtn").addEventListener("click", () => this.pickExpertMaterial());
+    $("#expertClearBtn").addEventListener("click", () => this.clearExpertConversation());
+    $("#expertSaveRecordBtn").addEventListener("click", () => this.saveExpertRecord());
+
+    ["expertDirection", "expertDifficulty", "expertModule", "expertRule", "expertSourceText", "expertUserTranslation", "expertReferenceText"].forEach((id) => {
+      $(`#${id}`).addEventListener("input", () => this.saveDraft());
+      $(`#${id}`).addEventListener("change", () => this.saveDraft());
     });
   }
 
@@ -553,20 +758,20 @@ class InterpreterV4App {
         <p>${escapeHtml(report.diagnosis.summary)}</p>
         ${report.aiNotice ? `<p class="status-line">${escapeHtml(report.aiNotice)}</p>` : ""}
       </section>
+      ${report.breakdown.map((item) => this.renderBreakdown(item)).join("")}
+      <section class="reference-card">
+        <h3>参考译文</h3>
+        <p>${escapeHtml(report.referenceTranslation)}</p>
+      </section>
+      <section class="reference-card">
+        <h3>迁移口诀</h3>
+        ${report.mantras.map((mantra) => `<p>${escapeHtml(mantra)}</p>`).join("")}
+      </section>
       <section class="score-row">
         ${this.scoreCard("总分", report.scores.total)}
         ${this.scoreCard("发音", report.scores.pronunciation)}
         ${this.scoreCard("流畅", report.scores.fluency)}
         ${this.scoreCard("准确", report.scores.accuracy)}
-      </section>
-      <section class="reference-card">
-        <h3>参考译文</h3>
-        <p>${escapeHtml(report.referenceTranslation)}</p>
-      </section>
-      ${report.breakdown.map((item) => this.renderBreakdown(item)).join("")}
-      <section class="reference-card">
-        <h3>迁移口诀</h3>
-        ${report.mantras.map((mantra) => `<p>${escapeHtml(mantra)}</p>`).join("")}
       </section>
     `;
   }
@@ -602,11 +807,33 @@ class InterpreterV4App {
         userTranslation: $("#userTranslation").value.trim(),
         referenceTranslation: $("#referenceText").value.trim(),
         report: this.currentReport,
-        audioBlobId: this.currentAudioBlobId
+        audioBlobId: this.currentAudioBlobId,
+        modeSource: "workspace"
       });
       $("#saveRecordBtn").disabled = true;
       await this.refreshRecords();
       this.toast("本次训练已保存。", "success");
+    } catch (error) {
+      this.toast(`保存失败：${error.message}`, "error");
+    }
+  }
+
+  async saveExpertRecord() {
+    if (!this.expertReport || !this.records) return;
+    try {
+      await this.records.savePractice({
+        material: this.expertMaterial,
+        sourceText: $("#expertSourceText").value.trim(),
+        transcript: $("#expertUserTranslation").value.trim(),
+        userTranslation: $("#expertUserTranslation").value.trim(),
+        referenceTranslation: $("#expertReferenceText").value.trim(),
+        report: this.expertReport,
+        audioBlobId: "",
+        modeSource: "expert"
+      });
+      $("#expertSaveRecordBtn").disabled = true;
+      await this.refreshRecords();
+      this.toast("专家对话训练已保存。", "success");
     } catch (error) {
       this.toast(`保存失败：${error.message}`, "error");
     }
@@ -796,7 +1023,7 @@ class InterpreterV4App {
 
   renderRecordsTable(records) {
     if (records.length === 0) {
-      $("#recordsTable").innerHTML = `<tr><td colspan="6">暂无学习记录。</td></tr>`;
+      $("#recordsTable").innerHTML = `<tr><td colspan="7">暂无学习记录。</td></tr>`;
       return;
     }
     $("#recordsTable").innerHTML = records
@@ -806,6 +1033,7 @@ class InterpreterV4App {
           <td>${new Date(record.timestamp).toLocaleString("zh-CN")}</td>
           <td>${directionLabel[record.direction] || record.direction}</td>
           <td>${escapeHtml(this.moduleTitle(record.focusModule))}</td>
+          <td>${record.modeSource === "expert" ? "专家对话" : "工作区"}</td>
           <td><strong>${record.scores?.total ?? ""}</strong></td>
           <td><div class="card-meta">${rules || '<span class="tag">无明显触发</span>'}</div></td>
           <td>
@@ -830,6 +1058,7 @@ class InterpreterV4App {
         <div class="card-meta">
           <span class="tag teal">${directionLabel[record.direction] || record.direction}</span>
           <span class="tag amber">总分 ${record.scores?.total ?? ""}</span>
+          <span class="tag">${record.modeSource === "expert" ? "专家对话" : "工作区"}</span>
           <span class="tag blue">${escapeHtml(record.feedbackSource)}</span>
         </div>
         <h3>原文</h3>
@@ -916,7 +1145,14 @@ class InterpreterV4App {
       rule: $("#ruleSelect")?.value,
       sourceText: $("#sourceText")?.value,
       referenceText: $("#referenceText")?.value,
-      userTranslation: $("#userTranslation")?.value
+      userTranslation: $("#userTranslation")?.value,
+      expertDirection: $("#expertDirection")?.value,
+      expertDifficulty: $("#expertDifficulty")?.value,
+      expertModule: $("#expertModule")?.value,
+      expertRule: $("#expertRule")?.value,
+      expertSourceText: $("#expertSourceText")?.value,
+      expertReferenceText: $("#expertReferenceText")?.value,
+      expertUserTranslation: $("#expertUserTranslation")?.value
     });
   }
 
@@ -930,6 +1166,13 @@ class InterpreterV4App {
     $("#sourceText").value = draft.sourceText || "";
     $("#referenceText").value = draft.referenceText || "";
     $("#userTranslation").value = draft.userTranslation || "";
+    if (draft.expertDirection) $("#expertDirection").value = draft.expertDirection;
+    if (draft.expertDifficulty) $("#expertDifficulty").value = draft.expertDifficulty;
+    if (draft.expertModule) $("#expertModule").value = draft.expertModule;
+    if (draft.expertRule) $("#expertRule").value = draft.expertRule;
+    $("#expertSourceText").value = draft.expertSourceText || "";
+    $("#expertReferenceText").value = draft.expertReferenceText || "";
+    $("#expertUserTranslation").value = draft.expertUserTranslation || "";
     this.renderRuleTree();
     this.renderRuleMap();
     if (this.settings.activeSurface) this.showSurface(this.settings.activeSurface);

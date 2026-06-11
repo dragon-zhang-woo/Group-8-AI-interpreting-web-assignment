@@ -34,6 +34,24 @@ function isValidReport(value) {
   );
 }
 
+function mergeByRuleId(localItems = [], enhancedItems = []) {
+  const merged = [...localItems];
+  const seen = new Set(localItems.map((item) => item.ruleId || item.id || item.displayRuleName || item.ruleName));
+
+  enhancedItems.forEach((item) => {
+    const key = item.ruleId || item.id || item.displayRuleName || item.ruleName;
+    if (!key || seen.has(key)) return;
+    seen.add(key);
+    merged.push(item);
+  });
+
+  return merged;
+}
+
+function mergeStrings(localItems = [], enhancedItems = []) {
+  return [...new Set([...(localItems || []), ...(enhancedItems || [])].filter(Boolean))];
+}
+
 export class AIFeedbackService {
   constructor(settings = {}, rubric = FALLBACK_RUBRIC) {
     this.settings = settings;
@@ -94,19 +112,23 @@ export class AIFeedbackService {
       const enhanced = extractJson(content);
       if (!isValidReport(enhanced)) throw new Error("AI response JSON did not match the expected report shape.");
 
+      const triggeredRuleIds = mergeStrings(localReport.diagnosis?.triggeredRuleIds, enhanced.diagnosis?.triggeredRuleIds);
+      const triggeredRuleNames = mergeStrings(localReport.diagnosis?.triggeredRuleNames, enhanced.diagnosis?.triggeredRuleNames);
+      const breakdown = mergeByRuleId(localReport.breakdown, enhanced.breakdown);
+      const mantras = mergeStrings(localReport.mantras, enhanced.mantras);
+
       return {
         ...localReport,
         ...enhanced,
         diagnosis: {
           ...localReport.diagnosis,
           ...enhanced.diagnosis,
-          triggeredRuleIds: [
-            ...new Set([
-              ...(localReport.diagnosis?.triggeredRuleIds || []),
-              ...(enhanced.diagnosis?.triggeredRuleIds || [])
-            ])
-          ]
+          count: Math.max(localReport.diagnosis?.count || 0, enhanced.diagnosis?.count || 0, triggeredRuleIds.length, breakdown.length),
+          triggeredRuleIds,
+          triggeredRuleNames
         },
+        breakdown,
+        mantras,
         feedbackSource: "ai",
         aiNotice: "AI 已基于本地诊断补充更自然的讲解。"
       };

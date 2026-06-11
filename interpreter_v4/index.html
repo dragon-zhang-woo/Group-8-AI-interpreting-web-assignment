@@ -28,6 +28,7 @@
       <nav class="surface-tabs" aria-label="主界面">
         <button class="surface-tab active" data-surface="desk">训练桌面</button>
         <button class="surface-tab" data-surface="workspace">实战工作区</button>
+        <button class="surface-tab" data-surface="expert">专家对话</button>
         <button class="surface-tab" data-surface="records">学习记录</button>
       </nav>
 
@@ -190,6 +191,86 @@
         </div>
       </section>
 
+      <section class="surface" id="surface-expert" aria-labelledby="expertTitle">
+        <div class="expert-layout">
+          <div class="expert-head">
+            <div>
+              <p class="eyebrow">Expert Conversation</p>
+              <h1 id="expertTitle">中英转换专家对话</h1>
+            </div>
+            <div class="expert-actions">
+              <button class="btn secondary" id="expertNewPromptBtn" type="button">按条件出题</button>
+              <button class="btn secondary" id="expertClearBtn" type="button">清空对话</button>
+            </div>
+          </div>
+
+          <div class="expert-shell">
+            <section class="expert-chat" aria-label="专家对话记录">
+              <div class="expert-messages" id="expertMessages"></div>
+              <div class="expert-composer">
+                <label class="field-block">
+                  <span>发送给专家</span>
+                  <textarea id="expertInput" rows="4" placeholder="直接输入原文，或说：我想练中→英、文化负载词、综合难度"></textarea>
+                </label>
+                <div class="expert-composer-actions">
+                  <button class="btn secondary" id="expertSendBtn" type="button">发送</button>
+                  <button class="btn primary" id="expertDiagnoseBtn" type="button">诊断译文</button>
+                </div>
+              </div>
+            </section>
+
+            <aside class="expert-controls" aria-label="专家训练控制">
+              <div class="control-row expert-control-row">
+                <label>
+                  <span>方向</span>
+                  <select id="expertDirection">
+                    <option value="auto" selected>自动检测</option>
+                    <option value="all">混合</option>
+                    <option value="zh-en">中 → 英</option>
+                    <option value="en-zh">英 → 中</option>
+                  </select>
+                </label>
+                <label>
+                  <span>难度</span>
+                  <select id="expertDifficulty">
+                    <option value="all">全部</option>
+                    <option value="easy">基础</option>
+                    <option value="medium">进阶</option>
+                    <option value="hard">综合</option>
+                  </select>
+                </label>
+                <label>
+                  <span>模块</span>
+                  <select id="expertModule">
+                    <option value="all">全部模块</option>
+                  </select>
+                </label>
+                <label>
+                  <span>规则</span>
+                  <select id="expertRule">
+                    <option value="all">全部规则</option>
+                  </select>
+                </label>
+              </div>
+
+              <label class="field-block">
+                <span>当前原文</span>
+                <textarea id="expertSourceText" rows="5" placeholder="专家会把直接输入或抽题原文放在这里"></textarea>
+              </label>
+              <label class="field-block">
+                <span>你的译文</span>
+                <textarea id="expertUserTranslation" rows="6" placeholder="有原文后，在这里输入译文再诊断"></textarea>
+              </label>
+              <label class="field-block">
+                <span>参考译文</span>
+                <textarea id="expertReferenceText" rows="5" placeholder="诊断时自动生成或由抽题带入"></textarea>
+              </label>
+              <button class="btn primary full" id="expertSaveRecordBtn" type="button" disabled>保存专家对话训练</button>
+            </aside>
+          </div>
+        </div>
+      </section>
+
       <section class="surface" id="surface-records" aria-labelledby="recordsTitle">
         <div class="records-layout">
           <div class="records-head">
@@ -242,6 +323,7 @@
                   <th>时间</th>
                   <th>方向</th>
                   <th>模块</th>
+                  <th>入口</th>
                   <th>总分</th>
                   <th>触发规则</th>
                   <th>操作</th>
