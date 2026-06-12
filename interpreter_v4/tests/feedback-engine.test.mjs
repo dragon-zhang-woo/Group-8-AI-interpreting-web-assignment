@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
+import fs from "node:fs";
 import { TranscodingFeedbackEngine } from "../js/components/TranscodingFeedbackEngine.js";
 import { parseExpertRequestIntent } from "../js/components/ExpertConversation.js";
 import { AIFeedbackService } from "../js/services/AIFeedbackService.js";
+import { MaterialLibrary } from "../js/components/MaterialLibrary.js";
 
 const engine = new TranscodingFeedbackEngine();
 
@@ -175,5 +177,135 @@ assert.equal(expertIntent.isPracticeRequest, true);
 assert.equal(expertIntent.direction, "zh-en");
 assert.equal(expertIntent.module, "culture-loaded");
 assert.equal(expertIntent.difficulty, "hard");
+
+const materials = JSON.parse(fs.readFileSync(new URL("../data/materials.json", import.meta.url), "utf8"));
+assert.ok(materials.length >= 120, `Expected at least 120 materials, got ${materials.length}`);
+
+const countBy = (field) =>
+  materials.reduce((acc, material) => {
+    acc[material[field]] = (acc[material[field]] || 0) + 1;
+    return acc;
+  }, {});
+const byDirection = countBy("direction");
+assert.ok(byDirection["zh-en"] >= 55, `Expected substantial zh-en coverage, got ${byDirection["zh-en"] || 0}`);
+assert.ok(byDirection["en-zh"] >= 55, `Expected substantial en-zh coverage, got ${byDirection["en-zh"] || 0}`);
+
+const byDifficulty = countBy("difficultyLevel");
+["easy", "medium", "hard"].forEach((difficulty) => {
+  assert.ok(byDifficulty[difficulty] >= 30, `Expected ${difficulty} coverage, got ${byDifficulty[difficulty] || 0}`);
+});
+
+const byModule = countBy("focusModule");
+["hypotaxis-parataxis", "topic-subject", "syntax-integration", "static-dynamic", "logic-redundancy", "culture-loaded"].forEach((moduleId) => {
+  assert.ok(byModule[moduleId] >= 15, `Expected module coverage for ${moduleId}, got ${byModule[moduleId] || 0}`);
+});
+
+const ruleCounts = materials.reduce((acc, material) => {
+  (material.focusRules || []).forEach((ruleId) => {
+    acc[ruleId] = (acc[ruleId] || 0) + 1;
+  });
+  return acc;
+}, {});
+[
+  "verb-piling",
+  "chinese-order-literalism",
+  "missing-logical-connector",
+  "topic-subject-mismatch",
+  "redundancy-category-word",
+  "cultural-imagery-literalism",
+  "passive-active-mismatch"
+].forEach((ruleId) => {
+  assert.ok(ruleCounts[ruleId] >= 15, `Expected rule coverage for ${ruleId}, got ${ruleCounts[ruleId] || 0}`);
+});
+
+const fakeStorage = {
+  getRecentMaterialIds: () => [],
+  saveRecentMaterialIds: () => {}
+};
+const materialLibrary = new MaterialLibrary(fakeStorage);
+materialLibrary.materials = [
+  {
+    id: "one-rule",
+    direction: "zh-en",
+    difficultyLevel: "medium",
+    focusModule: "syntax-integration",
+    focusRules: ["verb-piling"],
+    sourceText: "A",
+    referenceTranslation: "B"
+  },
+  {
+    id: "two-rules",
+    direction: "zh-en",
+    difficultyLevel: "medium",
+    focusModule: "syntax-integration",
+    focusRules: ["verb-piling", "chinese-order-literalism"],
+    sourceText: "C",
+    referenceTranslation: "D"
+  },
+  {
+    id: "other-rule",
+    direction: "zh-en",
+    difficultyLevel: "medium",
+    focusModule: "syntax-integration",
+    focusRules: ["missing-logical-connector"],
+    sourceText: "E",
+    referenceTranslation: "F"
+  }
+];
+const selectedMaterial = materialLibrary.getRandom({
+  direction: "zh-en",
+  difficulty: "medium",
+  focusModule: "syntax-integration",
+  focusRules: ["verb-piling", "chinese-order-literalism"]
+});
+assert.equal(selectedMaterial.id, "two-rules");
+
+const noImmediateRepeat = materialLibrary.getRandom({
+  direction: "zh-en",
+  difficulty: "medium",
+  focusModule: "syntax-integration",
+  focusRules: ["verb-piling"],
+  excludeId: "one-rule"
+});
+assert.notEqual(noImmediateRepeat.id, "one-rule");
+
+const narrowLibrary = new MaterialLibrary(fakeStorage);
+narrowLibrary.materials = [
+  {
+    id: "current-only-exact",
+    direction: "zh-en",
+    difficultyLevel: "hard",
+    focusModule: "syntax-integration",
+    focusRules: ["verb-piling", "chinese-order-literalism"],
+    sourceText: "A",
+    referenceTranslation: "B"
+  },
+  {
+    id: "same-module-alternative",
+    direction: "zh-en",
+    difficultyLevel: "hard",
+    focusModule: "syntax-integration",
+    focusRules: ["verb-piling"],
+    sourceText: "C",
+    referenceTranslation: "D"
+  },
+  {
+    id: "other-module",
+    direction: "zh-en",
+    difficultyLevel: "hard",
+    focusModule: "culture-loaded",
+    focusRules: ["cultural-imagery-literalism"],
+    sourceText: "E",
+    referenceTranslation: "F"
+  }
+];
+const relaxedMaterial = narrowLibrary.getRandom({
+  direction: "zh-en",
+  difficulty: "hard",
+  focusModule: "syntax-integration",
+  focusRules: ["verb-piling", "chinese-order-literalism"],
+  excludeId: "current-only-exact"
+});
+assert.equal(relaxedMaterial.id, "same-module-alternative");
 
 console.log("feedback-engine tests passed");

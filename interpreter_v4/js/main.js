@@ -1,12 +1,12 @@
-import { LocalStorageManager } from "./storage/LocalStorageManager.js";
-import { IndexedDBManager } from "./storage/IndexedDBManager.js";
-import { TranslationService } from "./services/TranslationService.js";
-import { AIFeedbackService } from "./services/AIFeedbackService.js";
-import { AudioRecorder, SpeechRecognitionService, SpeechSynthesisService } from "./services/SpeechService.js";
-import { TranscodingFeedbackEngine, ERROR_DEFINITIONS, detectDirection } from "./components/TranscodingFeedbackEngine.js";
-import { looksLikePracticeRequest, parseExpertRequestIntent } from "./components/ExpertConversation.js";
-import { MaterialLibrary } from "./components/MaterialLibrary.js";
-import { RecordManager } from "./components/RecordManager.js";
+import { LocalStorageManager } from "./storage/LocalStorageManager.js?v=20260612-draw-fix2";
+import { IndexedDBManager } from "./storage/IndexedDBManager.js?v=20260612-draw-fix2";
+import { TranslationService } from "./services/TranslationService.js?v=20260612-draw-fix2";
+import { AIFeedbackService } from "./services/AIFeedbackService.js?v=20260612-draw-fix2";
+import { AudioRecorder, SpeechRecognitionService, SpeechSynthesisService } from "./services/SpeechService.js?v=20260612-draw-fix2";
+import { TranscodingFeedbackEngine, ERROR_DEFINITIONS, detectDirection } from "./components/TranscodingFeedbackEngine.js?v=20260612-draw-fix2";
+import { looksLikePracticeRequest, parseExpertRequestIntent } from "./components/ExpertConversation.js?v=20260612-draw-fix2";
+import { MaterialLibrary } from "./components/MaterialLibrary.js?v=20260612-draw-fix2";
+import { RecordManager } from "./components/RecordManager.js?v=20260612-draw-fix2";
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -48,6 +48,15 @@ function textToParagraphs(value = "") {
     .join("");
 }
 
+function normalizeRuleList(value) {
+  const items = Array.isArray(value) ? value : value && value !== "all" ? [value] : [];
+  return [...new Set(items.filter((item) => item && item !== "all"))];
+}
+
+function ruleName(ruleId) {
+  return ERROR_DEFINITIONS[ruleId]?.name || ruleId;
+}
+
 class InterpreterV4App {
   constructor() {
     this.storage = new LocalStorageManager();
@@ -73,6 +82,8 @@ class InterpreterV4App {
     this.deskView = "grid";
     this.recordModuleFilter = "all";
     this.recordRuleFilter = "all";
+    this.selectedRules = [];
+    this.selectedExpertRules = [];
   }
 
   async init() {
@@ -151,17 +162,20 @@ class InterpreterV4App {
       this.recordModuleFilter = $("#recordModuleFilter").value;
       if (this.recordModuleFilter !== "all" && $("#moduleSelect").value !== this.recordModuleFilter) {
         $("#moduleSelect").value = this.recordModuleFilter;
+        this.syncCustomSelect("moduleSelect");
       }
       this.renderRecords();
+      this.syncCustomSelect("recordModuleFilter");
     });
     $("#recordRuleFilter").addEventListener("change", () => {
       this.recordRuleFilter = $("#recordRuleFilter").value;
-      if (this.recordRuleFilter !== "all" && $("#ruleSelect").value !== this.recordRuleFilter) {
-        $("#ruleSelect").value = this.recordRuleFilter;
+      if (this.recordRuleFilter !== "all" && !this.selectedRules.includes(this.recordRuleFilter)) {
+        this.setSelectedRules([this.recordRuleFilter], { render: true, syncRecords: false });
       }
       this.renderRecords();
+      this.syncCustomSelect("recordRuleFilter");
     });
-    $("#resetRecordFiltersBtn").addEventListener("click", () => this.syncRecordFilters("all", "all"));
+    $("#resetRecordFiltersBtn").addEventListener("click", () => this.syncRecordFilters("all", []));
   }
 
   bindWorkspaceEvents() {
@@ -179,12 +193,13 @@ class InterpreterV4App {
     $("#exportCsvBtn").addEventListener("click", () => this.exportRecords());
     $("#clearRecordsBtn").addEventListener("click", () => this.clearRecords());
 
-    ["directionSelect", "difficultySelect", "moduleSelect", "ruleSelect", "sourceText", "referenceText", "userTranslation"].forEach((id) => {
+    ["directionSelect", "difficultySelect", "moduleSelect", "sourceText", "referenceText", "userTranslation"].forEach((id) => {
       $(`#${id}`).addEventListener("input", () => this.saveDraft());
       $(`#${id}`).addEventListener("change", () => {
         this.saveDraft();
-        if (id === "moduleSelect" || id === "ruleSelect") {
-          this.syncRecordFilters($("#moduleSelect").value, $("#ruleSelect").value, { silent: true });
+        this.syncCustomSelect(id);
+        if (id === "moduleSelect") {
+          this.syncRecordFilters($("#moduleSelect").value, this.selectedRules, { silent: true });
           this.renderRuleTree();
           this.renderRuleMap();
         }
@@ -219,6 +234,79 @@ class InterpreterV4App {
     $("#recordRuleFilter").innerHTML = ruleSelect.innerHTML;
     $("#expertModule").innerHTML = moduleSelect.innerHTML;
     $("#expertRule").innerHTML = ruleSelect.innerHTML;
+    this.hydrateCustomSelects();
+    this.renderRuleSelectionSummary();
+    this.renderExpertRulePicker();
+  }
+
+  hydrateCustomSelects() {
+    $$("select:not([data-native-only])").forEach((select) => {
+      let shell = select.closest(".select-shell");
+      if (!shell) {
+        shell = document.createElement("div");
+        shell.className = "select-shell";
+        select.parentNode.insertBefore(shell, select);
+        shell.appendChild(select);
+        select.classList.add("native-select");
+        const button = document.createElement("button");
+        button.className = "select-trigger";
+        button.type = "button";
+        button.setAttribute("aria-haspopup", "listbox");
+        const menu = document.createElement("div");
+        menu.className = "select-menu";
+        menu.setAttribute("role", "listbox");
+        shell.append(button, menu);
+        button.addEventListener("click", () => {
+          const isOpen = shell.classList.contains("open");
+          this.closeCustomSelects();
+          shell.classList.toggle("open", !isOpen);
+          button.setAttribute("aria-expanded", String(!isOpen));
+        });
+        select.addEventListener("change", () => this.syncCustomSelect(select.id));
+      }
+      this.syncCustomSelect(select.id);
+    });
+
+    document.addEventListener("click", (event) => {
+      if (!event.target.closest(".select-shell")) this.closeCustomSelects();
+    });
+  }
+
+  syncCustomSelect(id) {
+    const select = $(`#${id}`);
+    const shell = select?.closest(".select-shell");
+    if (!select || !shell) return;
+    const trigger = shell.querySelector(".select-trigger");
+    const menu = shell.querySelector(".select-menu");
+    const selected = select.selectedOptions[0] || select.options[0];
+    trigger.innerHTML = `<span>${escapeHtml(selected?.textContent || "请选择")}</span><span class="select-caret">⌄</span>`;
+    trigger.setAttribute("aria-expanded", String(shell.classList.contains("open")));
+    menu.innerHTML = [...select.options]
+      .map(
+        (option) => `<button class="select-option ${option.selected ? "selected" : ""}" type="button" role="option" aria-selected="${option.selected}" data-select-value="${escapeHtml(option.value)}">
+          <span>${escapeHtml(option.textContent)}</span>
+          <span class="select-check" aria-hidden="true">✓</span>
+        </button>`
+      )
+      .join("");
+    menu.querySelectorAll(".select-option").forEach((button) => {
+      button.addEventListener("click", () => {
+        select.value = button.dataset.selectValue;
+        select.dispatchEvent(new Event("change", { bubbles: true }));
+        this.closeCustomSelects();
+      });
+    });
+  }
+
+  refreshCustomSelects() {
+    $$("select").forEach((select) => this.syncCustomSelect(select.id));
+  }
+
+  closeCustomSelects() {
+    $$(".select-shell.open").forEach((shell) => {
+      shell.classList.remove("open");
+      shell.querySelector(".select-trigger")?.setAttribute("aria-expanded", "false");
+    });
   }
 
   renderDesk() {
@@ -334,7 +422,8 @@ class InterpreterV4App {
     if (intent.direction) $("#expertDirection").value = intent.direction;
     if (intent.difficulty) $("#expertDifficulty").value = intent.difficulty;
     if (intent.module) $("#expertModule").value = intent.module;
-    if (intent.rule) $("#expertRule").value = intent.rule;
+    if (intent.rule) this.setSelectedExpertRules([intent.rule]);
+    this.refreshCustomSelects();
     return intent;
   }
 
@@ -343,7 +432,8 @@ class InterpreterV4App {
       direction: this.selectedExpertMaterialDirection(),
       difficulty: $("#expertDifficulty").value,
       focusModule: $("#expertModule").value,
-      focusRule: $("#expertRule").value
+      focusRules: this.selectedExpertRules,
+      excludeId: this.expertMaterial?.id || ""
     });
     if (!material) {
       this.toast("暂无符合条件的专家练习素材。", "error");
@@ -352,10 +442,6 @@ class InterpreterV4App {
 
     this.expertMaterial = material;
     this.expertReport = null;
-    $("#expertDirection").value = material.direction;
-    $("#expertDifficulty").value = material.difficultyLevel;
-    $("#expertModule").value = material.focusModule || "all";
-    $("#expertRule").value = material.focusRules?.[0] || "all";
     $("#expertSourceText").value = material.sourceText;
     $("#expertReferenceText").value = material.referenceTranslation;
     $("#expertUserTranslation").value = "";
@@ -472,31 +558,79 @@ class InterpreterV4App {
 
   renderRuleTree() {
     const activeModule = $("#moduleSelect").value;
-    const activeRule = $("#ruleSelect").value;
-    $("#ruleTree").innerHTML = this.rules.modules
+    const activeRules = this.selectedRules;
+    const summary =
+      activeRules.length === 0
+        ? "未限定规则，将按方向、难度和模块综合抽题。"
+        : activeRules.length === 1
+          ? `专项训练：${ruleName(activeRules[0])}`
+          : `综合训练：已选择 ${activeRules.length} 条规则`;
+    $("#ruleTree").innerHTML = `
+      <div class="rule-tree-tools">
+        <button class="small-btn" type="button" id="clearRuleSelectionBtn">清空规则</button>
+        <span>${escapeHtml(summary)}</span>
+      </div>
+      ${this.rules.modules
       .map((module) => {
         const moduleActive = activeModule === module.id;
-        return `<div class="tree-module ${moduleActive ? "active" : ""}">
-          <button type="button" data-module-id="${module.id}">${escapeHtml(module.title)}</button>
+        const selectedCount = module.errorTypes.filter((ruleId) => activeRules.includes(ruleId)).length;
+        return `<section class="tree-module ${moduleActive || selectedCount ? "active" : ""}">
+          <button class="tree-module-head" type="button" data-module-id="${module.id}" aria-expanded="${moduleActive || selectedCount ? "true" : "false"}">
+            <span>
+              <strong>${escapeHtml(module.title)}</strong>
+              <small>${escapeHtml(module.summary)}</small>
+            </span>
+            <em>${selectedCount ? `${selectedCount}/${module.errorTypes.length}` : `${module.errorTypes.length} 条`}</em>
+          </button>
+          <div class="tree-module-actions">
+            <button class="tree-mini-btn" type="button" data-select-module-rules="${module.id}">全选本组</button>
+            <button class="tree-mini-btn" type="button" data-clear-module-rules="${module.id}">清空本组</button>
+          </div>
+          <div class="tree-rules">
           ${module.errorTypes
             .map((ruleId) => {
               const rule = this.rules.errorTypes.find((item) => item.id === ruleId);
-              return `<button class="tree-rule ${activeRule === ruleId ? "active" : ""}" type="button" data-rule-id="${ruleId}" data-parent-module="${module.id}">${escapeHtml(rule?.name || ruleId)}</button>`;
+              const checked = activeRules.includes(ruleId);
+              return `<label class="tree-rule ${checked ? "active" : ""}">
+                <input type="checkbox" data-rule-id="${ruleId}" data-parent-module="${module.id}" ${checked ? "checked" : ""}>
+                <span class="tree-check" aria-hidden="true">✓</span>
+                <span>
+                  <strong>${escapeHtml(rule?.name || ruleId)}</strong>
+                  <small>${escapeHtml(rule?.defaultFix || "")}</small>
+                </span>
+              </label>`;
             })
             .join("")}
-        </div>`;
+          </div>
+        </section>`;
       })
-      .join("");
+      .join("")}`;
 
-    $$(".tree-module > button").forEach((button) => {
+    $("#clearRuleSelectionBtn").addEventListener("click", () => this.setSelectedRules([], { render: true }));
+    $$(".tree-module-head").forEach((button) => {
       button.addEventListener("click", () => {
-        this.applyPracticeFilters(button.dataset.moduleId, "all");
+        this.applyPracticeFilters(button.dataset.moduleId, this.selectedRules);
         this.saveDraft();
       });
     });
-    $$(".tree-rule").forEach((button) => {
+    $$("[data-select-module-rules]").forEach((button) => {
       button.addEventListener("click", () => {
-        this.applyPracticeFilters(button.dataset.parentModule, button.dataset.ruleId);
+        const module = this.rules.modules.find((item) => item.id === button.dataset.selectModuleRules);
+        this.applyPracticeFilters(module?.id || "all", module?.errorTypes || []);
+      });
+    });
+    $$("[data-clear-module-rules]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const module = this.rules.modules.find((item) => item.id === button.dataset.clearModuleRules);
+        const nextRules = this.selectedRules.filter((ruleId) => !module?.errorTypes.includes(ruleId));
+        this.applyPracticeFilters(module?.id || "all", nextRules);
+      });
+    });
+    $$(".tree-rule input").forEach((input) => {
+      input.addEventListener("change", () => {
+        const ruleId = input.dataset.ruleId;
+        const nextRules = input.checked ? [...this.selectedRules, ruleId] : this.selectedRules.filter((item) => item !== ruleId);
+        this.applyPracticeFilters(input.dataset.parentModule, nextRules);
         this.saveDraft();
       });
     });
@@ -509,15 +643,18 @@ class InterpreterV4App {
     $("#expertClearBtn").addEventListener("click", () => this.clearExpertConversation());
     $("#expertSaveRecordBtn").addEventListener("click", () => this.saveExpertRecord());
 
-    ["expertDirection", "expertDifficulty", "expertModule", "expertRule", "expertSourceText", "expertUserTranslation", "expertReferenceText"].forEach((id) => {
+    ["expertDirection", "expertDifficulty", "expertModule", "expertSourceText", "expertUserTranslation", "expertReferenceText"].forEach((id) => {
       $(`#${id}`).addEventListener("input", () => this.saveDraft());
-      $(`#${id}`).addEventListener("change", () => this.saveDraft());
+      $(`#${id}`).addEventListener("change", () => {
+        this.saveDraft();
+        this.syncCustomSelect(id);
+      });
     });
   }
 
   renderRuleMap() {
     const activeModule = $("#moduleSelect").value;
-    const activeRule = $("#ruleSelect").value;
+    const activeRules = this.selectedRules;
     const moduleNodes = this.rules.modules.map((module, index) => ({
       id: module.id,
       type: "module",
@@ -570,7 +707,7 @@ class InterpreterV4App {
           node.type === "module"
             ? node.id === activeModule
             : node.type === "rule"
-              ? node.ruleId === activeRule && (activeModule === "all" || node.parentId === activeModule)
+              ? activeRules.includes(node.ruleId)
               : false;
         const attrs =
           node.type === "module"
@@ -587,30 +724,100 @@ class InterpreterV4App {
     $("#ruleMap").innerHTML = `<div class="map-canvas">${linkMarkup}${nodeMarkup}</div>`;
     $$("[data-map-module]").forEach((button) => {
       button.addEventListener("click", () => {
-        this.applyPracticeFilters(button.dataset.mapModule, "all");
+        this.applyPracticeFilters(button.dataset.mapModule, this.selectedRules);
       });
     });
     $$("[data-map-rule]").forEach((button) => {
       button.addEventListener("click", () => {
-        this.applyPracticeFilters(button.dataset.mapParent, button.dataset.mapRule);
+        const ruleId = button.dataset.mapRule;
+        const nextRules = this.selectedRules.includes(ruleId)
+          ? this.selectedRules.filter((item) => item !== ruleId)
+          : [...this.selectedRules, ruleId];
+        this.applyPracticeFilters(button.dataset.mapParent, nextRules);
       });
     });
   }
 
-  applyPracticeFilters(moduleId = "all", ruleId = "all") {
+  setSelectedRules(rules = [], { render = false, syncRecords = true, save = true } = {}) {
+    this.selectedRules = normalizeRuleList(rules);
+    $("#ruleSelect").value = this.selectedRules[0] || "all";
+    this.renderRuleSelectionSummary();
+    if (syncRecords) this.syncRecordFilters($("#moduleSelect").value, this.selectedRules, { silent: true });
+    if (render) {
+      this.renderRuleTree();
+      this.renderRuleMap();
+    }
+    if (save) this.saveDraft();
+  }
+
+  setSelectedExpertRules(rules = [], { save = true } = {}) {
+    this.selectedExpertRules = normalizeRuleList(rules);
+    $("#expertRule").value = this.selectedExpertRules[0] || "all";
+    this.renderExpertRulePicker();
+    if (save) this.saveDraft();
+  }
+
+  renderRuleSelectionSummary() {
+    const target = $("#selectedRuleSummary");
+    if (!target) return;
+    if (this.selectedRules.length === 0) {
+      target.innerHTML = `<span>全部规则</span><small>未限定规则</small>`;
+      return;
+    }
+    const mode = this.selectedRules.length === 1 ? "专项训练" : "综合训练";
+    target.innerHTML = `<span>${escapeHtml(mode)}</span><small>${escapeHtml(this.selectedRules.map(ruleName).join("、"))}</small>`;
+  }
+
+  renderExpertRulePicker() {
+    const target = $("#expertRulePicker");
+    if (!target) return;
+    target.innerHTML = `
+      <div class="rule-picker-head">
+        <span>${this.selectedExpertRules.length ? `已选 ${this.selectedExpertRules.length} 条规则` : "全部规则"}</span>
+        <button class="tree-mini-btn" type="button" id="clearExpertRulesBtn">清空</button>
+      </div>
+      <div class="rule-picker-grid">
+        ${this.rules.errorTypes
+          .map((rule) => {
+            const checked = this.selectedExpertRules.includes(rule.id);
+            return `<label class="compact-check ${checked ? "active" : ""}">
+              <input type="checkbox" data-expert-rule-id="${rule.id}" ${checked ? "checked" : ""}>
+              <span aria-hidden="true">✓</span>
+              <strong>${escapeHtml(rule.name)}</strong>
+            </label>`;
+          })
+          .join("")}
+      </div>`;
+    $("#clearExpertRulesBtn")?.addEventListener("click", () => this.setSelectedExpertRules([]));
+    $$("[data-expert-rule-id]").forEach((input) => {
+      input.addEventListener("change", () => {
+        const ruleId = input.dataset.expertRuleId;
+        const nextRules = input.checked
+          ? [...this.selectedExpertRules, ruleId]
+          : this.selectedExpertRules.filter((item) => item !== ruleId);
+        this.setSelectedExpertRules(nextRules);
+      });
+    });
+  }
+
+  applyPracticeFilters(moduleId = "all", rules = []) {
     $("#moduleSelect").value = moduleId;
-    $("#ruleSelect").value = ruleId;
-    this.syncRecordFilters(moduleId, ruleId);
+    this.syncCustomSelect("moduleSelect");
+    this.setSelectedRules(rules, { syncRecords: false });
+    this.syncRecordFilters(moduleId, this.selectedRules);
     this.renderRuleTree();
     this.renderRuleMap();
     this.saveDraft();
   }
 
-  syncRecordFilters(moduleId = "all", ruleId = "all", { silent = false } = {}) {
+  syncRecordFilters(moduleId = "all", rules = [], { silent = false } = {}) {
     this.recordModuleFilter = moduleId || "all";
-    this.recordRuleFilter = ruleId || "all";
+    const ruleList = normalizeRuleList(rules);
+    this.recordRuleFilter = ruleList.length === 1 ? ruleList[0] : "all";
     if ($("#recordModuleFilter")) $("#recordModuleFilter").value = this.recordModuleFilter;
     if ($("#recordRuleFilter")) $("#recordRuleFilter").value = this.recordRuleFilter;
+    this.syncCustomSelect("recordModuleFilter");
+    this.syncCustomSelect("recordRuleFilter");
     if (!silent) this.renderRecords();
   }
 
@@ -628,22 +835,26 @@ class InterpreterV4App {
       direction: this.selectedMaterialDirection(),
       difficulty: $("#difficultySelect").value,
       focusModule: $("#moduleSelect").value,
-      focusRule: $("#ruleSelect").value
+      focusRules: this.selectedRules,
+      excludeId: this.currentMaterial?.id || ""
     });
     if (!material) {
       this.toast("暂无符合条件的素材。", "error");
       return;
     }
-    this.loadMaterial(material);
+    this.loadMaterial(material, { syncFilters: false });
   }
 
-  loadMaterial(material) {
+  loadMaterial(material, { syncFilters = true } = {}) {
     if (!material) return;
     this.currentMaterial = material;
-    $("#directionSelect").value = material.direction;
-    $("#difficultySelect").value = material.difficultyLevel;
-    $("#moduleSelect").value = material.focusModule || "all";
-    $("#ruleSelect").value = material.focusRules?.[0] || "all";
+    if (syncFilters) {
+      $("#directionSelect").value = material.direction;
+      $("#difficultySelect").value = material.difficultyLevel;
+      $("#moduleSelect").value = material.focusModule || "all";
+      this.setSelectedRules(material.focusRules || [], { syncRecords: false });
+      this.refreshCustomSelects();
+    }
     $("#sourceText").value = material.sourceText;
     $("#referenceText").value = material.referenceTranslation;
     $("#userTranslation").value = "";
@@ -652,6 +863,7 @@ class InterpreterV4App {
     $("#saveRecordBtn").disabled = true;
     this.renderRuleTree();
     this.renderRuleMap();
+    if (syncFilters) this.syncRecordFilters($("#moduleSelect").value, this.selectedRules);
     this.renderFeedbackEmpty("素材已载入。");
     this.saveDraft();
   }
@@ -808,7 +1020,9 @@ class InterpreterV4App {
         referenceTranslation: $("#referenceText").value.trim(),
         report: this.currentReport,
         audioBlobId: this.currentAudioBlobId,
-        modeSource: "workspace"
+        modeSource: "workspace",
+        selectedTrainingRules: this.selectedRules,
+        selectedTrainingRuleNames: this.selectedRules.map(ruleName)
       });
       $("#saveRecordBtn").disabled = true;
       await this.refreshRecords();
@@ -829,7 +1043,9 @@ class InterpreterV4App {
         referenceTranslation: $("#expertReferenceText").value.trim(),
         report: this.expertReport,
         audioBlobId: "",
-        modeSource: "expert"
+        modeSource: "expert",
+        selectedTrainingRules: this.selectedExpertRules,
+        selectedTrainingRuleNames: this.selectedExpertRules.map(ruleName)
       });
       $("#expertSaveRecordBtn").disabled = true;
       await this.refreshRecords();
@@ -914,7 +1130,8 @@ class InterpreterV4App {
   getFilteredRecords() {
     return this.recordsCache.filter((record) => {
       const moduleOk = this.recordModuleFilter === "all" || record.focusModule === this.recordModuleFilter;
-      const ruleOk = this.recordRuleFilter === "all" || (record.triggeredRules || []).includes(this.recordRuleFilter);
+      const recordRules = [...(record.triggeredRules || []), ...(record.selectedTrainingRules || [])];
+      const ruleOk = this.recordRuleFilter === "all" || recordRules.includes(this.recordRuleFilter);
       return moduleOk && ruleOk;
     });
   }
@@ -1053,6 +1270,11 @@ class InterpreterV4App {
   openRecord(id) {
     const record = this.recordsCache.find((item) => item.id === id);
     if (!record) return;
+    const selectedRules = record.selectedTrainingRuleNames?.length
+      ? record.selectedTrainingRuleNames.join("、")
+      : record.selectedTrainingRules?.length
+        ? record.selectedTrainingRules.map(ruleName).join("、")
+        : "未限定规则";
     $("#recordDetail").innerHTML = `<div class="record-detail">
       <section class="record-detail-section">
         <div class="card-meta">
@@ -1067,6 +1289,8 @@ class InterpreterV4App {
         <p>${escapeHtml(record.userTranslation || "未提交译文（默认模式）")}</p>
         <h3>参考译文</h3>
         <p>${escapeHtml(record.referenceTranslation)}</p>
+        <h3>训练选择规则</h3>
+        <p>${escapeHtml(selectedRules)}</p>
       </section>
       ${record.report?.breakdown?.map((item) => this.renderBreakdown(item)).join("") || ""}
     </div>`;
@@ -1142,14 +1366,16 @@ class InterpreterV4App {
       direction: $("#directionSelect")?.value,
       difficulty: $("#difficultySelect")?.value,
       module: $("#moduleSelect")?.value,
-      rule: $("#ruleSelect")?.value,
+      rule: this.selectedRules[0] || "all",
+      rules: this.selectedRules,
       sourceText: $("#sourceText")?.value,
       referenceText: $("#referenceText")?.value,
       userTranslation: $("#userTranslation")?.value,
       expertDirection: $("#expertDirection")?.value,
       expertDifficulty: $("#expertDifficulty")?.value,
       expertModule: $("#expertModule")?.value,
-      expertRule: $("#expertRule")?.value,
+      expertRule: this.selectedExpertRules[0] || "all",
+      expertRules: this.selectedExpertRules,
       expertSourceText: $("#expertSourceText")?.value,
       expertReferenceText: $("#expertReferenceText")?.value,
       expertUserTranslation: $("#expertUserTranslation")?.value
@@ -1162,19 +1388,21 @@ class InterpreterV4App {
     if (draft.direction) $("#directionSelect").value = draft.direction;
     if (draft.difficulty) $("#difficultySelect").value = draft.difficulty;
     if (draft.module) $("#moduleSelect").value = draft.module;
-    if (draft.rule) $("#ruleSelect").value = draft.rule;
+    this.setSelectedRules(draft.rules || draft.rule || [], { syncRecords: false, save: false });
     $("#sourceText").value = draft.sourceText || "";
     $("#referenceText").value = draft.referenceText || "";
     $("#userTranslation").value = draft.userTranslation || "";
     if (draft.expertDirection) $("#expertDirection").value = draft.expertDirection;
     if (draft.expertDifficulty) $("#expertDifficulty").value = draft.expertDifficulty;
     if (draft.expertModule) $("#expertModule").value = draft.expertModule;
-    if (draft.expertRule) $("#expertRule").value = draft.expertRule;
+    this.setSelectedExpertRules(draft.expertRules || draft.expertRule || [], { save: false });
     $("#expertSourceText").value = draft.expertSourceText || "";
     $("#expertReferenceText").value = draft.expertReferenceText || "";
     $("#expertUserTranslation").value = draft.expertUserTranslation || "";
     this.renderRuleTree();
     this.renderRuleMap();
+    this.refreshCustomSelects();
+    this.syncRecordFilters($("#moduleSelect").value, this.selectedRules, { silent: true });
     if (this.settings.activeSurface) this.showSurface(this.settings.activeSurface);
   }
 

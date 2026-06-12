@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Interpreter V4 - 中英转换训练台</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='16' fill='%23f7f5ee'/%3E%3Cpath d='M8 24V9m0 15 8-6m-8 6 8 2m0-8V6m0 12 8-5m-8 13v-8m8-5v10' fill='none' stroke='%2316776f' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='8' cy='9' r='2.5' fill='%2316776f'/%3E%3Ccircle cx='16' cy='6' r='2.5' fill='%2316776f'/%3E%3Ccircle cx='24' cy='13' r='2.5' fill='%2316776f'/%3E%3Ccircle cx='24' cy='23' r='2.5' fill='%2316776f'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/main.css?v=20260612-draw-fix2">
 </head>
 <body>
   <div class="app" id="app">
@@ -139,9 +139,10 @@
                   </label>
                   <label>
                     <span>规则</span>
-                    <select id="ruleSelect">
+                    <select id="ruleSelect" data-native-only>
                       <option value="all">全部规则</option>
                     </select>
+                    <div class="rule-selection-summary" id="selectedRuleSummary">全部规则</div>
                   </label>
                 </div>
 
@@ -248,11 +249,12 @@
                 </label>
                 <label>
                   <span>规则</span>
-                  <select id="expertRule">
+                  <select id="expertRule" data-native-only>
                     <option value="all">全部规则</option>
                   </select>
                 </label>
               </div>
+              <div class="expert-rule-picker" id="expertRulePicker" aria-label="专家规则多选"></div>
 
               <label class="field-block">
                 <span>当前原文</span>
@@ -392,6 +394,6 @@
     <div class="toast-stack" id="toastStack" aria-live="polite"></div>
   </div>
 
-  <script type="module" src="js/main.js"></script>
+  <script type="module" src="js/main.js?v=20260612-draw-fix2"></script>
 </body>
 </html>
