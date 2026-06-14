@@ -1,0 +1,1806 @@
+[
+  {
+    "id": "v4_zh_en_001",
+    "sourceText": "这家公司去年亏损严重，裁掉了30%的员工，现在正在寻找新的投资者。",
+    "referenceTranslation": "This company, which suffered heavy losses and laid off 30% of its employees last year, is now looking for new investors.",
+    "difficultyLevel": "medium",
+    "topicCategory": "business",
+    "direction": "zh-en",
+    "wordCount": 35,
+    "focusModule": "syntax-integration",
+    "focusRules": [
+      "verb-piling",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_en_zh_001",
+    "sourceText": "Many of the buildings destroyed in the earthquake were constructed without proper safety standards.",
+    "referenceTranslation": "地震摧毁了许多建筑。这些建筑当初建造时，没有遵循适当的安全标准。",
+    "difficultyLevel": "medium",
+    "topicCategory": "public-safety",
+    "direction": "en-zh",
+    "wordCount": 13,
+    "focusModule": "static-dynamic",
+    "focusRules": [
+      "passive-active-mismatch",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_zh_en_002",
+    "sourceText": "你不来，我不走。",
+    "referenceTranslation": "I will not leave if you do not come.",
+    "difficultyLevel": "easy",
+    "topicCategory": "daily",
+    "direction": "zh-en",
+    "wordCount": 7,
+    "focusModule": "hypotaxis-parataxis",
+    "focusRules": [
+      "missing-logical-connector"
+    ]
+  },
+  {
+    "id": "v4_zh_en_003",
+    "sourceText": "那所房子你们早该修了。",
+    "referenceTranslation": "You should have repaired that house long ago.",
+    "difficultyLevel": "easy",
+    "topicCategory": "daily",
+    "direction": "zh-en",
+    "wordCount": 8,
+    "focusModule": "topic-subject",
+    "focusRules": [
+      "topic-subject-mismatch"
+    ]
+  },
+  {
+    "id": "v4_zh_en_004",
+    "sourceText": "我们要加强环境保护的工作。",
+    "referenceTranslation": "We should strengthen environmental protection.",
+    "difficultyLevel": "easy",
+    "topicCategory": "environment",
+    "direction": "zh-en",
+    "wordCount": 6,
+    "focusModule": "logic-redundancy",
+    "focusRules": [
+      "redundancy-category-word"
+    ]
+  },
+  {
+    "id": "v4_zh_en_005",
+    "sourceText": "他做事总是拖泥带水，客户很不满意。",
+    "referenceTranslation": "The client is very dissatisfied with his sloppy and inefficient work style.",
+    "difficultyLevel": "medium",
+    "topicCategory": "business",
+    "direction": "zh-en",
+    "wordCount": 13,
+    "focusModule": "culture-loaded",
+    "focusRules": [
+      "cultural-imagery-literalism"
+    ]
+  },
+  {
+    "id": "v4_zh_en_006",
+    "sourceText": "这个项目要摸着石头过河，边做边调整。",
+    "referenceTranslation": "We need to take a trial-and-error approach in this project and adjust as we go.",
+    "difficultyLevel": "medium",
+    "topicCategory": "project",
+    "direction": "zh-en",
+    "wordCount": 15,
+    "focusModule": "culture-loaded",
+    "focusRules": [
+      "cultural-imagery-literalism"
+    ]
+  },
+  {
+    "id": "v4_zh_en_007",
+    "sourceText": "问题已经解决了。",
+    "referenceTranslation": "The problem has been solved.",
+    "difficultyLevel": "easy",
+    "topicCategory": "general",
+    "direction": "zh-en",
+    "wordCount": 5,
+    "focusModule": "static-dynamic",
+    "focusRules": [
+      "passive-active-mismatch"
+    ]
+  },
+  {
+    "id": "v4_en_zh_002",
+    "sourceText": "The proposal put forward by a researcher who joined the team only three months ago has attracted wide attention.",
+    "referenceTranslation": "一名研究员提出了这项议案。他三个月前才加入团队，这项议案已经引起广泛关注。",
+    "difficultyLevel": "hard",
+    "topicCategory": "academic",
+    "direction": "en-zh",
+    "wordCount": 17,
+    "focusModule": "syntax-integration",
+    "focusRules": [
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_zh_en_008",
+    "sourceText": "如果你不能来，请提前告诉我们，我们可以重新安排时间。",
+    "referenceTranslation": "Please let us know in advance if you cannot come, so that we can reschedule.",
+    "difficultyLevel": "medium",
+    "topicCategory": "coordination",
+    "direction": "zh-en",
+    "wordCount": 14,
+    "focusModule": "hypotaxis-parataxis",
+    "focusRules": [
+      "missing-logical-connector",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_en_zh_003",
+    "sourceText": "The policy was designed to reduce waste and encourage companies to reuse materials.",
+    "referenceTranslation": "这项政策旨在减少浪费，并鼓励企业重复利用材料。",
+    "difficultyLevel": "medium",
+    "topicCategory": "policy",
+    "direction": "en-zh",
+    "wordCount": 13,
+    "focusModule": "static-dynamic",
+    "focusRules": [
+      "passive-active-mismatch"
+    ]
+  },
+  {
+    "id": "v4_zh_en_009",
+    "sourceText": "万事俱备，只欠东风。",
+    "referenceTranslation": "Everything is ready; only one crucial condition is still missing.",
+    "difficultyLevel": "hard",
+    "topicCategory": "culture",
+    "direction": "zh-en",
+    "wordCount": 8,
+    "focusModule": "culture-loaded",
+    "focusRules": [
+      "cultural-imagery-literalism",
+      "missing-logical-connector"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_001",
+    "sourceText": "你提前确认，我就安排会议室。",
+    "referenceTranslation": "I will book the meeting room if you confirm in advance.",
+    "difficultyLevel": "easy",
+    "topicCategory": "daily",
+    "direction": "zh-en",
+    "wordCount": 12,
+    "focusModule": "hypotaxis-parataxis",
+    "focusRules": [
+      "missing-logical-connector",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_002",
+    "sourceText": "雨停了，我们再出发。",
+    "referenceTranslation": "We will set out after the rain stops.",
+    "difficultyLevel": "medium",
+    "topicCategory": "meeting",
+    "direction": "zh-en",
+    "wordCount": 8,
+    "focusModule": "hypotaxis-parataxis",
+    "focusRules": [
+      "missing-logical-connector"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_003",
+    "sourceText": "材料不齐，申请就不能受理。",
+    "referenceTranslation": "The application cannot be processed unless all materials are complete.",
+    "difficultyLevel": "easy",
+    "topicCategory": "education",
+    "direction": "zh-en",
+    "wordCount": 11,
+    "focusModule": "hypotaxis-parataxis",
+    "focusRules": [
+      "missing-logical-connector"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_004",
+    "sourceText": "价格再降一点，客户可能今天签约。",
+    "referenceTranslation": "The client may sign today if the price is lowered a little more.",
+    "difficultyLevel": "medium",
+    "topicCategory": "travel",
+    "direction": "zh-en",
+    "wordCount": 14,
+    "focusModule": "hypotaxis-parataxis",
+    "focusRules": [
+      "missing-logical-connector"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_005",
+    "sourceText": "老师讲完例题，学生再分组练习。",
+    "referenceTranslation": "Students will practise in groups after the teacher finishes the example.",
+    "difficultyLevel": "easy",
+    "topicCategory": "public-service",
+    "direction": "zh-en",
+    "wordCount": 13,
+    "focusModule": "hypotaxis-parataxis",
+    "focusRules": [
+      "missing-logical-connector",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_006",
+    "sourceText": "没有稳定的数据，结论就站不住脚。",
+    "referenceTranslation": "The conclusion will not hold unless the data are reliable.",
+    "difficultyLevel": "medium",
+    "topicCategory": "daily",
+    "direction": "zh-en",
+    "wordCount": 14,
+    "focusModule": "hypotaxis-parataxis",
+    "focusRules": [
+      "missing-logical-connector"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_007",
+    "sourceText": "路上堵车，代表团可能会晚到。",
+    "referenceTranslation": "The delegation may arrive late because traffic is heavy.",
+    "difficultyLevel": "easy",
+    "topicCategory": "meeting",
+    "direction": "zh-en",
+    "wordCount": 12,
+    "focusModule": "hypotaxis-parataxis",
+    "focusRules": [
+      "missing-logical-connector"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_008",
+    "sourceText": "你把问题说清楚，技术团队才能定位原因。",
+    "referenceTranslation": "The technical team can identify the cause only if you describe the problem clearly.",
+    "difficultyLevel": "medium",
+    "topicCategory": "education",
+    "direction": "zh-en",
+    "wordCount": 17,
+    "focusModule": "hypotaxis-parataxis",
+    "focusRules": [
+      "missing-logical-connector"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_009",
+    "sourceText": "政策落实得好，社区服务就会更高效。",
+    "referenceTranslation": "Community services will become more efficient if the policy is implemented well.",
+    "difficultyLevel": "easy",
+    "topicCategory": "travel",
+    "direction": "zh-en",
+    "wordCount": 15,
+    "focusModule": "hypotaxis-parataxis",
+    "focusRules": [
+      "missing-logical-connector",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_010",
+    "sourceText": "方案通过后，我们马上启动试点。",
+    "referenceTranslation": "We will launch the pilot as soon as the proposal is approved.",
+    "difficultyLevel": "medium",
+    "topicCategory": "public-service",
+    "direction": "zh-en",
+    "wordCount": 13,
+    "focusModule": "hypotaxis-parataxis",
+    "focusRules": [
+      "missing-logical-connector"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_001",
+    "sourceText": "If the supplier confirms the delivery date today, we can adjust the launch schedule.",
+    "referenceTranslation": "如果供应商今天确认交付日期，我们就可以调整发布计划。",
+    "difficultyLevel": "easy",
+    "topicCategory": "daily",
+    "direction": "en-zh",
+    "wordCount": 14,
+    "focusModule": "hypotaxis-parataxis",
+    "focusRules": [
+      "missing-logical-connector",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_002",
+    "sourceText": "Because the data were collected too quickly, the research team will verify the sample again.",
+    "referenceTranslation": "由于数据收集得过快，研究团队将再次核查样本。",
+    "difficultyLevel": "medium",
+    "topicCategory": "meeting",
+    "direction": "en-zh",
+    "wordCount": 15,
+    "focusModule": "hypotaxis-parataxis",
+    "focusRules": [
+      "missing-logical-connector"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_003",
+    "sourceText": "Unless the weather improves, the outdoor training session will be moved online.",
+    "referenceTranslation": "如果天气没有好转，户外培训将改到线上进行。",
+    "difficultyLevel": "easy",
+    "topicCategory": "education",
+    "direction": "en-zh",
+    "wordCount": 12,
+    "focusModule": "hypotaxis-parataxis",
+    "focusRules": [
+      "missing-logical-connector"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_004",
+    "sourceText": "When the new rules take effect, small shops will need clearer price labels.",
+    "referenceTranslation": "新规定生效后，小商店需要使用更清晰的价格标签。",
+    "difficultyLevel": "medium",
+    "topicCategory": "travel",
+    "direction": "en-zh",
+    "wordCount": 13,
+    "focusModule": "hypotaxis-parataxis",
+    "focusRules": [
+      "missing-logical-connector"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_005",
+    "sourceText": "Although the task looks simple, it requires careful coordination among three departments.",
+    "referenceTranslation": "虽然这项任务看起来简单，但需要三个部门仔细协调。",
+    "difficultyLevel": "easy",
+    "topicCategory": "public-service",
+    "direction": "en-zh",
+    "wordCount": 12,
+    "focusModule": "hypotaxis-parataxis",
+    "focusRules": [
+      "missing-logical-connector",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_006",
+    "sourceText": "Since the platform was updated last night, some users may need to log in again.",
+    "referenceTranslation": "平台昨晚更新后，部分用户可能需要重新登录。",
+    "difficultyLevel": "medium",
+    "topicCategory": "daily",
+    "direction": "en-zh",
+    "wordCount": 15,
+    "focusModule": "hypotaxis-parataxis",
+    "focusRules": [
+      "missing-logical-connector"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_007",
+    "sourceText": "If demand continues to rise, the factory will add a second shift next month.",
+    "referenceTranslation": "如果需求继续增长，工厂下个月将增加第二班。",
+    "difficultyLevel": "easy",
+    "topicCategory": "meeting",
+    "direction": "en-zh",
+    "wordCount": 14,
+    "focusModule": "hypotaxis-parataxis",
+    "focusRules": [
+      "missing-logical-connector"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_008",
+    "sourceText": "After the students finish the listening exercise, they will compare their notes in pairs.",
+    "referenceTranslation": "学生完成听力练习后，将两人一组对照笔记。",
+    "difficultyLevel": "medium",
+    "topicCategory": "education",
+    "direction": "en-zh",
+    "wordCount": 14,
+    "focusModule": "hypotaxis-parataxis",
+    "focusRules": [
+      "missing-logical-connector"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_009",
+    "sourceText": "Because the river level is still high, residents should avoid the low bridge.",
+    "referenceTranslation": "由于河水水位仍然较高，居民应避开那座低桥。",
+    "difficultyLevel": "easy",
+    "topicCategory": "travel",
+    "direction": "en-zh",
+    "wordCount": 13,
+    "focusModule": "hypotaxis-parataxis",
+    "focusRules": [
+      "missing-logical-connector",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_010",
+    "sourceText": "Once the contract is reviewed, the legal team will send us a final version.",
+    "referenceTranslation": "合同审核完成后，法务团队会把最终版本发给我们。",
+    "difficultyLevel": "medium",
+    "topicCategory": "public-service",
+    "direction": "en-zh",
+    "wordCount": 14,
+    "focusModule": "hypotaxis-parataxis",
+    "focusRules": [
+      "missing-logical-connector"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_011",
+    "sourceText": "这份报告，我们明天上午必须交。",
+    "referenceTranslation": "We must submit this report tomorrow morning.",
+    "difficultyLevel": "hard",
+    "topicCategory": "daily",
+    "direction": "zh-en",
+    "wordCount": 13,
+    "focusModule": "topic-subject",
+    "focusRules": [
+      "topic-subject-mismatch",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_012",
+    "sourceText": "那台旧电脑，信息中心已经安排人来修。",
+    "referenceTranslation": "The IT center has arranged for someone to repair that old computer.",
+    "difficultyLevel": "easy",
+    "topicCategory": "housing",
+    "direction": "zh-en",
+    "wordCount": 16,
+    "focusModule": "topic-subject",
+    "focusRules": [
+      "topic-subject-mismatch"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_013",
+    "sourceText": "这个问题，管理层还没有给出明确答复。",
+    "referenceTranslation": "Management has not given a clear response to this issue yet.",
+    "difficultyLevel": "hard",
+    "topicCategory": "healthcare",
+    "direction": "zh-en",
+    "wordCount": 16,
+    "focusModule": "topic-subject",
+    "focusRules": [
+      "topic-subject-mismatch"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_014",
+    "sourceText": "这条路线，游客最好避开早高峰。",
+    "referenceTranslation": "Tourists should avoid this route during the morning rush hour.",
+    "difficultyLevel": "easy",
+    "topicCategory": "service",
+    "direction": "zh-en",
+    "wordCount": 13,
+    "focusModule": "topic-subject",
+    "focusRules": [
+      "topic-subject-mismatch"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_015",
+    "sourceText": "这些药，医生建议饭后再吃。",
+    "referenceTranslation": "The doctor recommends taking these medicines after meals.",
+    "difficultyLevel": "hard",
+    "topicCategory": "education",
+    "direction": "zh-en",
+    "wordCount": 11,
+    "focusModule": "topic-subject",
+    "focusRules": [
+      "topic-subject-mismatch",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_016",
+    "sourceText": "那份申请，学校已经退回要求补充材料。",
+    "referenceTranslation": "The school has returned that application and asked for additional documents.",
+    "difficultyLevel": "easy",
+    "topicCategory": "daily",
+    "direction": "zh-en",
+    "wordCount": 16,
+    "focusModule": "topic-subject",
+    "focusRules": [
+      "topic-subject-mismatch"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_017",
+    "sourceText": "这个项目，客户希望下周看到样机。",
+    "referenceTranslation": "The client hopes to see a prototype of this project next week.",
+    "difficultyLevel": "hard",
+    "topicCategory": "housing",
+    "direction": "zh-en",
+    "wordCount": 14,
+    "focusModule": "topic-subject",
+    "focusRules": [
+      "topic-subject-mismatch"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_018",
+    "sourceText": "这项服务，老年人使用起来还不够方便。",
+    "referenceTranslation": "This service is still not convenient enough for older users.",
+    "difficultyLevel": "easy",
+    "topicCategory": "healthcare",
+    "direction": "zh-en",
+    "wordCount": 16,
+    "focusModule": "topic-subject",
+    "focusRules": [
+      "topic-subject-mismatch"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_019",
+    "sourceText": "那笔费用，财务部会在月底统一结算。",
+    "referenceTranslation": "The finance department will settle that expense at the end of the month.",
+    "difficultyLevel": "hard",
+    "topicCategory": "service",
+    "direction": "zh-en",
+    "wordCount": 15,
+    "focusModule": "topic-subject",
+    "focusRules": [
+      "topic-subject-mismatch",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_020",
+    "sourceText": "这段录音，评委需要再听一遍。",
+    "referenceTranslation": "The judges need to listen to this recording again.",
+    "difficultyLevel": "easy",
+    "topicCategory": "education",
+    "direction": "zh-en",
+    "wordCount": 12,
+    "focusModule": "topic-subject",
+    "focusRules": [
+      "topic-subject-mismatch"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_011",
+    "sourceText": "The form that residents submitted last week still needs a signature from the community office.",
+    "referenceTranslation": "居民上周提交了这张表格。社区办公室还需要在上面签字。",
+    "difficultyLevel": "hard",
+    "topicCategory": "daily",
+    "direction": "en-zh",
+    "wordCount": 15,
+    "focusModule": "topic-subject",
+    "focusRules": [
+      "topic-subject-mismatch",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_012",
+    "sourceText": "The camera installed near the gate records only the entrance area, not the whole street.",
+    "referenceTranslation": "大门附近安装的摄像头只记录入口区域，不记录整条街。",
+    "difficultyLevel": "easy",
+    "topicCategory": "housing",
+    "direction": "en-zh",
+    "wordCount": 15,
+    "focusModule": "topic-subject",
+    "focusRules": [
+      "topic-subject-mismatch"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_013",
+    "sourceText": "The training plan we discussed yesterday should be revised before it is sent to new employees.",
+    "referenceTranslation": "我们昨天讨论了培训计划。发给新员工之前，还应对它进行修改。",
+    "difficultyLevel": "hard",
+    "topicCategory": "healthcare",
+    "direction": "en-zh",
+    "wordCount": 16,
+    "focusModule": "topic-subject",
+    "focusRules": [
+      "topic-subject-mismatch"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_014",
+    "sourceText": "The restaurant recommended by the host is popular with visitors but hard to book on weekends.",
+    "referenceTranslation": "主持人推荐了那家餐厅。它很受游客欢迎，但周末很难订位。",
+    "difficultyLevel": "easy",
+    "topicCategory": "service",
+    "direction": "en-zh",
+    "wordCount": 16,
+    "focusModule": "topic-subject",
+    "focusRules": [
+      "topic-subject-mismatch"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_015",
+    "sourceText": "The document on the manager’s desk contains the budget figures for the next quarter.",
+    "referenceTranslation": "经理桌上的那份文件包含下一季度的预算数据。",
+    "difficultyLevel": "hard",
+    "topicCategory": "education",
+    "direction": "en-zh",
+    "wordCount": 70,
+    "focusModule": "topic-subject",
+    "focusRules": [
+      "topic-subject-mismatch",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_016",
+    "sourceText": "The app used by students to reserve study rooms will be unavailable tonight.",
+    "referenceTranslation": "学生用来预约自习室的应用今晚将无法使用。",
+    "difficultyLevel": "easy",
+    "topicCategory": "daily",
+    "direction": "en-zh",
+    "wordCount": 13,
+    "focusModule": "topic-subject",
+    "focusRules": [
+      "topic-subject-mismatch"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_017",
+    "sourceText": "The bridge connecting the two villages was repaired after the summer floods.",
+    "referenceTranslation": "连接两个村庄的桥在夏季洪水后得到了修复。",
+    "difficultyLevel": "hard",
+    "topicCategory": "housing",
+    "direction": "en-zh",
+    "wordCount": 12,
+    "focusModule": "topic-subject",
+    "focusRules": [
+      "topic-subject-mismatch"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_018",
+    "sourceText": "The poster placed at the clinic entrance explains the new appointment process.",
+    "referenceTranslation": "诊所入口处的海报说明了新的预约流程。",
+    "difficultyLevel": "easy",
+    "topicCategory": "healthcare",
+    "direction": "en-zh",
+    "wordCount": 12,
+    "focusModule": "topic-subject",
+    "focusRules": [
+      "topic-subject-mismatch"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_019",
+    "sourceText": "The course chosen by most first-year students focuses on academic writing.",
+    "referenceTranslation": "大多数一年级学生选择了这门课程。课程重点是学术写作。",
+    "difficultyLevel": "hard",
+    "topicCategory": "service",
+    "direction": "en-zh",
+    "wordCount": 11,
+    "focusModule": "topic-subject",
+    "focusRules": [
+      "topic-subject-mismatch",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_020",
+    "sourceText": "The package left at the front desk belongs to the visiting delegation.",
+    "referenceTranslation": "前台留下的包裹属于来访代表团。",
+    "difficultyLevel": "easy",
+    "topicCategory": "education",
+    "direction": "en-zh",
+    "wordCount": 12,
+    "focusModule": "topic-subject",
+    "focusRules": [
+      "topic-subject-mismatch"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_021",
+    "sourceText": "团队完成了调研，整理了数据，正在准备向董事会汇报。",
+    "referenceTranslation": "After completing the survey and organizing the data, the team is preparing to report to the board.",
+    "difficultyLevel": "medium",
+    "topicCategory": "business",
+    "direction": "zh-en",
+    "wordCount": 22,
+    "focusModule": "syntax-integration",
+    "focusRules": [
+      "verb-piling",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_022",
+    "sourceText": "公司扩大了产能，优化了物流，今年有望缩短交货周期。",
+    "referenceTranslation": "By expanding capacity and improving logistics, the company is expected to shorten delivery times this year.",
+    "difficultyLevel": "hard",
+    "topicCategory": "research",
+    "direction": "zh-en",
+    "wordCount": 22,
+    "focusModule": "syntax-integration",
+    "focusRules": [
+      "verb-piling",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_023",
+    "sourceText": "政府发布了新指南，明确了审批流程，并要求各部门公开进度。",
+    "referenceTranslation": "The government issued new guidelines that clarify the approval process and require departments to disclose progress.",
+    "difficultyLevel": "medium",
+    "topicCategory": "policy",
+    "direction": "zh-en",
+    "wordCount": 25,
+    "focusModule": "syntax-integration",
+    "focusRules": [
+      "verb-piling",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_024",
+    "sourceText": "研究人员收集了样本，进行了对比实验，发现结果存在明显差异。",
+    "referenceTranslation": "The researchers collected samples and ran comparative experiments, finding significant differences in the results.",
+    "difficultyLevel": "hard",
+    "topicCategory": "technology",
+    "direction": "zh-en",
+    "wordCount": 26,
+    "focusModule": "syntax-integration",
+    "focusRules": [
+      "verb-piling",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_025",
+    "sourceText": "平台升级了搜索功能，增加了离线缓存，方便用户在弱网环境下使用。",
+    "referenceTranslation": "The platform upgraded search and added offline caching to help users work in poor network conditions.",
+    "difficultyLevel": "medium",
+    "topicCategory": "news",
+    "direction": "zh-en",
+    "wordCount": 28,
+    "focusModule": "syntax-integration",
+    "focusRules": [
+      "verb-piling",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_026",
+    "sourceText": "代表团参观了园区，听取了介绍，随后与企业负责人座谈。",
+    "referenceTranslation": "The delegation toured the park, listened to a briefing, and then held talks with company leaders.",
+    "difficultyLevel": "hard",
+    "topicCategory": "business",
+    "direction": "zh-en",
+    "wordCount": 23,
+    "focusModule": "syntax-integration",
+    "focusRules": [
+      "verb-piling",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_027",
+    "sourceText": "学校调整了课程表，增加了口语训练，鼓励学生进行同伴反馈。",
+    "referenceTranslation": "The school adjusted the timetable, added speaking practice, and encouraged peer feedback.",
+    "difficultyLevel": "medium",
+    "topicCategory": "research",
+    "direction": "zh-en",
+    "wordCount": 25,
+    "focusModule": "syntax-integration",
+    "focusRules": [
+      "verb-piling",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_028",
+    "sourceText": "医院优化了挂号流程，开通了线上提醒，减少了患者等待时间。",
+    "referenceTranslation": "The hospital improved the registration process and launched online reminders to reduce patient waiting time.",
+    "difficultyLevel": "hard",
+    "topicCategory": "policy",
+    "direction": "zh-en",
+    "wordCount": 25,
+    "focusModule": "syntax-integration",
+    "focusRules": [
+      "verb-piling",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_029",
+    "sourceText": "社区建立了志愿者队伍，开展了安全巡查，及时处理了隐患。",
+    "referenceTranslation": "The community formed a volunteer team to conduct safety inspections and address risks promptly.",
+    "difficultyLevel": "medium",
+    "topicCategory": "technology",
+    "direction": "zh-en",
+    "wordCount": 24,
+    "focusModule": "syntax-integration",
+    "focusRules": [
+      "verb-piling",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_030",
+    "sourceText": "企业引入了新设备，培训了操作人员，计划下月正式投产。",
+    "referenceTranslation": "The company introduced new equipment, trained operators, and plans to begin formal production next month.",
+    "difficultyLevel": "hard",
+    "topicCategory": "news",
+    "direction": "zh-en",
+    "wordCount": 23,
+    "focusModule": "syntax-integration",
+    "focusRules": [
+      "verb-piling",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_021",
+    "sourceText": "The report prepared by the consultants after three rounds of interviews will be discussed at Monday’s meeting.",
+    "referenceTranslation": "顾问进行了三轮访谈后准备了这份报告。报告将在周一的会议上讨论。",
+    "difficultyLevel": "medium",
+    "topicCategory": "business",
+    "direction": "en-zh",
+    "wordCount": 93,
+    "focusModule": "syntax-integration",
+    "focusRules": [
+      "verb-piling",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_022",
+    "sourceText": "The proposal submitted by the city government to improve night buses has received support from commuters.",
+    "referenceTranslation": "市政府提交了一项改善夜间公交的方案。通勤者对此表示支持。",
+    "difficultyLevel": "hard",
+    "topicCategory": "research",
+    "direction": "en-zh",
+    "wordCount": 16,
+    "focusModule": "syntax-integration",
+    "focusRules": [
+      "verb-piling",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_023",
+    "sourceText": "The device developed by the engineering team for remote monitoring can send alerts within seconds.",
+    "referenceTranslation": "工程团队开发了这款远程监测设备。它能在几秒钟内发出警报。",
+    "difficultyLevel": "medium",
+    "topicCategory": "policy",
+    "direction": "en-zh",
+    "wordCount": 15,
+    "focusModule": "syntax-integration",
+    "focusRules": [
+      "verb-piling",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_024",
+    "sourceText": "The article written by a student who interviewed local shop owners has been published on the school website.",
+    "referenceTranslation": "一名学生采访了当地店主，并写成这篇文章。文章已经发布在学校网站上。",
+    "difficultyLevel": "hard",
+    "topicCategory": "technology",
+    "direction": "en-zh",
+    "wordCount": 18,
+    "focusModule": "syntax-integration",
+    "focusRules": [
+      "verb-piling",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_025",
+    "sourceText": "The plan revised after last week’s budget review includes fewer venues and more online sessions.",
+    "referenceTranslation": "上周预算审查后，计划作了修改。修改后的计划减少了场地数量，增加了线上场次。",
+    "difficultyLevel": "medium",
+    "topicCategory": "news",
+    "direction": "en-zh",
+    "wordCount": 81,
+    "focusModule": "syntax-integration",
+    "focusRules": [
+      "verb-piling",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_026",
+    "sourceText": "The guidelines released by the ministry for emergency shelters emphasize clear signs and accessible entrances.",
+    "referenceTranslation": "该部发布了应急避难场所指南。指南强调标识清楚、入口无障碍。",
+    "difficultyLevel": "hard",
+    "topicCategory": "business",
+    "direction": "en-zh",
+    "wordCount": 15,
+    "focusModule": "syntax-integration",
+    "focusRules": [
+      "verb-piling",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_027",
+    "sourceText": "The survey conducted among first-time users revealed confusion about the payment page.",
+    "referenceTranslation": "团队对首次使用者进行了调查。调查显示，他们对付款页面感到困惑。",
+    "difficultyLevel": "medium",
+    "topicCategory": "research",
+    "direction": "en-zh",
+    "wordCount": 12,
+    "focusModule": "syntax-integration",
+    "focusRules": [
+      "verb-piling",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_028",
+    "sourceText": "The bridge damaged by heavy rain last summer reopened after months of repair work.",
+    "referenceTranslation": "去年夏天大雨损坏了这座桥。经过数月维修，它已经重新开放。",
+    "difficultyLevel": "hard",
+    "topicCategory": "policy",
+    "direction": "en-zh",
+    "wordCount": 14,
+    "focusModule": "syntax-integration",
+    "focusRules": [
+      "verb-piling",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_029",
+    "sourceText": "The training materials translated for overseas volunteers need another round of review.",
+    "referenceTranslation": "这些培训材料是为海外志愿者翻译的，还需要再审核一轮。",
+    "difficultyLevel": "medium",
+    "topicCategory": "technology",
+    "direction": "en-zh",
+    "wordCount": 12,
+    "focusModule": "syntax-integration",
+    "focusRules": [
+      "verb-piling",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_030",
+    "sourceText": "The exhibition curated by young artists from the region attracted many families during the holiday.",
+    "referenceTranslation": "当地青年艺术家策划了这场展览。假日期间，许多家庭前来参观。",
+    "difficultyLevel": "hard",
+    "topicCategory": "news",
+    "direction": "en-zh",
+    "wordCount": 15,
+    "focusModule": "syntax-integration",
+    "focusRules": [
+      "verb-piling",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_031",
+    "sourceText": "系统已经修好了，用户可以正常登录。",
+    "referenceTranslation": "The system has been repaired, and users can now log in normally.",
+    "difficultyLevel": "easy",
+    "topicCategory": "policy",
+    "direction": "zh-en",
+    "wordCount": 15,
+    "focusModule": "static-dynamic",
+    "focusRules": [
+      "passive-active-mismatch",
+      "topic-subject-mismatch",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_032",
+    "sourceText": "会议临时取消了，具体时间另行通知。",
+    "referenceTranslation": "The meeting has been canceled temporarily, and the new time will be announced later.",
+    "difficultyLevel": "medium",
+    "topicCategory": "technology",
+    "direction": "zh-en",
+    "wordCount": 15,
+    "focusModule": "static-dynamic",
+    "focusRules": [
+      "passive-active-mismatch",
+      "topic-subject-mismatch"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_033",
+    "sourceText": "这个决定让我想到，我们还需要评估长期风险。",
+    "referenceTranslation": "It occurred to me from this decision that we still need to assess long-term risks.",
+    "difficultyLevel": "easy",
+    "topicCategory": "operations",
+    "direction": "zh-en",
+    "wordCount": 19,
+    "focusModule": "static-dynamic",
+    "focusRules": [
+      "passive-active-mismatch",
+      "topic-subject-mismatch"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_034",
+    "sourceText": "这次经历让她更加重视团队沟通。",
+    "referenceTranslation": "This experience made her attach greater importance to team communication.",
+    "difficultyLevel": "medium",
+    "topicCategory": "public-safety",
+    "direction": "zh-en",
+    "wordCount": 14,
+    "focusModule": "static-dynamic",
+    "focusRules": [
+      "passive-active-mismatch",
+      "topic-subject-mismatch"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_035",
+    "sourceText": "通知已经发出，请各部门按要求准备材料。",
+    "referenceTranslation": "The notice has been issued, and all departments are asked to prepare the required materials.",
+    "difficultyLevel": "easy",
+    "topicCategory": "healthcare",
+    "direction": "zh-en",
+    "wordCount": 17,
+    "focusModule": "static-dynamic",
+    "focusRules": [
+      "passive-active-mismatch",
+      "topic-subject-mismatch",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_036",
+    "sourceText": "道路正在抢修，车辆请绕行。",
+    "referenceTranslation": "The road is being repaired urgently, so vehicles should take an alternative route.",
+    "difficultyLevel": "medium",
+    "topicCategory": "policy",
+    "direction": "zh-en",
+    "wordCount": 11,
+    "focusModule": "static-dynamic",
+    "focusRules": [
+      "passive-active-mismatch",
+      "topic-subject-mismatch"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_037",
+    "sourceText": "这项发现说明，早期筛查非常重要。",
+    "referenceTranslation": "This finding shows that early screening is very important.",
+    "difficultyLevel": "easy",
+    "topicCategory": "technology",
+    "direction": "zh-en",
+    "wordCount": 14,
+    "focusModule": "static-dynamic",
+    "focusRules": [
+      "passive-active-mismatch",
+      "topic-subject-mismatch"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_038",
+    "sourceText": "申请已经批准，资金将在本周拨付。",
+    "referenceTranslation": "The application has been approved, and the funds will be allocated this week.",
+    "difficultyLevel": "medium",
+    "topicCategory": "operations",
+    "direction": "zh-en",
+    "wordCount": 14,
+    "focusModule": "static-dynamic",
+    "focusRules": [
+      "passive-active-mismatch",
+      "topic-subject-mismatch"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_039",
+    "sourceText": "这个变化让我们意识到，用户需求正在变得更细分。",
+    "referenceTranslation": "This change has made us realize that user needs are becoming more segmented.",
+    "difficultyLevel": "easy",
+    "topicCategory": "public-safety",
+    "direction": "zh-en",
+    "wordCount": 21,
+    "focusModule": "static-dynamic",
+    "focusRules": [
+      "passive-active-mismatch",
+      "topic-subject-mismatch",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_040",
+    "sourceText": "问题已经记录，客服会在两个工作日内回复。",
+    "referenceTranslation": "The issue has been recorded, and customer service will respond within two working days.",
+    "difficultyLevel": "medium",
+    "topicCategory": "healthcare",
+    "direction": "zh-en",
+    "wordCount": 18,
+    "focusModule": "static-dynamic",
+    "focusRules": [
+      "passive-active-mismatch",
+      "topic-subject-mismatch"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_031",
+    "sourceText": "The problem was solved after the engineers checked the server logs.",
+    "referenceTranslation": "工程师检查服务器日志后解决了这个问题。",
+    "difficultyLevel": "easy",
+    "topicCategory": "policy",
+    "direction": "en-zh",
+    "wordCount": 11,
+    "focusModule": "static-dynamic",
+    "focusRules": [
+      "passive-active-mismatch",
+      "topic-subject-mismatch",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_032",
+    "sourceText": "The patient was advised to rest for three days before returning to work.",
+    "referenceTranslation": "医生建议患者休息三天后再回去工作。",
+    "difficultyLevel": "medium",
+    "topicCategory": "technology",
+    "direction": "en-zh",
+    "wordCount": 13,
+    "focusModule": "static-dynamic",
+    "focusRules": [
+      "passive-active-mismatch",
+      "topic-subject-mismatch"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_033",
+    "sourceText": "The old warehouse was converted into a community library last year.",
+    "referenceTranslation": "去年，人们把旧仓库改造成了社区图书馆。",
+    "difficultyLevel": "easy",
+    "topicCategory": "operations",
+    "direction": "en-zh",
+    "wordCount": 11,
+    "focusModule": "static-dynamic",
+    "focusRules": [
+      "passive-active-mismatch",
+      "topic-subject-mismatch"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_034",
+    "sourceText": "The safety notice was posted at every entrance before the event began.",
+    "referenceTranslation": "活动开始前，工作人员在每个入口张贴了安全提示。",
+    "difficultyLevel": "medium",
+    "topicCategory": "public-safety",
+    "direction": "en-zh",
+    "wordCount": 12,
+    "focusModule": "static-dynamic",
+    "focusRules": [
+      "passive-active-mismatch",
+      "topic-subject-mismatch"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_035",
+    "sourceText": "The damaged files were recovered by the support team within an hour.",
+    "referenceTranslation": "支持团队在一小时内恢复了损坏的文件。",
+    "difficultyLevel": "easy",
+    "topicCategory": "healthcare",
+    "direction": "en-zh",
+    "wordCount": 12,
+    "focusModule": "static-dynamic",
+    "focusRules": [
+      "passive-active-mismatch",
+      "topic-subject-mismatch",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_036",
+    "sourceText": "The village was connected to the new water supply system in April.",
+    "referenceTranslation": "四月，新供水系统接入了这个村庄。",
+    "difficultyLevel": "medium",
+    "topicCategory": "policy",
+    "direction": "en-zh",
+    "wordCount": 12,
+    "focusModule": "static-dynamic",
+    "focusRules": [
+      "passive-active-mismatch",
+      "topic-subject-mismatch"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_037",
+    "sourceText": "The proposal was rejected because it lacked a clear budget plan.",
+    "referenceTranslation": "由于缺少清晰的预算方案，这项提案没有获批。",
+    "difficultyLevel": "easy",
+    "topicCategory": "technology",
+    "direction": "en-zh",
+    "wordCount": 11,
+    "focusModule": "static-dynamic",
+    "focusRules": [
+      "passive-active-mismatch",
+      "topic-subject-mismatch"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_038",
+    "sourceText": "The museum was designed to guide visitors through local history step by step.",
+    "referenceTranslation": "博物馆的设计引导参观者一步步了解当地历史。",
+    "difficultyLevel": "medium",
+    "topicCategory": "operations",
+    "direction": "en-zh",
+    "wordCount": 13,
+    "focusModule": "static-dynamic",
+    "focusRules": [
+      "passive-active-mismatch",
+      "topic-subject-mismatch"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_039",
+    "sourceText": "The warning message was displayed when users entered an invalid code.",
+    "referenceTranslation": "用户输入无效代码时，页面会显示警告信息。",
+    "difficultyLevel": "easy",
+    "topicCategory": "public-safety",
+    "direction": "en-zh",
+    "wordCount": 11,
+    "focusModule": "static-dynamic",
+    "focusRules": [
+      "passive-active-mismatch",
+      "topic-subject-mismatch",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_040",
+    "sourceText": "The results were reviewed by two independent experts before publication.",
+    "referenceTranslation": "发布前，两名独立专家审核了这些结果。",
+    "difficultyLevel": "medium",
+    "topicCategory": "healthcare",
+    "direction": "en-zh",
+    "wordCount": 10,
+    "focusModule": "static-dynamic",
+    "focusRules": [
+      "passive-active-mismatch",
+      "topic-subject-mismatch"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_041",
+    "sourceText": "我们要推进校园安全管理的工作。",
+    "referenceTranslation": "We should improve campus safety management.",
+    "difficultyLevel": "hard",
+    "topicCategory": "environment",
+    "direction": "zh-en",
+    "wordCount": 14,
+    "focusModule": "logic-redundancy",
+    "focusRules": [
+      "redundancy-category-word",
+      "missing-logical-connector",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_042",
+    "sourceText": "企业需要解决物流成本过高的问题。",
+    "referenceTranslation": "Companies need to reduce excessive logistics costs.",
+    "difficultyLevel": "easy",
+    "topicCategory": "management",
+    "direction": "zh-en",
+    "wordCount": 15,
+    "focusModule": "logic-redundancy",
+    "focusRules": [
+      "redundancy-category-word",
+      "missing-logical-connector"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_043",
+    "sourceText": "请大家提高节约用水的意识。",
+    "referenceTranslation": "Please become more aware of water conservation.",
+    "difficultyLevel": "hard",
+    "topicCategory": "service",
+    "direction": "zh-en",
+    "wordCount": 12,
+    "focusModule": "logic-redundancy",
+    "focusRules": [
+      "redundancy-category-word",
+      "missing-logical-connector"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_044",
+    "sourceText": "这个平台存在信息更新不及时的情况。",
+    "referenceTranslation": "This platform does not update information promptly.",
+    "difficultyLevel": "easy",
+    "topicCategory": "education",
+    "direction": "zh-en",
+    "wordCount": 16,
+    "focusModule": "logic-redundancy",
+    "focusRules": [
+      "redundancy-category-word",
+      "missing-logical-connector"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_045",
+    "sourceText": "部门要加强数据共享方面的合作。",
+    "referenceTranslation": "Departments should strengthen data-sharing cooperation.",
+    "difficultyLevel": "hard",
+    "topicCategory": "policy",
+    "direction": "zh-en",
+    "wordCount": 14,
+    "focusModule": "logic-redundancy",
+    "focusRules": [
+      "redundancy-category-word",
+      "missing-logical-connector",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_046",
+    "sourceText": "如果流程再简化，群众办事会更方便。",
+    "referenceTranslation": "If the process is simplified further, public services will become more convenient.",
+    "difficultyLevel": "easy",
+    "topicCategory": "environment",
+    "direction": "zh-en",
+    "wordCount": 15,
+    "focusModule": "logic-redundancy",
+    "focusRules": [
+      "redundancy-category-word",
+      "missing-logical-connector"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_047",
+    "sourceText": "我们要持续改善空气质量状况。",
+    "referenceTranslation": "We should continue to improve air quality.",
+    "difficultyLevel": "hard",
+    "topicCategory": "management",
+    "direction": "zh-en",
+    "wordCount": 13,
+    "focusModule": "logic-redundancy",
+    "focusRules": [
+      "redundancy-category-word",
+      "missing-logical-connector"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_048",
+    "sourceText": "学校正在研究提高课堂互动水平的办法。",
+    "referenceTranslation": "The school is exploring ways to improve classroom interaction.",
+    "difficultyLevel": "easy",
+    "topicCategory": "service",
+    "direction": "zh-en",
+    "wordCount": 17,
+    "focusModule": "logic-redundancy",
+    "focusRules": [
+      "redundancy-category-word",
+      "missing-logical-connector"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_049",
+    "sourceText": "项目组需要避免重复建设的问题。",
+    "referenceTranslation": "The project team needs to avoid duplicate construction.",
+    "difficultyLevel": "hard",
+    "topicCategory": "education",
+    "direction": "zh-en",
+    "wordCount": 14,
+    "focusModule": "logic-redundancy",
+    "focusRules": [
+      "redundancy-category-word",
+      "missing-logical-connector",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_050",
+    "sourceText": "有疑问及时反馈，我们可以当天处理。",
+    "referenceTranslation": "If you have questions, report them promptly so that we can handle them the same day.",
+    "difficultyLevel": "easy",
+    "topicCategory": "policy",
+    "direction": "zh-en",
+    "wordCount": 15,
+    "focusModule": "logic-redundancy",
+    "focusRules": [
+      "redundancy-category-word",
+      "missing-logical-connector"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_041",
+    "sourceText": "The program aims to improve waste sorting and reduce unnecessary packaging.",
+    "referenceTranslation": "这个项目旨在改进垃圾分类，并减少不必要的包装。",
+    "difficultyLevel": "hard",
+    "topicCategory": "environment",
+    "direction": "en-zh",
+    "wordCount": 11,
+    "focusModule": "logic-redundancy",
+    "focusRules": [
+      "redundancy-category-word",
+      "missing-logical-connector",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_042",
+    "sourceText": "If residents report problems early, maintenance workers can respond before the damage spreads.",
+    "referenceTranslation": "如果居民尽早报告问题，维修人员就能在损害扩大前处理。",
+    "difficultyLevel": "easy",
+    "topicCategory": "management",
+    "direction": "en-zh",
+    "wordCount": 13,
+    "focusModule": "logic-redundancy",
+    "focusRules": [
+      "redundancy-category-word",
+      "missing-logical-connector"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_043",
+    "sourceText": "The new form removes repeated questions and shortens the application process.",
+    "referenceTranslation": "新表格删除了重复问题，缩短了申请流程。",
+    "difficultyLevel": "hard",
+    "topicCategory": "service",
+    "direction": "en-zh",
+    "wordCount": 11,
+    "focusModule": "logic-redundancy",
+    "focusRules": [
+      "redundancy-category-word",
+      "missing-logical-connector"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_044",
+    "sourceText": "Because the notice was unclear, many visitors waited in the wrong line.",
+    "referenceTranslation": "由于通知不够清楚，许多访客排错了队。",
+    "difficultyLevel": "easy",
+    "topicCategory": "education",
+    "direction": "en-zh",
+    "wordCount": 12,
+    "focusModule": "logic-redundancy",
+    "focusRules": [
+      "redundancy-category-word",
+      "missing-logical-connector"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_045",
+    "sourceText": "The team reduced meeting time by combining three weekly updates into one report.",
+    "referenceTranslation": "团队把每周三次更新合并成一份报告，从而减少了会议时间。",
+    "difficultyLevel": "hard",
+    "topicCategory": "policy",
+    "direction": "en-zh",
+    "wordCount": 13,
+    "focusModule": "logic-redundancy",
+    "focusRules": [
+      "redundancy-category-word",
+      "missing-logical-connector",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_046",
+    "sourceText": "Unless the old data are cleaned first, the dashboard will continue to show misleading trends.",
+    "referenceTranslation": "如果不先清理旧数据，仪表盘会继续显示误导性的趋势。",
+    "difficultyLevel": "easy",
+    "topicCategory": "environment",
+    "direction": "en-zh",
+    "wordCount": 15,
+    "focusModule": "logic-redundancy",
+    "focusRules": [
+      "redundancy-category-word",
+      "missing-logical-connector"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_047",
+    "sourceText": "The service center simplified the refund steps and removed two unnecessary approvals.",
+    "referenceTranslation": "服务中心简化了退款步骤，并取消了两个不必要的审批环节。",
+    "difficultyLevel": "hard",
+    "topicCategory": "management",
+    "direction": "en-zh",
+    "wordCount": 12,
+    "focusModule": "logic-redundancy",
+    "focusRules": [
+      "redundancy-category-word",
+      "missing-logical-connector"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_048",
+    "sourceText": "Although the campaign attracted attention, its message was repeated too often.",
+    "referenceTranslation": "虽然这次活动吸引了关注，但它的信息重复得太多。",
+    "difficultyLevel": "easy",
+    "topicCategory": "service",
+    "direction": "en-zh",
+    "wordCount": 11,
+    "focusModule": "logic-redundancy",
+    "focusRules": [
+      "redundancy-category-word",
+      "missing-logical-connector"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_049",
+    "sourceText": "The school combined similar courses so students could spend more time practising.",
+    "referenceTranslation": "学校合并了相似课程，让学生有更多时间练习。",
+    "difficultyLevel": "hard",
+    "topicCategory": "education",
+    "direction": "en-zh",
+    "wordCount": 12,
+    "focusModule": "logic-redundancy",
+    "focusRules": [
+      "redundancy-category-word",
+      "missing-logical-connector",
+      "chinese-order-literalism"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_050",
+    "sourceText": "The office reduced paperwork because most certificates can now be verified online.",
+    "referenceTranslation": "由于大多数证明现在可以在线核验，办公室减少了纸质材料。",
+    "difficultyLevel": "easy",
+    "topicCategory": "policy",
+    "direction": "en-zh",
+    "wordCount": 12,
+    "focusModule": "logic-redundancy",
+    "focusRules": [
+      "redundancy-category-word",
+      "missing-logical-connector"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_051",
+    "sourceText": "这个建议有点画蛇添足，反而让方案更复杂。",
+    "referenceTranslation": "This suggestion is unnecessary and makes the plan more complicated.",
+    "difficultyLevel": "medium",
+    "topicCategory": "culture",
+    "direction": "zh-en",
+    "wordCount": 18,
+    "focusModule": "culture-loaded",
+    "focusRules": [
+      "cultural-imagery-literalism"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_052",
+    "sourceText": "他说话总是拐弯抹角，客户听得很费劲。",
+    "referenceTranslation": "He always speaks indirectly, which makes it hard for clients to follow him.",
+    "difficultyLevel": "hard",
+    "topicCategory": "business",
+    "direction": "zh-en",
+    "wordCount": 16,
+    "focusModule": "culture-loaded",
+    "focusRules": [
+      "cultural-imagery-literalism"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_053",
+    "sourceText": "团队不能临阵磨枪，发布前才补测试。",
+    "referenceTranslation": "The team should not rush preparations at the last minute and add tests only before launch.",
+    "difficultyLevel": "medium",
+    "topicCategory": "speech",
+    "direction": "zh-en",
+    "wordCount": 15,
+    "focusModule": "culture-loaded",
+    "focusRules": [
+      "cultural-imagery-literalism"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_054",
+    "sourceText": "这个品牌想借东风，赶上绿色消费的趋势。",
+    "referenceTranslation": "The brand wants to ride the momentum of green consumption.",
+    "difficultyLevel": "hard",
+    "topicCategory": "education",
+    "direction": "zh-en",
+    "wordCount": 17,
+    "focusModule": "culture-loaded",
+    "focusRules": [
+      "cultural-imagery-literalism"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_055",
+    "sourceText": "别把这个问题踢皮球，各部门要一起解决。",
+    "referenceTranslation": "Do not pass the problem around; all departments should solve it together.",
+    "difficultyLevel": "medium",
+    "topicCategory": "media",
+    "direction": "zh-en",
+    "wordCount": 17,
+    "focusModule": "culture-loaded",
+    "focusRules": [
+      "cultural-imagery-literalism"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_056",
+    "sourceText": "她在汇报中一针见血地指出了风险。",
+    "referenceTranslation": "In her report, she pointed out the risk directly and precisely.",
+    "difficultyLevel": "hard",
+    "topicCategory": "culture",
+    "direction": "zh-en",
+    "wordCount": 15,
+    "focusModule": "culture-loaded",
+    "focusRules": [
+      "cultural-imagery-literalism"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_057",
+    "sourceText": "项目刚起步，大家还在摸着石头过河。",
+    "referenceTranslation": "The project is still at an early stage, and everyone is learning through trial and error.",
+    "difficultyLevel": "medium",
+    "topicCategory": "business",
+    "direction": "zh-en",
+    "wordCount": 15,
+    "focusModule": "culture-loaded",
+    "focusRules": [
+      "cultural-imagery-literalism"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_058",
+    "sourceText": "这次合作不能只看眼前利益，要放长线。",
+    "referenceTranslation": "This cooperation should look beyond immediate gains and take a long-term view.",
+    "difficultyLevel": "hard",
+    "topicCategory": "speech",
+    "direction": "zh-en",
+    "wordCount": 16,
+    "focusModule": "culture-loaded",
+    "focusRules": [
+      "cultural-imagery-literalism"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_059",
+    "sourceText": "他把复杂概念讲得深入浅出，学生很容易理解。",
+    "referenceTranslation": "He explained the complex idea clearly and accessibly, so students could understand it easily.",
+    "difficultyLevel": "medium",
+    "topicCategory": "education",
+    "direction": "zh-en",
+    "wordCount": 19,
+    "focusModule": "culture-loaded",
+    "focusRules": [
+      "cultural-imagery-literalism"
+    ]
+  },
+  {
+    "id": "v4_zh_en_exp_060",
+    "sourceText": "这个案例提醒我们，不能头痛医头、脚痛医脚。",
+    "referenceTranslation": "This case reminds us not to treat symptoms in isolation without addressing the root cause.",
+    "difficultyLevel": "hard",
+    "topicCategory": "media",
+    "direction": "zh-en",
+    "wordCount": 18,
+    "focusModule": "culture-loaded",
+    "focusRules": [
+      "cultural-imagery-literalism"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_051",
+    "sourceText": "The manager said the team should not put all its eggs in one basket.",
+    "referenceTranslation": "经理说，团队不应把所有希望都押在一个方案上。",
+    "difficultyLevel": "medium",
+    "topicCategory": "culture",
+    "direction": "en-zh",
+    "wordCount": 14,
+    "focusModule": "culture-loaded",
+    "focusRules": [
+      "cultural-imagery-literalism"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_052",
+    "sourceText": "The speaker cut to the chase and explained the main risk in the first minute.",
+    "referenceTranslation": "发言人开门见山，在第一分钟就说明了主要风险。",
+    "difficultyLevel": "hard",
+    "topicCategory": "business",
+    "direction": "en-zh",
+    "wordCount": 15,
+    "focusModule": "culture-loaded",
+    "focusRules": [
+      "cultural-imagery-literalism"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_053",
+    "sourceText": "The company tried to ride the wave of online learning during the holiday season.",
+    "referenceTranslation": "公司试图借助假期线上学习的热潮。",
+    "difficultyLevel": "medium",
+    "topicCategory": "speech",
+    "direction": "en-zh",
+    "wordCount": 14,
+    "focusModule": "culture-loaded",
+    "focusRules": [
+      "cultural-imagery-literalism"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_054",
+    "sourceText": "The teacher used a down-to-earth example to explain a difficult grammar point.",
+    "referenceTranslation": "老师用一个接地气的例子解释了一个难语法点。",
+    "difficultyLevel": "hard",
+    "topicCategory": "education",
+    "direction": "en-zh",
+    "wordCount": 12,
+    "focusModule": "culture-loaded",
+    "focusRules": [
+      "cultural-imagery-literalism"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_055",
+    "sourceText": "The proposal looks impressive, but it may be more style than substance.",
+    "referenceTranslation": "这项提案看起来很亮眼，但可能形式大于内容。",
+    "difficultyLevel": "medium",
+    "topicCategory": "media",
+    "direction": "en-zh",
+    "wordCount": 12,
+    "focusModule": "culture-loaded",
+    "focusRules": [
+      "cultural-imagery-literalism"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_056",
+    "sourceText": "The campaign turned a small local story into a powerful public message.",
+    "referenceTranslation": "这次活动把一个地方小故事转化成了有力量的公共信息。",
+    "difficultyLevel": "hard",
+    "topicCategory": "culture",
+    "direction": "en-zh",
+    "wordCount": 12,
+    "focusModule": "culture-loaded",
+    "focusRules": [
+      "cultural-imagery-literalism"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_057",
+    "sourceText": "The team learned the hard way that shortcuts can create bigger problems later.",
+    "referenceTranslation": "团队吃一堑长一智，明白走捷径以后可能造成更大问题。",
+    "difficultyLevel": "medium",
+    "topicCategory": "business",
+    "direction": "en-zh",
+    "wordCount": 13,
+    "focusModule": "culture-loaded",
+    "focusRules": [
+      "cultural-imagery-literalism"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_058",
+    "sourceText": "The host broke the ice by asking guests to share a childhood memory.",
+    "referenceTranslation": "主持人请嘉宾分享童年记忆，以此打破僵局。",
+    "difficultyLevel": "hard",
+    "topicCategory": "speech",
+    "direction": "en-zh",
+    "wordCount": 13,
+    "focusModule": "culture-loaded",
+    "focusRules": [
+      "cultural-imagery-literalism"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_059",
+    "sourceText": "The article warns readers not to judge a policy by its slogan alone.",
+    "referenceTranslation": "文章提醒读者，不要只凭口号评价一项政策。",
+    "difficultyLevel": "medium",
+    "topicCategory": "education",
+    "direction": "en-zh",
+    "wordCount": 13,
+    "focusModule": "culture-loaded",
+    "focusRules": [
+      "cultural-imagery-literalism"
+    ]
+  },
+  {
+    "id": "v4_en_zh_exp_060",
+    "sourceText": "The volunteer said small acts of kindness can snowball into real community change.",
+    "referenceTranslation": "志愿者说，小小善举可以逐渐汇聚成真正的社区改变。",
+    "difficultyLevel": "hard",
+    "topicCategory": "media",
+    "direction": "en-zh",
+    "wordCount": 13,
+    "focusModule": "culture-loaded",
+    "focusRules": [
+      "cultural-imagery-literalism"
+    ]
+  }
+]
