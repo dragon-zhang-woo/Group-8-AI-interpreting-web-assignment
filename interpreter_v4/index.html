@@ -165,15 +165,31 @@
                 <div class="voice-strip">
                   <button class="btn secondary" id="recordBtn" type="button">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a4 4 0 0 0 4-4V6a4 4 0 0 0-8 0v4a4 4 0 0 0 4 4Zm7-4a7 7 0 0 1-14 0m7 7v4m-4 0h8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                    开始录音
+    开始录音
                   </button>
                   <button class="btn danger hidden" id="stopRecordBtn" type="button">停止</button>
                   <button class="btn secondary" id="speakReferenceBtn" type="button">朗读参考</button>
-                  <span class="status-line" id="recordStatus"></span>
-                </div>
-                <div class="interim-line hidden" id="interimLine"></div>
-              </form>
-            </div>
+                  
+                  <!-- ===== 新增音频导入功能 ===== -->
+                  <input type="file" id="audioUploadInput" accept=".mp3,.wav,.m4a" hidden>
+                  <button class="btn secondary" id="btnImportAudio" type="button">
+                    📂 导入音频
+                  </button>
+                  
+                  <!-- 离线收音转写按钮 -->
+                  <button class="btn secondary" onclick="startOfflineAudioRecognition()" type="button">
+                    🎙️ 离线转写
+                  </button>
+                  <!-- 一键清空音频+原文按钮 -->
+                  <button class="btn secondary" onclick="clearAudioAndText()" type="button">
+                    🗑️ 清空
+                  </button>
+
+  <span class="status-line" id="recordStatus"></span>
+</div>
+
+<!-- 音频播放控件，默认隐藏 -->
+<audio id="audioPreviewPlayer" controls style="width: 100%; margin-top: 12px; display: none;">
 
             <div class="workspace-view" id="mapView">
               <div class="rule-map" id="ruleMap" aria-label="转换规则地图"></div>
@@ -395,5 +411,6 @@
   </div>
 
   <script type="module" src="js/main.js?v=20260612-draw-fix2"></script>
+  <script src="./js/audio-importer.js" type="module"></script>
 </body>
 </html>
