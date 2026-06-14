@@ -3,7 +3,7 @@ export class RecordManager {
     this.db = db;
   }
 
-  async savePractice({ material, sourceText, transcript, userTranslation, referenceTranslation, report, audioBlobId }) {
+  async savePractice({ material, sourceText, transcript, userTranslation, referenceTranslation, report, audioBlobId, modeSource = "workspace", selectedTrainingRules = [], selectedTrainingRuleNames = [] }) {
     return this.db.saveRecord({
       materialId: material?.id || "",
       sourceText,
@@ -13,7 +13,10 @@ export class RecordManager {
       scores: report.scores,
       triggeredRules: report.diagnosis.triggeredRuleIds,
       triggeredRuleNames: report.diagnosis.triggeredRuleNames,
+      selectedTrainingRules,
+      selectedTrainingRuleNames,
       feedbackSource: report.feedbackSource,
+      modeSource,
       focusModule: material?.focusModule || "direct",
       difficultyLevel: material?.difficultyLevel || "custom",
       direction: report.direction,
@@ -53,6 +56,8 @@ export class RecordManager {
       "流畅",
       "准确",
       "触发规则",
+      "训练选择规则",
+      "训练入口",
       "反馈来源"
     ];
     const rows = records.map((record) => [
@@ -68,6 +73,8 @@ export class RecordManager {
       record.scores?.fluency ?? "",
       record.scores?.accuracy ?? "",
       (record.triggeredRuleNames || []).join(" / "),
+      (record.selectedTrainingRuleNames || record.selectedTrainingRules || []).join(" / "),
+      record.modeSource || "workspace",
       record.feedbackSource
     ]);
 

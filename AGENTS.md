@@ -1,58 +1,78 @@
 # AGENTS.md
 
-This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
+This file provides guidance to Codex when working in this repository.
 
-## Project overview
+## Project Overview
 
-AI 口译训练平台 — a browser-based Chinese-English interpreting training tool. The project was originally designed as a Python/Gradio multi-module system (see README.md for the original architecture plan), but has since been rewritten as a **pure frontend single-file application** with no backend, no build step, and no dependencies.
+AI 口译训练平台 is currently centered on `interpreter_v4`, a browser-based Chinese-English language transcoding training site. Earlier Python / Gradio plans and the old `interpreter_v2.html` single-file prototype are historical references only.
 
-## How to run
+The current app is still pure frontend: no backend, no build step, no package manager requirement. It uses ES modules and loads JSON data with `fetch()`, so it should be served over local HTTP instead of opened directly from the filesystem.
 
-Open `interpreter_v2.html` directly in Chrome or Edge (required for Web Speech API support):
+## How To Run
 
 ```bash
-start "" "interpreter_v2.html"
+cd interpreter_v4
+python -m http.server 8084
 ```
 
-There is no dev server, no build tool, and no package manager. The file is self-contained.
+Then open Chrome or Edge at:
 
-## Architecture
+```text
+http://localhost:8084
+```
 
-`interpreter_v2.html` (~102KB, ~1350 lines) contains everything: HTML structure, CSS styles, and all JavaScript logic in a single file. It uses only browser-native APIs — no frameworks, no libraries.
+Chrome / Edge are recommended because recording, speech recognition, and speech synthesis depend on browser Web Speech APIs.
 
-**Three-tab SPA structure:**
+## Current V4 Architecture
 
-1. **AI 翻译机 (Translation Demo)** — Text or voice input → MyMemory API translation (free tier, falls back to LibreTranslate) → TTS playback via SpeechSynthesis API. Supports bidirectional Chinese ↔ English.
-2. **实战演练 (Practice Mode)** — Pulls a random item from an embedded 174-item material library (3 difficulty levels × 29 items each, stored as JS objects `MATERIALS` and `MATERIALS_REVERSE` in the script). User records their translation → Web Speech API STT → local scoring engine compares against reference via Jaccard + bigram character similarity → 3-dimension score (pronunciation, fluency, accuracy, each 0–3) → saves to localStorage.
-3. **学习记录 (Learning Records)** — Reads practice history from localStorage, displays stats panel, sortable table, detail modal, CSV export.
+`interpreter_v4/` is the active implementation.
 
-**External API calls (no auth required):**
-- MyMemory translation API: `https://api.mymemory.translated.net/get`
-- LibreTranslate fallback: `https://libretranslate.com/translate`
+- `index.html`: SPA shell with training desk, workspace, expert conversation, records, and settings.
+- `styles/main.css`: responsive UI, custom select menus, rule tree, cards, records, and modal styling.
+- `data/transcoding-rules.json`: six knowledge modules and seven local diagnostic rule types.
+- `data/materials.json`: 132原创 bilingual practice materials with direction, difficulty, module, and focus rules.
+- `js/main.js`: application orchestration and UI state.
+- `js/components/TranscodingFeedbackEngine.js`: local rule-based diagnostic engine.
+- `js/components/MaterialLibrary.js`: material loading and multi-rule random selection.
+- `js/components/RecordManager.js`: IndexedDB record persistence and CSV export.
+- `js/services/`: optional translation, AI feedback enhancement, and speech services.
+- `tests/feedback-engine.test.mjs`: local rule, AI fallback, expert intent, material coverage, and multi-rule selection tests.
 
-**Browser APIs used:** Web Speech API (SpeechRecognition + SpeechSynthesis), MediaRecorder API, localStorage.
+## Product Behavior Notes
 
-## Repository structure
+- Core goal: Chinese-English language transcoding, not generic machine translation.
+- Main surfaces: training desk, practice workspace, expert conversation, and learning records.
+- The workspace rule tree supports multi-selection:
+  - one selected rule = targeted practice;
+  - multiple selected rules = comprehensive practice.
+- Expert conversation supports direct source-text feedback and guided practice requests such as `我想练中→英，文化负载词，综合难度`.
+- Learning records store both the selected training rules and the actually triggered diagnostic rules.
 
-| Path | Purpose |
-|------|---------|
-| `interpreter_v2.html` | **Main application** (current, actively developed) |
-| `integrated_ui.html` | V1 prototype (superseded) |
-| `src/Front-end/` | Copies of the HTML files and documentation guides |
-| `.env` | API keys for DashScope and Google Translate (unused by current frontend; gitignored) |
-| `README.md` | Original Python/Gradio architecture plan (outdated — describes a 6-person, 5-week workflow that no longer applies) |
-| `instructions.txt` | Legacy venv/pip setup notes (obsolete) |
-| `uploads/` | Empty directory |
-| `venv/` | Residual Python virtual environment |
-| `.kiro/specs/` | Formal 18-requirement specification for the platform |
+## Data And Browser APIs
 
-## Key technical notes
+- Settings and session drafts are stored in `localStorage` with the `int4_` prefix.
+- Learning records and audio blobs are stored in IndexedDB.
+- Recording uses MediaRecorder.
+- Speech recognition and speech synthesis use browser Web Speech APIs.
+- Optional machine translation uses DeepL when configured, otherwise MyMemory / LibreTranslate fallback.
+- Optional AI feedback enhancement accepts OpenAI-compatible `/v1/chat/completions` endpoints. Local rule feedback must remain usable without an API key.
 
-- The **material library** (`MATERIALS` and `MATERIALS_REVERSE` objects) contains 174 bilingual entries hardcoded in the `<script>` tag. `MATERIALS` is English→Chinese, `MATERIALS_REVERSE` is Chinese→English. Each has `easy`, `medium`, `hard` arrays.
-- The **scoring engine** is purely client-side: Jaccard similarity on character trigrams + bigram sequence comparison. No LLM is involved in scoring (the original README planned LLM-based scoring, but the implementation uses local text similarity).
-- Speech recognition uses the browser's built-in `webkitSpeechRecognition` — this only works in Chrome/Edge and requires `lang` to be set dynamically based on the translation direction.
-- The `.env` file with DashScope/Google Translate keys is **not used** by the current frontend-only implementation.
+## Test Commands
 
-## Git workflow
+```bash
+cd interpreter_v4
+node tests/feedback-engine.test.mjs
+node --check js/main.js
+node --check js/components/TranscodingFeedbackEngine.js
+node --check js/components/ExpertConversation.js
+node --check js/components/MaterialLibrary.js
+node --check js/components/RecordManager.js
+```
 
-Current branch is `worktree`. Main branch is `main`. The remote has additional branches: `src`, `version-bychl`.
+The test suite intentionally triggers one invalid AI endpoint to verify local fallback; the resulting console warning is expected when the command exits successfully.
+
+## Historical Files
+
+- `interpreter_v2.html`, `integrated_ui.html`, and `src/Front-end/` are earlier prototypes or copies.
+- `venv/`, `uploads/`, and legacy setup notes are not required for running V4.
+- Treat old README or setup instructions that mention Python / Gradio runtime modules as historical unless the user explicitly asks to inspect legacy versions.

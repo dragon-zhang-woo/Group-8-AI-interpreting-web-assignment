@@ -57,16 +57,34 @@ const CULTURE_PATTERNS = [
   }
 ];
 
+const NOMINALIZATION_PATTERNS = [
+  {
+    source: /反对|支持|决定|讨论|调查|改进|保护|分析|申请|批准/,
+    target: /\b(oppose|support|decide|discuss|investigate|improve|protect|analyze|apply|approve)\b/i,
+    suggestion: "可考虑用 opposition to, support for, decision on, discussion of 等名词或介词结构。"
+  }
+];
+
+const PERSONAL_SUBJECT_PATTERNS = [
+  {
+    source: /我突然想到|我认为有必要|我们发现|我记得|我担心/,
+    target: /^(i|we)\b/i,
+    suggestion: "可考虑用 It occurred to me that..., Evidence shows..., This raises concerns that... 等物称或形式主语。"
+  }
+];
+
 function normalize(text = "") {
   return String(text).replace(/\s+/g, " ").trim();
 }
 
-function containsChinese(text) {
+export function containsChinese(text) {
   return /[\u4e00-\u9fff]/.test(text);
 }
 
-function detectDirection(sourceText) {
-  return containsChinese(sourceText) ? "zh-en" : "en-zh";
+export function detectDirection(sourceText) {
+  if (containsChinese(sourceText)) return "zh-en";
+  if (/[A-Za-z]/.test(sourceText)) return "en-zh";
+  return "zh-en";
 }
 
 function tokenizeWords(text) {
@@ -84,8 +102,9 @@ function clampScore(value) {
 function uniqueFindings(findings) {
   const seen = new Set();
   return findings.filter((finding) => {
-    if (!finding || seen.has(finding.id)) return false;
-    seen.add(finding.id);
+    const key = finding?.dedupeKey || finding?.id;
+    if (!finding || seen.has(key)) return false;
+    seen.add(key);
     return true;
   });
 }
@@ -96,19 +115,27 @@ export class TranscodingFeedbackEngine {
     const user = normalize(userTranslation);
     const reference = normalize(referenceTranslation);
     const activeDirection = direction || detectDirection(source);
+    const hasUserTranslation = user.length > 0;
 
-    const findings = uniqueFindings([
-      this.detectVerbPiling(source, user, activeDirection),
-      this.detectChineseOrderLiteralism(source, user, activeDirection),
-      this.detectMissingLogicalConnector(source, user, activeDirection),
-      this.detectTopicSubjectMismatch(source, user, activeDirection),
-      this.detectRedundancyCategoryWord(source, user, activeDirection),
-      this.detectCulturalImageryLiteralism(source, user, activeDirection),
-      this.detectPassiveActiveMismatch(source, user, activeDirection)
-    ]);
+    const findings = uniqueFindings(
+      hasUserTranslation
+        ? [
+            this.detectVerbPiling(source, user, activeDirection),
+            this.detectChineseOrderLiteralism(source, user, activeDirection),
+            this.detectMissingLogicalConnector(source, user, activeDirection),
+            this.detectTopicSubjectMismatch(source, user, activeDirection),
+            this.detectNominalizationOpportunity(source, user, activeDirection),
+            this.detectImpersonalSubjectOpportunity(source, user, activeDirection),
+            this.detectRedundancyCategoryWord(source, user, activeDirection),
+            this.detectCulturalImageryLiteralism(source, user, activeDirection),
+            this.detectPassiveActiveMismatch(source, user, activeDirection)
+          ]
+        : this.detectSourceChallenges(source, activeDirection)
+    );
 
     const scores = this.score({ sourceText: source, userTranslation: user, referenceTranslation: reference, findings });
     const triggeredRuleIds = findings.map((finding) => finding.id);
+    const triggeredRuleNames = findings.map((finding) => finding.diagnosticLabel || finding.ruleName);
 
     return {
       mode,
@@ -116,15 +143,21 @@ export class TranscodingFeedbackEngine {
       diagnosis: {
         count: findings.length,
         triggeredRuleIds,
-        triggeredRuleNames: findings.map((finding) => finding.ruleName),
+        triggeredRuleNames,
         summary:
-          findings.length > 0
+          !hasUserTranslation && findings.length > 0
+            ? `默认模式识别出 ${findings.length} 个转换关注点：${triggeredRuleNames.join("、")}。`
+            : !hasUserTranslation
+              ? "已生成参考译文；未发现明显高风险转换点，可以继续提交自己的译文做精确诊断。"
+              : findings.length > 0
             ? `这句译文触犯了 ${findings.length} 条转换规则：${findings.map((finding) => finding.ruleName).join("、")}。`
             : "未发现明显转换规则问题，可以继续检查表达自然度和信息完整性。"
       },
       breakdown: findings.map((finding) => ({
         ruleId: finding.id,
         ruleName: finding.ruleName,
+        displayRuleName: finding.diagnosticLabel || finding.ruleName,
+        diagnosticLabel: finding.diagnosticLabel || "",
         chineseThinking: finding.chineseThinking,
         requirement: finding.requirement,
         application: finding.application
@@ -136,6 +169,91 @@ export class TranscodingFeedbackEngine {
       aiNotice: "",
       createdAt: Date.now()
     };
+  }
+
+  detectSourceChallenges(source, direction) {
+    if (!source) return [];
+
+    if (direction === "zh-en") {
+      return [
+        this.sourceHint(
+          /这家公司|，.+，|、|并且|然后|现在/.test(source),
+          "verb-piling",
+          "原文有连续动作或多个分句，容易被译成英文逗号流水句。",
+          "英语需要先立主句，再把背景动作收进从句、分词结构或连接词。",
+          "本句训练重点是先判断哪个动作是主干，再处理次要动作。"
+        ),
+        this.sourceHint(
+          /你不来，我不走|有.+大家|如果|要是|若|只要|因为|所以|虽然|但是|否则|以便|为了/.test(source),
+          "missing-logical-connector",
+          "原文依靠语义暗示条件、因果、目的或转折关系。",
+          "英语需要用 if, because, so that, unless, although 等词显化逻辑。",
+          "本句训练重点是先给两个分句命名逻辑关系，再选择连接词。"
+        ),
+        this.sourceHint(
+          /^(那所房子|这所房子|这个问题|这个项目|这件事|这家公司)/.test(source),
+          "topic-subject-mismatch",
+          "原文先抛出话题，再对话题发表评论。",
+          "英语需要明确主语和谓语，话题不一定能直接当主语。",
+          "本句训练重点是把真正的施动者或判断对象放进英语主干。"
+        ),
+        this.sourceHint(
+          NOMINALIZATION_PATTERNS.some((pattern) => pattern.source.test(source)),
+          "chinese-order-literalism",
+          "原文含有汉语动词化表达，直译时容易把动作一路铺开。",
+          "英语常用名词、介词或抽象结构承接动作概念，让句子更静态、更紧凑。",
+          "本句训练重点是判断哪些动作可以转为名词或介词结构。",
+          { diagnosticLabel: "动词转名词/介词", dedupeKey: "source-nominalization" }
+        ),
+        this.sourceHint(
+          PERSONAL_SUBJECT_PATTERNS.some((pattern) => pattern.source.test(source)),
+          "topic-subject-mismatch",
+          "原文以人称主语展开，符合中文表达习惯。",
+          "英语在正式表达中常用事物、抽象名词或形式主语承载判断。",
+          "本句训练重点是判断是否可把 I / we 改成 it, evidence, the situation 等主语。",
+          { diagnosticLabel: "人称主语转物称/形式主语", dedupeKey: "source-impersonal-subject" }
+        ),
+        this.sourceHint(
+          /工作|问题|情况|状态|趋势|方面|任务/.test(source),
+          "redundancy-category-word",
+          "原文含有汉语常见范畴词或壳词。",
+          "英语通常删除空泛名词，直接表达核心概念。",
+          "本句训练重点是先删掉 work/problem/situation 这类直译冲动。"
+        ),
+        this.sourceHint(
+          CULTURE_PATTERNS.some((pattern) => pattern.source.test(source)),
+          "cultural-imagery-literalism",
+          "原文含有文化负载词，字面意象可能不能直接迁移。",
+          "目标语表达要优先传达交际功能，再决定是否保留文化意象。",
+          "本句训练重点是先问它在语境里起什么作用，而不是先逐字翻译。"
+        ),
+        this.sourceHint(
+          /问题已经解决了|已经完成了|已经确定了|已经批准了|已经公布了|得到解决/.test(source),
+          "passive-active-mismatch",
+          "原文没有明确施动者，汉语可以自然省略。",
+          "英语常把对象放到主语位置，用被动结构承接。",
+          "本句训练重点是判断是否应译成 has been done 这类被动。"
+        )
+      ].filter(Boolean);
+    }
+
+    return [
+      this.sourceHint(
+        /\b(was|were|is|are|been|being)\s+\w+(ed|en)\b/.test(source.toLowerCase()),
+        "passive-active-mismatch",
+        "原文含有英语被动结构，直译成中文容易生硬。",
+        "汉语更常转主动或拆分短句，必要时补出泛指施动者。",
+        "本句训练重点是先找事件本身，再决定谁来做中文主语。"
+      ),
+      this.sourceHint(
+        /\b(who|which|that|put forward by|destroyed in|constructed without|designed to)\b/i.test(source),
+        "chinese-order-literalism",
+        "原文含有英语长修饰链，中文直译容易出现层层“的”。",
+        "汉语更适合拆成短句，把修饰信息分步交代。",
+        "本句训练重点是避免“的的不休”，先拆再顺。",
+        { diagnosticLabel: "的的不休" }
+      )
+    ].filter(Boolean);
   }
 
   detectVerbPiling(source, user, direction) {
@@ -180,12 +298,17 @@ export class TranscodingFeedbackEngine {
     if (direction === "en-zh") {
       const deCount = (user.match(/的/g) || []).length;
       const passiveLiteral = /是被|被建造在|被构建在|被设计来/.test(user);
-      if (deCount >= 4 || passiveLiteral) {
+      const longAttributiveChain = /(?:的[^。！？,.，；;]*){3,}/.test(user);
+      const sentenceLikeFragments = user.split(/[。！？!?]/).map((part) => part.trim()).filter(Boolean).length;
+      const sourceHasLongModifier = /\b(who|which|that|put forward by|destroyed in|constructed without|designed to|joined|attracted)\b/i.test(source);
+      const likelyFragmentTranslation = sentenceLikeFragments <= 1 && user.length >= 24 && (deCount >= 3 || longAttributiveChain);
+      if (deCount >= 4 || passiveLiteral || (sourceHasLongModifier && likelyFragmentTranslation)) {
         return this.finding(
           "chinese-order-literalism",
           "学生译文保留英文长定语和被动骨架，中文读起来层层套叠。",
           "汉语更适合短句分述，先说事件，再补背景和条件。",
-          "本句应拆成两到三个短句，减少连续“的”字结构。"
+          "本句应拆成两到三个短句，减少连续“的”字结构。",
+          deCount >= 3 || longAttributiveChain ? { diagnosticLabel: "的的不休" } : {}
         );
       }
     }
@@ -247,6 +370,34 @@ export class TranscodingFeedbackEngine {
       );
     }
     return null;
+  }
+
+  detectNominalizationOpportunity(source, user, direction) {
+    if (direction !== "zh-en" || !user) return null;
+    const match = NOMINALIZATION_PATTERNS.find((pattern) => pattern.source.test(source) && pattern.target.test(user));
+    if (!match) return null;
+
+    return this.finding(
+      "chinese-order-literalism",
+      "学生译文把中文动词表达直接搬进英语，动作感偏重。",
+      "英语常用名词化或介词结构压缩动作，让信息层级更清楚。",
+      `本句可检查是否需要静态化处理：${match.suggestion}`,
+      { diagnosticLabel: "动词转名词/介词", dedupeKey: "nominalization-opportunity" }
+    );
+  }
+
+  detectImpersonalSubjectOpportunity(source, user, direction) {
+    if (direction !== "zh-en" || !user) return null;
+    const match = PERSONAL_SUBJECT_PATTERNS.find((pattern) => pattern.source.test(source) && pattern.target.test(user));
+    if (!match) return null;
+
+    return this.finding(
+      "topic-subject-mismatch",
+      "学生译文保留了中文的人称主语开头。",
+      "英语正式表达常用物称主语、抽象名词或形式主语，让判断更客观自然。",
+      `本句可检查是否需要改写主语：${match.suggestion}`,
+      { diagnosticLabel: "人称主语转物称/形式主语", dedupeKey: "impersonal-subject-opportunity" }
+    );
   }
 
   detectCulturalImageryLiteralism(source, user, direction) {
@@ -343,11 +494,17 @@ export class TranscodingFeedbackEngine {
     return result;
   }
 
-  finding(id, chineseThinking, requirement, application) {
+  sourceHint(active, id, chineseThinking, requirement, application, options = {}) {
+    return active ? this.finding(id, chineseThinking, requirement, application, options) : null;
+  }
+
+  finding(id, chineseThinking, requirement, application, options = {}) {
     const definition = ERROR_DEFINITIONS[id];
     return {
       id,
+      dedupeKey: options.dedupeKey || id,
       ruleName: definition.name,
+      diagnosticLabel: options.diagnosticLabel || "",
       chineseThinking,
       requirement,
       application,
